@@ -265,3 +265,83 @@ related concerns*
 **Powered by Skyscope Sentinel Intelligence**
 
 **Founded and developed by Miss Casey Jay Topojani.*
+
+
+## Skyscope Sentinel Windows GUI
+
+Alongside the web platform, Skyscope Sentinel also offers a dedicated Windows GUI application for enhanced local management of specific platform components, particularly Ollama model management and application configuration. This GUI is built using Python with the PySide6 framework.
+
+*(Placeholder for Screenshot: A general view of the Skyscope Sentinel Windows GUI main window, perhaps showing the Dashboard or Model Hub.)*
+
+### Purpose
+
+The Windows GUI provides a user-friendly interface for:
+*   Managing local Ollama models (listing, downloading, viewing details).
+*   Configuring application-specific settings.
+*   Monitoring the status of the Ollama service.
+*   A streamlined experience for Windows users interacting with the AI backend components.
+
+### Launching the GUI
+
+Currently, the GUI can be launched from the source code:
+
+1.  Ensure Python (3.8+) and pip are installed.
+2.  Clone the repository (if you haven't already).
+3.  Navigate to the repository root.
+4.  It's recommended to create a virtual environment:
+    ```bash
+    python -m venv venv_gui
+    source venv_gui/bin/activate  # On Linux/macOS
+    .\venv_gui\Scripts\activate   # On Windows
+    ```
+5.  Install required GUI dependencies:
+    ```bash
+    pip install PySide6
+    ```
+    (A `requirements_gui.txt` file will be added for easier dependency management).
+6.  Run the GUI using:
+    ```bash
+    python -m skyscope_sentinel.main
+    ```
+
+*(Future: Instructions for launching a packaged executable created with PyInstaller will be added here.)*
+
+### Key Features & Sections
+
+*(Placeholder for Screenshot: A composite image showing snippets of the Model Hub and Settings page.)*
+
+*   **Dashboard (Placeholder):** Intended to provide an overview of system status, active agents, and key metrics. Displays a basic card layout.
+*   **Agent Control (Placeholder):** Designed for managing and configuring AI agents. Includes placeholder text and an "Add New Agent" button.
+*   **Model Hub:**
+    *   **Installed Models:** View a list of all Ollama models available on your local system (Name, Size, Family, Quantization). You can refresh this list and view detailed information (including Modelfile and License) for each model.
+    *   **Download Models:** Search for and download new models from the Ollama Hub directly within the application. Download progress is displayed.
+    *   **Ollama Service Status:** Check the current status and version of your local Ollama service.
+*   **Log Stream (Placeholder):** Planned for real-time log viewing. Includes placeholder text and a filter dropdown.
+*   **Settings:**
+    *   **General:** Configure application startup behavior (placeholder), system tray icon preferences (enable/disable, minimize on close, notifications on minimize).
+    *   **Appearance:** Switch between Dark and Light themes, toggle acrylic/transparency effects for the sidebar. Accent color and UI scaling are placeholders.
+    *   **Ollama:** Configure the Ollama service URL and test connectivity. Placeholder for auto-starting local Ollama.
+    *   **Agents:** Set default agent log levels. Placeholder for agent auto-restart.
+    *   **Advanced:** Manage application data folder location (browse and set) and reset all settings to default. Placeholder for clearing application cache.
+    *   Settings are persisted locally using `QSettings` (typically in the system registry on Windows or a `.ini` file).
+*   **System Tray Icon:**
+    *   Provides quick access to show/hide the application window via left-click or context menu.
+    *   Context menu includes "Quit" option to close the application.
+    *   The application can be configured to minimize to the tray instead of closing (default is True).
+    *   Uses a placeholder `app_icon.png` (custom icon recommended for packaging).
+
+### Core Feature Usage
+
+*   **Managing Ollama Models:**
+    1.  Navigate to the "Model Hub".
+    2.  Click "Refresh List" to see your locally installed models. Select a model and click "View Details" (or double-click) for more information.
+    3.  To download a new model, enter its name (e.g., `llama3:latest`) in the "Download New Models" section and click "Download".
+*   **Changing Themes:**
+    1.  Click the "Toggle Theme" button in the sidebar for a quick switch between Dark and Light themes. This change is saved.
+    2.  Alternatively, go to "Settings" -> "Appearance" and select your desired theme from the dropdown.
+*   **Configuring Settings:**
+    1.  Navigate to "Settings".
+    2.  Select the appropriate tab (General, Appearance, etc.).
+    3.  Modify the settings as needed. Changes are saved automatically when a UI element's state changes (e.g., checkbox toggled, input field loses focus).
+    4.  Status bar messages provide feedback on saved settings or actions.
+```
