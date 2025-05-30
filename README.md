@@ -344,4 +344,34 @@ Currently, the GUI can be launched from the source code:
     2.  Select the appropriate tab (General, Appearance, etc.).
     3.  Modify the settings as needed. Changes are saved automatically when a UI element's state changes (e.g., checkbox toggled, input field loses focus).
     4.  Status bar messages provide feedback on saved settings or actions.
+
+## Dependencies
+
+### Python Packages
+
+Install the required Python packages using pip:
+
+```bash
+pip install -r requirements.txt
 ```
+
+The `requirements.txt` file includes:
+*   `PySide6`: For the application's graphical user interface.
+*   `moviepy>=1.0.3`: For creating videos from image sequences. Also uses `numpy`, `imageio`, `Pillow`, `tqdm`, `decorator`.
+*   `Pillow>=9.0.0`: For image manipulation tasks.
+
+### System-Level Dependencies
+
+*   **ffmpeg**: `moviepy` (used for the Images to Video feature) requires `ffmpeg` to be installed on your system and accessible in the system's PATH.
+    *   **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/download.html) and add the `bin` directory to your PATH.
+    *   **Linux (Ubuntu/Debian)**: `sudo apt update && sudo apt install ffmpeg`
+    *   **macOS (using Homebrew)**: `brew install ffmpeg`
+
+### Conceptual Dependencies (for future full DeOldify integration)
+
+The current video colorization feature is a simulation. A full integration of the DeOldify library would require additional heavy dependencies, including:
+*   `torch` (PyTorch)
+*   `fastai==1.0.61` (specific older version often required by DeOldify)
+*   `torchvision`
+*   `opencv-python`
+*   Pre-trained DeOldify model weights.
