@@ -263,6 +263,7 @@ class MainWindow(QMainWindow):
                 self.settings_page.status_message_requested.connect(self.show_status_message)
                 self.settings_page.theme_change_requested.connect(self.apply_theme_by_name)
                 self.settings_page.acrylic_effect_requested.connect(self.apply_acrylic_effect)
+                self.settings_page.tray_icon_visibility_requested.connect(self.set_tray_icon_visibility) # Connect new signal
                 self.content_area.addWidget(self.settings_page)
             elif section_name == "Video Tools": # Condition for Video Tools
                 self.video_agent_page = VideoAgentPage()
@@ -479,6 +480,22 @@ class MainWindow(QMainWindow):
         if self.tray_icon:
             self.tray_icon.hide() # Hide tray icon before quitting
         QApplication.instance().quit()
+
+    @Slot(bool)
+    def set_tray_icon_visibility(self, visible):
+        if hasattr(self, 'tray_icon'):
+            if visible:
+                if not self.tray_icon.isVisible():
+                    self.tray_icon.show()
+                    self.show_status_message("System tray icon enabled.", "info", 3000)
+            else:
+                if self.tray_icon.isVisible():
+                    self.tray_icon.hide()
+                    # The message in SettingsPage.on_enable_tray_icon_toggled is already good.
+                    # This one can be more direct about the immediate action.
+                    self.show_status_message("System tray icon hidden for this session.", "info", 3000)
+        else:
+            print("DEBUG: Tray icon not available when trying to set visibility.")
 
 
     @Slot(str, str, int)
