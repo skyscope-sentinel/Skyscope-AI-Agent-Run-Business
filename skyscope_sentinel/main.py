@@ -9,6 +9,7 @@ from PySide6.QtGui import QColor, QPalette, QIcon, QAction
 from .model_hub_page import ModelHubPage
 from .settings_page import SettingsPage, SETTING_THEME, SETTING_ACRYLIC_EFFECT, SETTING_AUTOSTART, SETTING_MINIMIZE_TO_TRAY # Added keys
 from .settings_manager import SettingsManager
+from .video_agent_page import VideoAgentPage # Import VideoAgentPage
 
 
 def load_stylesheet(filename):
@@ -129,7 +130,7 @@ class MainWindow(QMainWindow):
         self.settings_manager = SettingsManager() # Initialize settings manager for main window use
 
         self.nav_buttons = {}
-        self.sections = ["Dashboard", "Agent Control", "Model Hub", "Log Stream", "Settings"]
+        self.sections = ["Dashboard", "Agent Control", "Video Tools", "Model Hub", "Log Stream", "Settings"] # Added "Video Tools"
         
         app_title_label = QLabel("Skyscope Sentinel")
         app_title_label.setAlignment(Qt.AlignCenter)
@@ -142,6 +143,7 @@ class MainWindow(QMainWindow):
         icon_map = {
             "Dashboard": "view-dashboard",  # Common theme name
             "Agent Control": "applications-system", # or "preferences-system"
+            "Video Tools": "applications-multimedia", # Icon for video tools
             "Model Hub": "drive-harddisk", # or "applications-internet"
             "Log Stream": "document-view", 
             "Settings": "preferences-configure"
@@ -149,6 +151,7 @@ class MainWindow(QMainWindow):
         tooltips = {
             "Dashboard": "View system overview and key metrics",
             "Agent Control": "Manage and configure AI agents",
+            "Video Tools": "Access video processing utilities", # Tooltip for Video Tools
             "Model Hub": "Explore and manage Ollama models",
             "Log Stream": "Monitor real-time application and agent logs",
             "Settings": "Configure application settings"
@@ -174,6 +177,10 @@ class MainWindow(QMainWindow):
                 self.settings_page.theme_change_requested.connect(self.apply_theme_by_name)
                 self.settings_page.acrylic_effect_requested.connect(self.apply_acrylic_effect)
                 self.content_area.addWidget(self.settings_page)
+            elif section_name == "Video Tools": # Condition for Video Tools
+                self.video_agent_page = VideoAgentPage()
+                # self.video_agent_page.status_message_requested.connect(self.show_status_message) # If VideoAgentPage emits such a signal
+                self.content_area.addWidget(self.video_agent_page)
             else:
                 page = PlaceholderPage(section_name)
                 self.content_area.addWidget(page)
@@ -227,6 +234,8 @@ class MainWindow(QMainWindow):
             if section_name == "Model Hub" and isinstance(widget, ModelHubPage):
                 current_page_matches = True
             elif section_name == "Settings" and isinstance(widget, SettingsPage):
+                current_page_matches = True
+            elif section_name == "Video Tools" and isinstance(widget, VideoAgentPage): # Condition for VideoAgentPage
                 current_page_matches = True
             elif isinstance(widget, PlaceholderPage) and widget.label.text() == target_widget_label:
                 current_page_matches = True
