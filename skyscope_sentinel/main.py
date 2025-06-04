@@ -1,7 +1,8 @@
 import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QPushButton, QLabel, QStackedWidget, QFrame, QStatusBar, QSystemTrayIcon, QMenu, QGridLayout, QSizePolicy
+    QPushButton, QLabel, QStackedWidget, QFrame, QStatusBar, QSystemTrayIcon, QMenu, QGridLayout, QSizePolicy,
+    QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit # Added QTextEdit, QLineEdit for Log Stream
 )
 from PySide6.QtCore import Qt, QSize, QFile, QTextStream, Slot
 from PySide6.QtGui import QColor, QPalette, QIcon, QAction
@@ -62,29 +63,110 @@ class PlaceholderPage(QWidget):
             layout.addLayout(grid_layout)
 
         elif name == "Agent Control":
-            self.label.setText("Manage and Configure Your AI Agents")
-            info_label = QLabel("This section will allow you to start, stop, configure, and monitor various AI agents. You'll be able to assign models, set tasks, and view their operational logs.")
-            info_label.setWordWrap(True)
-            info_label.setAlignment(Qt.AlignCenter)
-            info_label.setStyleSheet("font-size: 14px; color: #777777; margin: 20px;")
-            layout.addWidget(info_label)
-            add_agent_btn = QPushButton(QIcon.fromTheme("list-add"), "Add New Agent (Placeholder)")
-            add_agent_btn.setToolTip("Define and configure a new AI agent.")
-            add_agent_btn.setStyleSheet("QPushButton { text-align: center; padding-left: 0px; }") # Center text when icon is present
+            self.label.setText("Manage and Configure Your AI Agents") # Main title
+            self.label.setAlignment(Qt.AlignTop | Qt.AlignHCenter) # Adjust alignment
+            self.label.setStyleSheet("font-size: 20px; font-weight: bold; color: #888888; margin-bottom: 10px;")
+
+
+            # Agents List Section
+            agents_group = QGroupBox("Available Agents")
+            agents_group_layout = QVBoxLayout() # Renamed to avoid conflict with main 'layout'
+
+            self.agent_list_widget = QListWidget()
+            self.agent_list_widget.addItems(["Website Content Agent (Offline)", "Crypto Trading Bot (Running)", "Social Media Poster (Idle)"])
+            self.agent_list_widget.setToolTip("List of configured AI agents and their status.")
+            # TODO: Add styling for QListWidget items if needed via QSS or delegate later
+            agents_group_layout.addWidget(self.agent_list_widget)
+
+            agents_group.setLayout(agents_group_layout)
+            layout.addWidget(agents_group)
+
+            # Agent Actions Section
+            actions_layout = QHBoxLayout()
+
+            btn_start_agent = QPushButton(QIcon.fromTheme("media-playback-start"), "Start Selected")
+            btn_start_agent.setToolTip("Start the selected agent (Placeholder).")
+            btn_start_agent.setEnabled(False) # Placeholder
+            actions_layout.addWidget(btn_start_agent)
+
+            btn_stop_agent = QPushButton(QIcon.fromTheme("media-playback-stop"), "Stop Selected")
+            btn_stop_agent.setToolTip("Stop the selected agent (Placeholder).")
+            btn_stop_agent.setEnabled(False) # Placeholder
+            actions_layout.addWidget(btn_stop_agent)
+
+            btn_config_agent = QPushButton(QIcon.fromTheme("preferences-system"), "Configure Selected")
+            btn_config_agent.setToolTip("Configure the selected agent (Placeholder).")
+            btn_config_agent.setEnabled(False) # Placeholder
+            actions_layout.addWidget(btn_config_agent)
+
+            btn_view_logs = QPushButton(QIcon.fromTheme("document-preview"), "View Logs")
+            btn_view_logs.setToolTip("View logs for the selected agent (Placeholder).")
+            btn_view_logs.setEnabled(False) # Placeholder
+            actions_layout.addWidget(btn_view_logs)
+
+            layout.addLayout(actions_layout)
+
+            # Add New Agent Button
+            add_agent_btn = QPushButton(QIcon.fromTheme("list-add"), "Add New Agent...")
+            add_agent_btn.setToolTip("Define and configure a new AI agent (Placeholder).")
+            # add_agent_btn.setEnabled(False) # Placeholder, but keep it enabled for now
+            add_agent_btn.setStyleSheet("QPushButton { text-align: center; padding-left: 0px; margin-top: 10px; }")
             layout.addWidget(add_agent_btn, 0, Qt.AlignCenter)
+
+            layout.addStretch() # Ensure content pushes to the top
 
 
         elif name == "Log Stream":
+            # Keep original label for this page, but adjust its style for consistency if needed.
             self.label.setText("Centralized Log Monitoring")
+            self.label.setAlignment(Qt.AlignTop | Qt.AlignHCenter)
+            self.label.setStyleSheet("font-size: 20px; font-weight: bold; color: #888888; margin-bottom: 10px;")
+
             info_label = QLabel("View real-time logs from the application, Ollama service, and all active agents. Filter by source, log level, and search for specific messages.")
             info_label.setWordWrap(True)
             info_label.setAlignment(Qt.AlignCenter)
-            info_label.setStyleSheet("font-size: 14px; color: #777777; margin: 20px;")
+            info_label.setStyleSheet("font-size: 14px; color: #777777; margin: 5px 20px 15px 20px;") # Adjusted margins
             layout.addWidget(info_label)
-            filter_combo = QComboBox()
-            filter_combo.addItems(["All Logs", "Application Logs", "Ollama Logs", "Agent Logs"])
-            filter_combo.setToolTip("Filter logs by source.")
-            layout.addWidget(filter_combo, 0, Qt.AlignCenter)
+
+            # Controls Area
+            controls_layout = QHBoxLayout()
+
+            filter_label = QLabel("Filter by source:")
+            controls_layout.addWidget(filter_label)
+
+            self.log_filter_combo = QComboBox()
+            self.log_filter_combo.addItems(["All Logs", "Application Logs", "Ollama Service", "Agent Alpha", "Agent Beta"])
+            self.log_filter_combo.setToolTip("Filter logs by their source.")
+            controls_layout.addWidget(self.log_filter_combo)
+
+            self.search_log_input = QLineEdit()
+            self.search_log_input.setPlaceholderText("Search logs...")
+            self.search_log_input.setToolTip("Enter keywords to search in logs (Placeholder).")
+            self.search_log_input.setEnabled(False) # Placeholder
+            controls_layout.addWidget(self.search_log_input)
+
+            clear_logs_btn = QPushButton(QIcon.fromTheme("edit-clear"), "Clear Logs")
+            clear_logs_btn.setToolTip("Clear the displayed logs (Placeholder).")
+            clear_logs_btn.setEnabled(False) # Placeholder
+            controls_layout.addWidget(clear_logs_btn)
+
+            layout.addLayout(controls_layout)
+
+            # Log Display Area
+            self.log_display_area = QTextEdit()
+            self.log_display_area.setReadOnly(True)
+            sample_logs = (
+                "[INFO] 2023-10-27 10:00:00 - Application successfully initialized.\n"
+                "[DEBUG] 2023-10-27 10:00:05 - Checking Ollama service status...\n"
+                "[OLLAMA] 2023-10-27 10:00:06 - Ollama service detected, version: 0.1.15\n"
+                "[AGENT_ALPHA] 2023-10-27 10:01:00 - Starting Website Content Generation task.\n"
+                "[ERROR] 2023-10-27 10:01:30 - Agent Beta failed to connect to external API: Timeout.\n"
+                "[WARNING] 2023-10-27 10:02:00 - Low disk space detected on /var/log."
+            )
+            self.log_display_area.setPlaceholderText("Logs will appear here...")
+            self.log_display_area.setText(sample_logs)
+            # Consider setFont (e.g., a monospaced font) for better log readability later
+            layout.addWidget(self.log_display_area)
 
 
         self.setLayout(layout)
@@ -94,12 +176,17 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("Skyscope Sentinel Intelligence")
         self.setGeometry(100, 100, 1200, 700)
-        
-        # For better rounded corners, especially if planning for custom title bar later:
-        # self.setAttribute(Qt.WA_TranslucentBackground, True)
-        # self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
-        # However, this requires custom handling for window dragging and min/max/close buttons.
-        # For now, we rely on QSS border-radius for the central widget.
+
+        # --- Enable Translucent Background and Frameless Window ---
+        # This makes the main window background transparent and removes the default OS window frame.
+        # The QSS styling for QWidget#centralWidget (with border-radius and background-color)
+        # will now create the visual effect of a rounded window.
+        self.setAttribute(Qt.WA_TranslucentBackground, True)
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.Window)
+        # NOTE: Enabling Qt.FramelessWindowHint removes the standard title bar.
+        # Custom controls for minimize, maximize, close, and window dragging would be
+        # needed for full desktop application behavior. For now, closing and interaction
+        # will be primarily via the system tray icon or task manager.
 
         # --- Main Widget and Layout ---
         self.central_widget = QWidget()
@@ -176,10 +263,11 @@ class MainWindow(QMainWindow):
                 self.settings_page.status_message_requested.connect(self.show_status_message)
                 self.settings_page.theme_change_requested.connect(self.apply_theme_by_name)
                 self.settings_page.acrylic_effect_requested.connect(self.apply_acrylic_effect)
+                self.settings_page.tray_icon_visibility_requested.connect(self.set_tray_icon_visibility) # Connect new signal
                 self.content_area.addWidget(self.settings_page)
             elif section_name == "Video Tools": # Condition for Video Tools
                 self.video_agent_page = VideoAgentPage()
-                # self.video_agent_page.status_message_requested.connect(self.show_status_message) # If VideoAgentPage emits such a signal
+                self.video_agent_page.status_message_requested.connect(self.show_status_message) # Connect the signal
                 self.content_area.addWidget(self.video_agent_page)
             else:
                 page = PlaceholderPage(section_name)
@@ -392,6 +480,22 @@ class MainWindow(QMainWindow):
         if self.tray_icon:
             self.tray_icon.hide() # Hide tray icon before quitting
         QApplication.instance().quit()
+
+    @Slot(bool)
+    def set_tray_icon_visibility(self, visible):
+        if hasattr(self, 'tray_icon'):
+            if visible:
+                if not self.tray_icon.isVisible():
+                    self.tray_icon.show()
+                    self.show_status_message("System tray icon enabled.", "info", 3000)
+            else:
+                if self.tray_icon.isVisible():
+                    self.tray_icon.hide()
+                    # The message in SettingsPage.on_enable_tray_icon_toggled is already good.
+                    # This one can be more direct about the immediate action.
+                    self.show_status_message("System tray icon hidden for this session.", "info", 3000)
+        else:
+            print("DEBUG: Tray icon not available when trying to set visibility.")
 
 
     @Slot(str, str, int)

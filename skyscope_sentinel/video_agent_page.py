@@ -4,12 +4,14 @@ from PySide6.QtWidgets import (
     QFrame, QGroupBox, QProgressBar, QFileDialog, QListWidget, QAbstractItemView,
     QSpinBox, QDoubleSpinBox, QMessageBox, QSizePolicy, QScrollArea, QTabWidget
 )
-from PySide6.QtCore import Qt, Slot
+from PySide6.QtCore import Qt, Slot, Signal # Added Signal
 from PySide6.QtGui import QIcon
 
 from .video_agent import VideoAgent # Assuming video_agent.py is in the same directory
 
 class VideoAgentPage(QWidget):
+    status_message_requested = Signal(str, str)  # msg, type ('info', 'error', 'success', 'warning')
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("videoAgentPage")
@@ -215,6 +217,7 @@ class VideoAgentPage(QWidget):
             base_name, ext = os.path.splitext(os.path.basename(file_path))
             output_dir = os.path.dirname(file_path)
             self.le_colorize_output_path.setText(os.path.join(output_dir, f"{base_name}_colorized{ext}"))
+            self.status_message_requested.emit(f"Input video selected: {os.path.basename(file_path)}", "info")
 
     def _browse_output_video_path(self, line_edit_widget, title_suffix="Video"):
         current_path = line_edit_widget.text()
@@ -228,6 +231,7 @@ class VideoAgentPage(QWidget):
             if not os.path.splitext(file_path)[1] and title_suffix != "Any": # Add default extension if missing
                  file_path += ".mp4"
             line_edit_widget.setText(file_path)
+            self.status_message_requested.emit(f"Output path set: {os.path.basename(file_path)}", "info")
 
     def _start_colorization_task(self):
         input_path = self.le_colorize_input_video.text()
@@ -244,6 +248,7 @@ class VideoAgentPage(QWidget):
         self.progress_colorize.setVisible(True)
         self.progress_colorize.setValue(0)
         self.lbl_colorize_status.setText("Starting colorization...")
+        self.status_message_requested.emit("Colorization task started.", "info")
         self.video_agent.colorize_video(input_path, output_path)
 
     def _add_images_to_list(self):
@@ -255,12 +260,15 @@ class VideoAgentPage(QWidget):
             if self.list_images.count() > 0 and not self.le_i2v_output_path.text():
                 first_image_dir = os.path.dirname(self.list_images.item(0).text())
                 self.le_i2v_output_path.setText(os.path.join(first_image_dir, "slideshow_output.mp4"))
+            self.status_message_requested.emit(f"{len(files)} images added to list.", "info")
 
     def _remove_selected_images(self):
         selected_items = self.list_images.selectedItems()
         if not selected_items: return
+        count_removed = len(selected_items)
         for item in selected_items:
             self.list_images.takeItem(self.list_images.row(item))
+        self.status_message_requested.emit(f"{count_removed} images removed.", "info")
 
     def _start_images_to_video_task(self):
         image_paths = [self.list_images.item(i).text() for i in range(self.list_images.count())]
@@ -280,10 +288,12 @@ class VideoAgentPage(QWidget):
         self.progress_i2v.setVisible(True)
         self.progress_i2v.setValue(0)
         self.lbl_i2v_status.setText("Starting video creation...")
+        self.status_message_requested.emit("Images to video task started.", "info")
         self.video_agent.images_to_video(image_paths, output_path, fps, duration_per_image)
 
     def _cancel_current_task(self):
         self.video_agent.cancel_current_task()
+        self.status_message_requested.emit("Task cancellation requested.", "warning")
         # UI update will primarily be handled by _on_task_error or _on_task_finished
         # (if cancellation is treated as an error or a specific type of finish)
         # For immediate feedback:
@@ -324,6 +334,7 @@ class VideoAgentPage(QWidget):
                 current_tab_idx = self.tab_widget.currentIndex()
                 if current_tab_idx == 0: self.lbl_colorize_status.setText(message)
                 elif current_tab_idx == 1: self.lbl_i2v_status.setText(message)
+        self.status_message_requested.emit(f"Video task update: {message}", "info")
 
 
     @Slot(str, str, str)
@@ -336,6 +347,7 @@ class VideoAgentPage(QWidget):
         elif task_type == "images_to_video":
             self.progress_i2v.setVisible(False)
             self.lbl_i2v_status.setText(f"Done. Output: {os.path.basename(output_path)}")
+        self.status_message_requested.emit(f"'{task_type.replace('_', ' ').title()}' task completed: {message}", "success")
 
     @Slot(str, str)
     def _on_task_error(self, error_message, task_type):
@@ -347,6 +359,7 @@ class VideoAgentPage(QWidget):
         elif task_type == "images_to_video":
             self.progress_i2v.setVisible(False)
             self.lbl_i2v_status.setText(f"Error.")
+        self.status_message_requested.emit(f"Error in '{task_type.replace('_', ' ').title()}': {error_message}", "error")
 
 if __name__ == '__main__':
     import sys

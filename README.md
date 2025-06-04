@@ -269,9 +269,9 @@ related concerns*
 
 ## Skyscope Sentinel Windows GUI
 
-Alongside the web platform, Skyscope Sentinel also offers a dedicated Windows GUI application for enhanced local management of specific platform components, particularly Ollama model management and application configuration. This GUI is built using Python with the PySide6 framework.
+Alongside the web platform, Skyscope Sentinel also offers a dedicated Windows GUI application for enhanced local management of specific platform components, particularly Ollama model management and application configuration. This GUI is built using Python with the PySide6 framework, featuring a modern, themeable interface with acrylic/glassy effects and rounded window corners (dark theme by default).
 
-*(Placeholder for Screenshot: A general view of the Skyscope Sentinel Windows GUI main window, perhaps showing the Dashboard or Model Hub.)*
+*(Placeholder for Screenshot: A general view of the Skyscope Sentinel Windows GUI main window, showcasing the dark theme, acrylic sidebar, rounded frameless window, and the Dashboard page.)*
 
 ### Purpose
 
@@ -296,9 +296,9 @@ Currently, the GUI can be launched from the source code:
     ```
 5.  Install required GUI dependencies:
     ```bash
-    pip install PySide6
+    pip install -r requirements_gui.txt
     ```
-    (A `requirements_gui.txt` file will be added for easier dependency management).
+    (`requirements_gui.txt` includes PySide6, moviepy, and other necessary GUI packages. This file ensures all specific dependencies for the GUI are installed.)
 6.  Run the GUI using:
     ```bash
     python -m skyscope_sentinel.main
@@ -308,20 +308,27 @@ Currently, the GUI can be launched from the source code:
 
 ### Key Features & Sections
 
-*(Placeholder for Screenshot: A composite image showing snippets of the Model Hub and Settings page.)*
+The GUI provides the following key sections, accessible via the sidebar navigation:
 
-*   **Dashboard (Placeholder):** Intended to provide an overview of system status, active agents, and key metrics. Displays a basic card layout.
-*   **Agent Control (Placeholder):** Designed for managing and configuring AI agents. Includes placeholder text and an "Add New Agent" button.
+*(Placeholder for Screenshot: A composite image showing snippets of the Model Hub, the enhanced Settings page (Appearance tab with Accent Color and UI Scaling), the Agent Control page, and the Log Stream page.)*
+
+*   **Dashboard (Placeholder):** Provides an overview of system status, active agents, and key metrics. Displays information in a card layout (e.g., "Active Agents," "System Status," "Recent Activity," "Model Performance").
+*   **Agent Control (Placeholder):** Designed for managing and configuring AI agents. Includes a list view for agents (with placeholder statuses like "Offline", "Running"), controls to (placeholder) Start, Stop, Configure selected agents, View Logs, and an "Add New Agent..." button.
+*   **Video Tools:** Provides utilities for video processing. Currently includes:
+    *   **Video Colorization (Simulated):** A placeholder for future AI-driven video colorization. Allows selecting an input B&W video and specifying an output path.
+    *   **Images to Video:** Allows users to select multiple images, set FPS and duration per image, and create a slideshow video.
 *   **Model Hub:**
     *   **Installed Models:** View a list of all Ollama models available on your local system (Name, Size, Family, Quantization). You can refresh this list and view detailed information (including Modelfile and License) for each model.
     *   **Download Models:** Search for and download new models from the Ollama Hub directly within the application. Download progress is displayed.
     *   **Ollama Service Status:** Check the current status and version of your local Ollama service.
-*   **Log Stream (Placeholder):** Planned for real-time log viewing. Includes placeholder text and a filter dropdown.
+*   **Log Stream (Placeholder):** Provides a centralized view for application logs. Includes a main display area for logs (populated with sample logs), a dropdown to filter by source (e.g., "Application Logs," "Ollama Service," specific agents), a disabled search bar, and a disabled "Clear Logs" button.
 *   **Settings:**
-    *   **General:** Configure application startup behavior (placeholder), system tray icon preferences (enable/disable, minimize on close, notifications on minimize).
-    *   **Appearance:** Switch between Dark and Light themes, toggle acrylic/transparency effects for the sidebar. Accent color and UI scaling are placeholders.
-    *   **Ollama:** Configure the Ollama service URL and test connectivity. Placeholder for auto-starting local Ollama.
-    *   **Agents:** Set default agent log levels. Placeholder for agent auto-restart.
+    *   **General:** Configure application startup behavior (preference saved, actual OS-level autostart is a future enhancement), system tray icon preferences (enable/disable, minimize on close, show notification on minimize to tray).
+    *   **Appearance:** Switch between Dark (default) and Light themes, toggle acrylic/transparency effects for the sidebar.
+        *   **Accent Color:** Choose a custom accent color for UI highlights (preview swatch updates, saved for future theme use).
+        *   **UI Scaling:** Select UI scaling preference (Small, Medium, Large). Requires application restart to take effect (preference saved, actual scaling implementation is a future enhancement).
+    *   **Ollama:** Configure the Ollama service URL, test connectivity, and set preference for attempting to auto-start the local Ollama service when the application launches (actual auto-start action happens at application startup if enabled).
+    *   **Agents:** Set default agent log levels (preference saved). Set preference for automatically restarting crashed agents (actual monitoring and restart logic is part of a future agent management system).
     *   **Advanced:** Manage application data folder location (browse and set) and reset all settings to default. Placeholder for clearing application cache.
     *   Settings are persisted locally using `QSettings` (typically in the system registry on Windows or a `.ini` file).
 *   **System Tray Icon:**
@@ -349,16 +356,16 @@ Currently, the GUI can be launched from the source code:
 
 ### Python Packages
 
-Install the required Python packages using pip:
+The main application dependencies are listed in `requirements.txt`. For the GUI specifically, install using:
 
 ```bash
-pip install -r requirements.txt
+pip install -r requirements_gui.txt
 ```
 
-The `requirements.txt` file includes:
-*   `PySide6`: For the application's graphical user interface.
-*   `moviepy>=1.0.3`: For creating videos from image sequences. Also uses `numpy`, `imageio`, `Pillow`, `tqdm`, `decorator`.
-*   `Pillow>=9.0.0`: For image manipulation tasks.
+The `requirements_gui.txt` file includes:
+*   `PySide6>=6.0.0`: For the application's graphical user interface.
+*   `moviepy>=1.0.3`: For creating videos from image sequences in the Video Tools page. Also uses `numpy`, `imageio`, `Pillow`, `tqdm`, `decorator`.
+*   `Pillow>=9.0.0`: For image manipulation tasks, also a dependency for moviepy.
 
 ### System-Level Dependencies
 
