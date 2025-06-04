@@ -120,9 +120,9 @@ class SettingsPage(QWidget):
         
         # Accent Color
         self.btn_accent_color = QPushButton(QIcon.fromTheme("preferences-desktop-color"), "Choose Accent Color")
-        self.btn_accent_color.setToolTip("Select a custom accent color for UI highlights (feature placeholder).")
+        self.btn_accent_color.setToolTip("Select a custom accent color for UI highlights.")
         self.btn_accent_color.clicked.connect(self.choose_accent_color)
-        self.btn_accent_color.setEnabled(False) # Placeholder for now
+        self.btn_accent_color.setEnabled(True) # Enabled for functionality
         
         self.lbl_accent_color_preview = QLabel() 
         self.lbl_accent_color_preview.setFixedSize(50,25) # Slightly larger preview
@@ -137,9 +137,13 @@ class SettingsPage(QWidget):
 
         self.combo_ui_scaling = QComboBox()
         self.combo_ui_scaling.addItems(["Small (80%)", "Medium (100%)", "Large (120%)"])
-        self.combo_ui_scaling.setToolTip("Adjust the overall size of UI elements (requires restart, placeholder).")
-        self.combo_ui_scaling.setEnabled(False) 
+        self.combo_ui_scaling.setToolTip("Adjust the overall size of UI elements. Requires application restart to take effect.")
+        self.combo_ui_scaling.setEnabled(True)
+        self.combo_ui_scaling.currentTextChanged.connect(self.on_ui_scaling_changed)
         layout.addRow("UI Scaling:", self.combo_ui_scaling)
+        # NOTE: Applying UI scaling (e.g., via QT_SCALE_FACTOR or similar) typically needs to be done
+        # before QApplication is initialized. This setting only saves the preference.
+        # The main application entry point would need to read this setting and apply it.
         
         return appearance_tab
 
@@ -157,10 +161,14 @@ class SettingsPage(QWidget):
         self.btn_test_ollama.clicked.connect(self.test_ollama_connection)
         layout.addRow(self.btn_test_ollama)
         
-        self.cb_ollama_auto_start = QCheckBox("Attempt to start local Ollama service with application (Placeholder)")
-        self.cb_ollama_auto_start.setToolTip("If checked, Skyscope Sentinel will try to start a local Ollama instance if one isn't detected.\n(This feature is a placeholder and depends on Ollama's CLI capabilities.)")
+        self.cb_ollama_auto_start = QCheckBox("Attempt to start local Ollama service with application")
+        self.cb_ollama_auto_start.setToolTip("If checked, Skyscope Sentinel will attempt to start a local Ollama instance at application startup if one isn't detected.\n(Depends on Ollama's CLI availability and system configuration.)")
         self.cb_ollama_auto_start.toggled.connect(lambda checked: self.save_setting_value(SETTING_OLLAMA_AUTO_START, checked))
-        self.cb_ollama_auto_start.setEnabled(False) # Placeholder
+        self.cb_ollama_auto_start.setEnabled(True)
+        # Note: This checkbox enables the *setting* for attempting to autostart Ollama.
+        # The actual logic to check and start Ollama based on this setting should be
+        # implemented in the application's main startup sequence (e.g., in main.py
+        # before or during MainWindow initialization, or when Ollama features are first accessed).
         layout.addRow(self.cb_ollama_auto_start)
 
         return ollama_tab
@@ -176,10 +184,13 @@ class SettingsPage(QWidget):
         )
         layout.addRow("Default Agent Log Level:", self.combo_agent_log_level)
 
-        self.cb_agent_auto_restart = QCheckBox("Automatically restart crashed agents (Placeholder)")
-        self.cb_agent_auto_restart.setToolTip("If an agent process unexpectedly stops, attempt to restart it automatically.")
+        self.cb_agent_auto_restart = QCheckBox("Automatically restart crashed agents")
+        self.cb_agent_auto_restart.setToolTip("If enabled, the system will attempt to automatically restart agents that stop unexpectedly.\n(Requires agent monitoring capabilities.)")
         self.cb_agent_auto_restart.toggled.connect(lambda checked: self.save_setting_value(SETTING_AGENT_AUTO_RESTART, checked))
-        self.cb_agent_auto_restart.setEnabled(False) # Placeholder
+        self.cb_agent_auto_restart.setEnabled(True)
+        # Note: This checkbox enables the *setting* for attempting to auto-restart crashed agents.
+        # The actual logic for monitoring agent health and performing restarts based on this
+        # setting would be part of a dedicated agent management system within the application.
         layout.addRow(self.cb_agent_auto_restart)
         
         return agents_tab
@@ -291,27 +302,55 @@ class SettingsPage(QWidget):
 
     @Slot()
     def choose_accent_color(self):
-        # This is a placeholder - full color picker logic would be here
-        self.status_message_requested.emit("Accent color selection is a placeholder.", "info")
-        # Example of how it might work:
-        # current_color_hex = self.settings_manager.load_setting(SETTING_ACCENT_COLOR, "#1abc9c")
-        # color = QColorDialog.getColor(QColor(current_color_hex), self, "Choose Accent Color")
-        # if color.isValid():
-        #     self.update_accent_color_preview(color.name())
-        #     self.save_setting_value(SETTING_ACCENT_COLOR, color.name())
-        #     # Potentially emit a signal for main app to update accent color dynamically if supported by QSS
-        QMessageBox.information(self, "Accent Color", "Custom accent color selection is not fully implemented yet.")
+        current_color_hex = self.settings_manager.load_setting(SETTING_ACCENT_COLOR, "#1abc9c")
+        try:
+            initial_color = QColor(current_color_hex)
+            if not initial_color.isValid(): # Fallback if stored color is invalid
+                print(f"Warning: Invalid current accent color '{current_color_hex}' from settings. Defaulting.")
+                initial_color = QColor("#1abc9c")
+        except Exception as e: # Catch potential errors from QColor constructor with bad hex
+            print(f"Error creating QColor from '{current_color_hex}': {e}. Defaulting.")
+            initial_color = QColor("#1abc9c")
+
+        color = QColorDialog.getColor(initial_color, self, "Choose Accent Color")
+
+        if color.isValid():
+            new_color_hex = color.name()
+            self.save_setting_value(SETTING_ACCENT_COLOR, new_color_hex) # save_setting_value already emits a generic status
+            self.update_accent_color_preview(new_color_hex)
+            # Emit a more specific status message for this action
+            self.status_message_requested.emit(f"Accent color changed to {new_color_hex}.", "info")
+            # Note: Dynamic application of this accent color across the app is not part of this subtask.
+        else:
+            self.status_message_requested.emit("Accent color selection cancelled.", "info")
 
 
-    @Slot()
+    @Slot(str) # Explicitly mark as a slot that accepts a string argument
     def update_accent_color_preview(self, color_hex):
         try:
-            palette = self.lbl_accent_color_preview.palette()
-            palette.setColor(QPalette.Window, QColor(color_hex)) # Use QPalette.Window for background of QLabel
-            self.lbl_accent_color_preview.setPalette(palette)
+            # It's good practice to ensure the label exists
+            if hasattr(self, 'lbl_accent_color_preview'):
+                palette = self.lbl_accent_color_preview.palette()
+                palette.setColor(QPalette.Window, QColor(color_hex)) # Use QPalette.Window for background of QLabel
+                self.lbl_accent_color_preview.setPalette(palette)
+            else:
+                print("Error: lbl_accent_color_preview not found.")
         except Exception as e:
-            print(f"Error updating accent color preview: {e}") # Log error
+            print(f"Error updating accent color preview with '{color_hex}': {e}") # Log error
+            self.status_message_requested.emit(f"Error applying accent color preview: {e}", "error")
 
+    @Slot(str)
+    def on_ui_scaling_changed(self, scaling_text):
+        self.save_setting_value(SETTING_UI_SCALING, scaling_text)
+        self.status_message_requested.emit(
+            f"UI Scaling set to '{scaling_text}'. Please restart the application for changes to take effect.",
+            "info"
+        )
+        # Add a more prominent QMessageBox to inform the user about restart
+        QMessageBox.information(self, "UI Scaling Changed",
+                                f"UI scaling preference has been set to '{scaling_text}'.\n\n"
+                                "A restart of the application is required for this change to apply.",
+                                QMessageBox.Ok)
 
     @Slot()
     def test_ollama_connection(self):

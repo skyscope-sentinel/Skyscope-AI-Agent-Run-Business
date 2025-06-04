@@ -1,0 +1,11 @@
+# Core framework for the Graphical User Interface
+# Provides the Qt bindings for Python, enabling the creation of desktop applications.
+PySide6>=6.0.0  # Example: PySide6==6.6.0 if a specific version is targeted
+
+# For video processing features in the Video Tools page (e.g., Images to Video, potentially colorization stubs)
+# Includes dependencies like numpy, imageio, Pillow, tqdm, decorator, which will be installed automatically.
+moviepy>=1.0.3
+
+# For image manipulation tasks, used by various components including video processing.
+# Also a dependency for moviepy.
+Pillow>=9.0.0

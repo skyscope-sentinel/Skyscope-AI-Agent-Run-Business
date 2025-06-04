@@ -3,8 +3,9 @@ QMainWindow {
     /* border-radius: 15px; */
 }
 
+/* Sidebar with acrylic effect */
 QFrame#sidebar {
-    background-color: rgba(230, 230, 230, 0.92); /* Very light grey, slightly more opaque */
+    background-color: rgba(230, 230, 230, 0.88); /* Light grey, more transparent */
     border-top-left-radius: 15px;
     border-bottom-left-radius: 15px;
     border-right: 1px solid #bdc3c7; /* Subtle separator */
@@ -15,7 +16,7 @@ QPushButton {
     color: #2c3e50; /* Wet Asphalt text */
     border: 1px solid #d4d8db; /* Slightly darker border */
     padding: 10px;
-    border-radius: 6px;
+    border-radius: 6px; /* Consistent rounded corners */
     min-height: 30px;
     text-align: left;
     padding-left: 10px;
@@ -67,9 +68,11 @@ QStackedWidget {
     padding: 10px;
 }
 
+/* Ensure the central widget holding sidebar and content area has rounded corners */
+/* This is key for the overall rounded window look. */
 QWidget#centralWidget {
     border-radius: 15px;
-    background-color: #ecf0f1; /* Clouds */
+    background-color: #ecf0f1; /* Clouds - content background */
 }
 
 /* Input Fields */
@@ -77,7 +80,7 @@ QLineEdit {
     background-color: #fdfefe; /* Near white */
     color: #2c3e50;
     border: 1px solid #bdc3c7; /* Silver border */
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded corners for QLineEdit */
     padding: 8px;
     min-height: 20px;
 }
@@ -94,7 +97,7 @@ QComboBox {
     background-color: #fdfefe;
     color: #2c3e50;
     border: 1px solid #bdc3c7;
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded corners for QComboBox */
     padding: 8px;
     min-height: 20px;
 }
@@ -108,8 +111,8 @@ QComboBox::drop-down {
     border-left-width: 1px;
     border-left-color: #bdc3c7;
     border-left-style: solid;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
+    border-top-right-radius: 3px; /* Consistent with parent */
+    border-bottom-right-radius: 3px; /* Consistent with parent */
     background-color: #e1e5e8;
 }
 QComboBox::down-arrow {
@@ -122,6 +125,7 @@ QComboBox QAbstractItemView { /* Dropdown list style */
     selection-background-color: #3498db;
     selection-color: white;
     padding: 5px;
+    border-radius: 4px; /* Rounded corners for dropdown view */
 }
 
 /* Table Widget */
@@ -130,7 +134,7 @@ QTableWidget {
     color: #2c3e50;
     border: 1px solid #dcdfe2; /* Lighter border */
     gridline-color: #e1e5e8;
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded corners for QTableWidget */
 }
 QHeaderView::section {
     background-color: #e1e5e8;
@@ -138,6 +142,7 @@ QHeaderView::section {
     padding: 5px;
     border: 1px solid #dcdfe2;
     font-weight: bold;
+    /* No border-radius for header sections for a flatter, integrated look */
 }
 QTableWidget::item {
     padding: 5px;
@@ -153,7 +158,7 @@ QTextEdit {
     background-color: #fdfefe;
     color: #2c3e50;
     border: 1px solid #bdc3c7;
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded corners for QTextEdit */
     padding: 5px;
 }
 
@@ -162,37 +167,37 @@ QScrollBar:vertical {
     border: 1px solid #dcdfe2;
     background: #e1e5e8;
     width: 12px;
-    margin: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px; /* No margin */
 }
 QScrollBar::handle:vertical {
     background: #bdc3c7; /* Silver */
     min-height: 20px;
-    border-radius: 5px;
+    border-radius: 6px; /* Rounded scrollbar handle */
 }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
-    height: 0px;
+    height: 0px; /* Hide arrows for a cleaner look */
     background: none;
 }
 QScrollBar:horizontal {
     border: 1px solid #dcdfe2;
     background: #e1e5e8;
     height: 12px;
-    margin: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px; /* No margin */
 }
 QScrollBar::handle:horizontal {
     background: #bdc3c7;
     min-width: 20px;
-    border-radius: 5px;
+    border-radius: 6px; /* Rounded scrollbar handle */
 }
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
-    width: 0px;
+    width: 0px; /* Hide arrows for a cleaner look */
     background: none;
 }
 
 /* ProgressBar */
 QProgressBar {
     border: 1px solid #bdc3c7;
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded corners for QProgressBar */
     background-color: #e1e5e8;
     text-align: center;
     color: #2c3e50; /* Text color on the progress bar */
@@ -201,7 +206,7 @@ QProgressBar {
 }
 QProgressBar::chunk {
     background-color: #2ecc71; /* Emerald */
-    border-radius: 3px;
+    border-radius: 3px; /* Slightly more rounded chunk, consistent with parent radius */
     margin: 1px;
 }
 
@@ -214,12 +219,13 @@ QCheckBox::indicator {
     width: 16px;
     height: 16px;
     border: 1px solid #bdc3c7;
-    border-radius: 3px;
+    border-radius: 3px; /* Rounded corners for checkbox indicator */
     background-color: #fdfefe;
 }
 QCheckBox::indicator:checked {
     background-color: #3498db; /* Peter River */
     image: url(skyscope_sentinel/assets/check_mark_dark.png); /* Needs this icon */
+    border-radius: 3px; /* Keep consistent */
 }
 QCheckBox::indicator:unchecked:hover {
     border: 1px solid #3498db;
@@ -233,23 +239,23 @@ QCheckBox::indicator:disabled {
 }
 
 /* TabWidget */
-QTabWidget::pane {
+QTabWidget::pane { /* The container for the tab contents */
     border: 1px solid #dcdfe2;
-    border-top: none;
+    border-top: none; /* Remove top border as tabs are above it */
     background-color: #ffffff; /* White content area for tabs */
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 4px; /* Rounded bottom corners */
+    border-bottom-right-radius: 4px; /* Rounded bottom corners */
     padding: 10px;
 }
 QTabBar::tab {
     background: #e1e5e8; /* Light grey tabs */
     color: #2c3e50;
     border: 1px solid #dcdfe2;
-    border-bottom: none;
+    border-bottom: none; /* Tab sits on top of the pane */
     padding: 8px 15px;
-    border-top-left-radius: 4px;
-    border-top-right-radius: 4px;
-    margin-right: 2px;
+    border-top-left-radius: 4px; /* Rounded top corners of tabs */
+    border-top-right-radius: 4px; /* Rounded top corners of tabs */
+    margin-right: 2px; /* Spacing between tabs */
 }
 QTabBar::tab:selected {
     background: #ffffff; /* White for selected tab */
@@ -264,7 +270,7 @@ QTabBar::tab:hover:!selected {
 QGroupBox {
     color: #2c3e50;
     border: 1px solid #bdc3c7;
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded corners for QGroupBox */
     margin-top: 10px;
     padding: 10px 5px 5px 5px;
 }
@@ -280,6 +286,7 @@ QGroupBox::title {
 /* QSplitter */
 QSplitter::handle {
     background-color: #bdc3c7; /* Silver handle */
+    border-radius: 3px; /* Rounded splitter handles */
 }
 QSplitter::handle:hover {
     background-color: #cacfd2;
@@ -294,6 +301,7 @@ QStatusBar {
     color: #2c3e50;
     border-top: 1px solid #dcdfe2; /* Separator line */
     padding: 3px;
+    /* No border-radius for status bar, typically spans window width */
 }
 QStatusBar::item {
     border: none;
@@ -302,11 +310,13 @@ QStatusBar::item {
 /* QMessageBox */
 QMessageBox {
     background-color: #ffffff; /* White background */
-    border-radius: 8px;
+    border: 1px solid #bdc3c7; /* Consistent border */
+    border-radius: 8px; /* Rounded corners for QMessageBox */
 }
 QMessageBox QLabel {
     color: #2c3e50;
     background-color: transparent;
+    padding: 5px;
 }
 QMessageBox QPushButton {
     background-color: #e1e5e8;
@@ -314,7 +324,7 @@ QMessageBox QPushButton {
     border: 1px solid #bdc3c7;
     padding: 8px 15px;
     min-width: 70px;
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded buttons in QMessageBox */
 }
 QMessageBox QPushButton:hover {
     background-color: #f5f7f9;
@@ -326,13 +336,14 @@ QMessageBox QPushButton:pressed {
 
 /* QDialog */
 QDialog {
-    background-color: #ffffff;
+    background-color: #ffffff; /* White background for dialogs */
     color: #2c3e50;
-    border: 1px solid #bdc3c7;
-    border-radius: 8px;
+    border: 1px solid #bdc3c7; /* Consistent border */
+    border-radius: 8px; /* Rounded corners for QDialog */
 }
 QDialog QLabel, QDialog QCheckBox {
     color: #2c3e50;
+    background-color: transparent;
 }
 QDialog QPushButton {
     background-color: #e1e5e8;
@@ -340,7 +351,7 @@ QDialog QPushButton {
     border: 1px solid #bdc3c7;
     padding: 8px 15px;
     min-width: 70px;
-    border-radius: 4px;
+    border-radius: 4px; /* Rounded buttons in QDialog */
 }
 QDialog QPushButton:hover {
     background-color: #f5f7f9;
@@ -349,4 +360,35 @@ QDialog QPushButton:pressed {
     background-color: #3498db;
     color: white;
 }
+
+
+/* Dashboard Card Styling */
+QFrame[objectName^="dashboardCard"] {
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white */
+    /* Alternative solid color: #FDFEFE; */
+    border: 1px solid #D5DBDB; /* Subtle light border */
+    border-radius: 8px; /* Consistent with other larger elements */
+    padding: 15px;
 }
+
+QFrame[objectName^="dashboardCard"] QLabel[objectName^="titleLabel"],
+QFrame[objectName^="dashboardCard"] QLabel:first-child {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50; /* Dark text for titles */
+    border: none;
+    background: transparent;
+    padding: 0px; /* Reset padding */
+}
+
+QFrame[objectName^="dashboardCard"] QLabel[objectName^="contentLabel"],
+QFrame[objectName^="dashboardCard"] QLabel:not(:first-child) {
+    font-size: 12px;
+    color: #566573; /* Slightly lighter text for content */
+    border: none;
+    background: transparent;
+    padding: 0px; /* Reset padding */
+}
+
+/* Add comments for clarity */
+/* End of light_theme.qss */
