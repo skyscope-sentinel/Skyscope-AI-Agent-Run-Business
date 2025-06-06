@@ -9,7 +9,7 @@ if project_root not in sys.path:
 import json # To format the PRD for the prompt
 from skyscope_sentinel.agents.base_agent import BaseAgent
 from skyscope_sentinel.ollama_integration import OllamaIntegration
-# from skyscope_sentinel.agents.messaging import AgentMessageQueue # May need if sending message directly
+from skyscope_sentinel.agents.messaging import AgentMessageQueue # For type hinting
 
 class EngineerAgent(BaseAgent):
     def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b"): # Using a small model, can be configured
@@ -103,8 +103,122 @@ class EngineerAgent(BaseAgent):
             recipient_id=original_sender_id,
             content=response_content
         )
-        self.log(f"Sent code generation result to '{original_sender_id}'.")
-        return generated_code is not None
+        self.log(f"Sent code to ReviewerAgent '{reviewer_agent_id}' for review.")
+        self.status = "waiting_code_review"
+        return generated_code
+
+    def handle_code_review_feedback(self,
+                                    review_feedback_content: dict,
+                                    original_code: str,
+                                    prd_data: dict,
+                                    message_queue: AgentMessageQueue,
+                                    final_recipient_id: str):
+        self.log(f"Received code review feedback: {str(review_feedback_content)[:150]}...")
+        self.status = "processing_code_review"
+
+        approved = review_feedback_content.get('approved', False)
+        suggestions = review_feedback_content.get('suggestions', [])
+
+        self.log(f"Reviewer Code Feedback - Approved: {approved}, Suggestions: {len(suggestions)}")
+
+        final_code_to_send = original_code
+        regeneration_attempted = False
+        code_was_revised = False
+
+        if not approved and suggestions: # If not approved AND there are suggestions, try to regenerate
+            self.log(f"Code not approved or has suggestions. Attempting regeneration based on feedback (Suggestions: {suggestions}).")
+            self.status = "regenerating_code"
+            regeneration_attempted = True
+
+            try:
+                prd_data_json_string = json.dumps(prd_data, indent=2)
+            except TypeError as e:
+                self.log(f"Error: Could not serialize PRD data to JSON for code regeneration prompt: {e}")
+                self.status = "error_regenerating_code" # Error in prep for regen
+                # Proceed to send original code below (pass will let it fall through)
+            else:
+                refinement_prompt = (
+                    f"The original Product Requirement Document (PRD) was:\n"
+                    f"```json\n{prd_data_json_string}\n```\n"
+                    f"The first attempt at generating Python code produced:\n"
+                    f"```{prd_data.get('target_platform', 'python')}\n{original_code}\n```\n" # Assuming python, or use target_platform
+                    f"A review of this code provided the following suggestions for improvement:\n"
+                )
+                for i, suggestion in enumerate(suggestions):
+                    refinement_prompt += f"- {suggestion}\n"
+
+                refinement_prompt += (
+                    f"\nPlease generate a revised Python code snippet that addresses these suggestions and adheres to the PRD. "
+                    f"Only output the raw Python code itself, without any surrounding text, explanations, or markdown formatting like ```python ... ```."
+                )
+
+                system_prompt_refine = "You are an expert Python programmer. You previously wrote a piece of code which received feedback. Your task is to revise the code based on the provided PRD and suggestions to improve its quality and correctness. Output only the code."
+
+                self.log(f"Code Refinement prompt (first 200 chars): {refinement_prompt[:200]}...")
+
+                revised_code_string, error = self.ollama_integration.generate_text_sync(
+                    model_name=self.model_name,
+                    prompt=refinement_prompt,
+                    system_prompt=system_prompt_refine
+                )
+
+                if error:
+                    self.log(f"Error during code regeneration from Ollama: {error}")
+                    self.status = "error_regenerating_code"
+                elif not revised_code_string:
+                    self.log("Ollama returned an empty response for code regeneration.")
+                    self.status = "error_regenerating_code"
+                else:
+                    self.log(f"Raw revised code string from Ollama: {revised_code_string[:300]}...")
+                    clean_revised_code = revised_code_string.strip()
+                    if clean_revised_code.startswith("```python"):
+                        clean_revised_code = clean_revised_code.removeprefix("```python").strip()
+                    if clean_revised_code.startswith("```"):
+                        clean_revised_code = clean_revised_code.removeprefix("```").strip()
+                    if clean_revised_code.endswith("```"):
+                        clean_revised_code = clean_revised_code.removesuffix("```").strip()
+
+                    if clean_revised_code:
+                        self.log("Successfully generated and cleaned revised code.")
+                        final_code_to_send = clean_revised_code
+                        code_was_revised = True
+                        self.status = "code_regenerated_and_approved"
+                    else:
+                        self.log("Revised code was empty after cleaning. Sticking with original.")
+                        self.status = "error_regenerating_code"
+        elif approved:
+            self.log("Code was approved by reviewer, or no actionable suggestions provided. Sending original code.")
+        else:
+            self.log("Code was not approved, but no suggestions to act upon. Sending original code with a warning.")
+
+        if not final_code_to_send:
+            self.log("Critical Error: No code available to send (original or revised). This should not happen if original_code was valid.")
+            self.status = "error_eng_logic_critical"
+            error_msg_content = {"type": "eng_error", "detail": "Critical error, no code available after review process."}
+            message_queue.send_message(self.agent_id, final_recipient_id, error_msg_content)
+            return False
+
+        code_delivery_content = {
+            "type": "code_generation_result",
+            "status": "success" if (approved or code_was_revised) else "success_with_unaddressed_review_suggestions",
+            "project_name": prd_data.get('project_name', 'Unknown Project'),
+            "generated_code_snippet": final_code_to_send[:250] + "...",
+            "full_code": final_code_to_send,
+            "review_was_conducted": True,
+            "code_was_revised": code_was_revised
+        }
+        message_queue.send_message(
+            sender_id=self.agent_id,
+            recipient_id=final_recipient_id,
+            content=code_delivery_content
+        )
+        if code_was_revised:
+            self.log(f"Sent REVISED code to final recipient '{final_recipient_id}'.")
+        else:
+            self.log(f"Sent ORIGINAL code to final recipient '{final_recipient_id}' (Review approved, no suggestions, or regeneration failed/skipped).")
+
+        self.status = "code_sent_to_user"
+        return True
 
 if __name__ == '__main__':
     print("--- EngineerAgent Test (with Ollama Integration) ---")
@@ -117,7 +231,10 @@ if __name__ == '__main__':
         print(f"ERROR: Could not list Ollama models: {error}. Aborting test.")
         sys.exit(1)
 
-    available_models = [m.get('name') for m in models if m.get('name')]
+    available_models = []
+    if models: # Ensure models is not None
+        available_models = [m.get('name') for m in models if m.get('name')]
+
     if eng_model not in available_models:
         print(f"ERROR: Test model '{eng_model}' for Engineer Agent not found.")
         print(f"Available models: {available_models}")
@@ -164,3 +281,12 @@ if __name__ == '__main__':
     else:
         print(f"Failed to generate code for '{prd_example_greeting['project_name']}'.")
     print(f"Status after generate_code for greeter: {eng_agent.get_status()}")
+
+    print("\nNote: Full workflow including code review request and handling feedback")
+    print("is typically tested in a multi-agent demo script using AgentMessageQueue.")
+    print("The methods 'handle_prd_and_generate_code' (now for initiating review) and 'handle_code_review_feedback'")
+    print("orchestrate these interactions.")
+    print("\nThe code refinement logic in 'handle_code_review_feedback'")
+    print("involves receiving feedback and potentially re-generating code using Ollama.")
+    print("This iterative process is best tested in the full multi-agent demo script,")
+    print("where actual reviewer feedback can be provided to trigger regeneration.")

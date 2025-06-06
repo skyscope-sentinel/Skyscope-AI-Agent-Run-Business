@@ -1,21 +1,15 @@
 import sys
 import os
-
-# Add project root to Python path for sibling imports
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
 import json
 from skyscope_sentinel.agents.base_agent import BaseAgent
 from skyscope_sentinel.ollama_integration import OllamaIntegration
-# from skyscope_sentinel.agents.messaging import AgentMessageQueue # May need if directly sending
+from skyscope_sentinel.agents.messaging import AgentMessageQueue # For type hinting
 
 class ProductManagerAgent(BaseAgent):
     def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b"):
         super().__init__(agent_id)
         self.ollama_integration = ollama_integration_instance if ollama_integration_instance else OllamaIntegration()
-        self.model_name = model_name # Model to use for PRD generation
+        self.model_name = model_name
         self.status = "idle_pm"
         self.log(f"initialized with model '{self.model_name}'.")
 
@@ -60,7 +54,6 @@ class ProductManagerAgent(BaseAgent):
 
         try:
             clean_json_string = generated_json_string.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
-
             prd_data = json.loads(clean_json_string)
 
             required_keys = ['project_name', 'description', 'features', 'target_platform']
@@ -82,26 +75,151 @@ class ProductManagerAgent(BaseAgent):
             self.status = "error_parsing_prd"
             return None
 
-    def handle_requirement_and_send_prd(self, user_requirement_text: str, message_queue, engineer_agent_id: str):
-        self.log(f"Handling requirement to generate PRD and send to engineer '{engineer_agent_id}'.")
+    def handle_requirement_and_send_prd(self,
+                                        user_requirement_text: str,
+                                        message_queue: AgentMessageQueue,
+                                        engineer_agent_id: str,
+                                        reviewer_agent_id: str,
+                                        original_user_id: str) -> dict | None: # Modified return type
+        self.log(f"Handling requirement to generate PRD, get reviewed by '{reviewer_agent_id}', then send to engineer '{engineer_agent_id}'. Original user: '{original_user_id}'.")
 
         prd_data = self.generate_prd(user_requirement_text)
 
-        if prd_data:
-            message_content = {
-                "type": "prd_document",
-                "prd": prd_data
+        if not prd_data:
+            self.log(f"Failed to generate initial PRD. Nothing to review or send to engineer.")
+            error_msg_content = {
+                "type": "prd_generation_failed",
+                "requirement": user_requirement_text,
+                "error": "PM failed to generate PRD."
             }
+            if message_queue:
+                message_queue.send_message(self.agent_id, original_user_id, error_msg_content)
+            return None
+
+        self.log(f"Initial PRD generated for '{prd_data.get('project_name', 'Unknown Project')}'.")
+
+        review_request_content = {
+            "type": "prd_review_request",
+            "prd_data": prd_data,
+            "respond_to_agent_id": self.agent_id
+        }
+        if message_queue:
             message_queue.send_message(
                 sender_id=self.agent_id,
-                recipient_id=engineer_agent_id,
-                content=message_content
+                recipient_id=reviewer_agent_id,
+                content=review_request_content
             )
-            self.log(f"Sent PRD to engineer '{engineer_agent_id}'.")
-            return True
+            self.log(f"Sent PRD to ReviewerAgent '{reviewer_agent_id}' for review.")
         else:
-            self.log(f"Failed to generate or parse PRD. Nothing sent to engineer '{engineer_agent_id}'.")
+            self.log("Warning: Message queue not provided. Cannot send PRD for review.")
+
+        self.status = "waiting_prd_review"
+        return prd_data
+
+    def handle_prd_review_feedback(self,
+                                   review_feedback_content: dict,
+                                   original_prd_data: dict,
+                                   user_requirement_text: str, # Needed for regeneration prompt
+                                   message_queue: AgentMessageQueue,
+                                   engineer_agent_id: str,
+                                   original_user_id: str):
+        self.log(f"Received PRD review feedback: {str(review_feedback_content)[:150]}...")
+        self.status = "processing_prd_review"
+
+        approved = review_feedback_content.get('approved', False)
+        suggestions = review_feedback_content.get('suggestions', [])
+        # comments = review_feedback_content.get('comments', "") # Already logged if needed
+
+        self.log(f"Reviewer Feedback - Approved: {approved}, Suggestions: {len(suggestions)}")
+
+        final_prd_to_send = original_prd_data
+        regeneration_attempted = False
+
+        if not approved and suggestions: # If not approved AND there are suggestions, try to regenerate
+            self.log(f"PRD not approved or has suggestions. Attempting regeneration based on feedback (Suggestions: {suggestions}).")
+            self.status = "regenerating_prd"
+            regeneration_attempted = True
+
+            refinement_prompt = (
+                f"The initial user requirement was: '{user_requirement_text}'.\n"
+                f"The first generated Product Requirement Document (PRD) was:\n"
+                f"```json\n{json.dumps(original_prd_data, indent=2)}\n```\n"
+                f"A review of this PRD provided the following suggestions for improvement:\n"
+            )
+            for i, suggestion in enumerate(suggestions):
+                refinement_prompt += f"- {suggestion}\n"
+
+            refinement_prompt += (
+                "\nPlease generate a revised PRD as a JSON string, addressing these suggestions. "
+                "The revised PRD must follow the same JSON structure as before: "
+                "an object with keys 'project_name', 'description', 'features' (list of strings), and 'target_platform'. "
+                "Ensure the JSON is well-formed and complete. Only output the JSON string."
+            )
+
+            system_prompt_refine = "You are a Product Manager AI. You previously created a PRD which received feedback. Your task is to revise the PRD based on the provided suggestions to improve its quality, clarity, and completeness, maintaining the JSON format."
+
+            self.log(f"Refinement prompt (first 200 chars): {refinement_prompt[:200]}...")
+
+            revised_prd_json_string, error = self.ollama_integration.generate_text_sync(
+                model_name=self.model_name,
+                prompt=refinement_prompt,
+                system_prompt=system_prompt_refine
+            )
+
+            if error:
+                self.log(f"Error during PRD regeneration from Ollama: {error}")
+                self.status = "error_regenerating_prd"
+            elif not revised_prd_json_string:
+                self.log("Ollama returned an empty response for PRD regeneration.")
+                self.status = "error_regenerating_prd"
+            else:
+                self.log(f"Raw revised PRD JSON string from Ollama: {revised_prd_json_string[:300]}...")
+                try:
+                    clean_revised_json_string = revised_prd_json_string.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+                    revised_prd_data = json.loads(clean_revised_json_string)
+
+                    required_keys = ['project_name', 'description', 'features', 'target_platform']
+                    if not all(key in revised_prd_data for key in required_keys) or not isinstance(revised_prd_data['features'], list):
+                        self.log(f"Revised PRD JSON is missing keys or 'features' is not a list. Sticking with original. Revised data: {revised_prd_data}")
+                    else:
+                        self.log(f"Successfully parsed revised PRD: {revised_prd_data}")
+                        final_prd_to_send = revised_prd_data
+                        self.status = "prd_regenerated_and_approved"
+                except json.JSONDecodeError as e:
+                    self.log(f"Failed to decode revised PRD JSON string: {e}. Sticking with original PRD.")
+                    self.log(f"Problematic revised JSON: {revised_prd_json_string[:500]}")
+                    self.status = "error_parsing_revised_prd"
+        elif approved:
+            self.log("PRD was approved by reviewer, or no actionable suggestions provided. Sending original PRD.")
+        else:
+            self.log("PRD was not approved, but no suggestions to act upon. Sending original PRD with a warning.")
+
+        if not final_prd_to_send:
+            self.log("Critical Error: No PRD data available to send (original or revised).")
+            self.status = "error_pm_logic_critical"
+            error_msg_content = {"type": "pm_error", "detail": "Critical error, no PRD available after review process."}
+            message_queue.send_message(self.agent_id, original_user_id, error_msg_content)
             return False
+
+        engineer_message_content = {
+            "type": "prd_document",
+            "prd": final_prd_to_send,
+            "respond_to_agent_id": original_user_id,
+            "review_was_conducted": True,
+            "prd_was_revised": regeneration_attempted and (final_prd_to_send != original_prd_data)
+        }
+        message_queue.send_message(
+            sender_id=self.agent_id,
+            recipient_id=engineer_agent_id,
+            content=engineer_message_content
+        )
+        if regeneration_attempted and (final_prd_to_send != original_prd_data):
+            self.log(f"Sent REVISED PRD to engineer '{engineer_agent_id}'.")
+        else:
+            self.log(f"Sent ORIGINAL PRD to engineer '{engineer_agent_id}' (Review approved, no suggestions, or regeneration failed/skipped).")
+
+        self.status = "prd_sent_to_engineer"
+        return True
 
 if __name__ == '__main__':
     print("--- ProductManagerAgent Test (with Ollama Integration) ---")
@@ -114,7 +232,10 @@ if __name__ == '__main__':
         print(f"ERROR: Could not list Ollama models: {error}. Aborting test.")
         sys.exit(1)
 
-    available_models = [m.get('name') for m in models if m.get('name')]
+    available_models = []
+    if models: # Ensure models is not None
+        available_models = [m.get('name') for m in models if m.get('name')]
+
     if pm_model not in available_models:
         print(f"ERROR: Test model '{pm_model}' for PM Agent not found.")
         print(f"Available models: {available_models}")
@@ -144,3 +265,12 @@ if __name__ == '__main__':
     else:
         print(f"Failed to generate PRD for '{requirement2}'.")
     print(f"Status after generate_prd for vague task: {pm_agent.get_status()}")
+
+    print("\nNote: Full workflow including review request and handling feedback")
+    print("is typically tested in a multi-agent demo script using AgentMessageQueue.")
+    print("The methods 'handle_requirement_and_send_prd' and 'handle_prd_review_feedback'")
+    print("orchestrate these interactions.")
+    print("\nThe PRD refinement logic in 'handle_prd_review_feedback'")
+    print("involves receiving feedback and potentially re-generating the PRD using Ollama.")
+    print("This iterative process is best tested in the full multi-agent demo script,")
+    print("where actual reviewer feedback (simulated or LLM-generated) can be provided.")
