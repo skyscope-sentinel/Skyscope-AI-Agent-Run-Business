@@ -5,7 +5,7 @@ QMainWindow {
 
 /* Sidebar with acrylic effect */
 QFrame#sidebar {
-    background-color: rgba(44, 62, 80, 0.85); /* Dark slate grey, more transparent */
+    background-color: rgba(40, 40, 40, 0.85); /* Dark grey, less transparent than centralWidget */
     border-top-left-radius: 15px;
     border-bottom-left-radius: 15px;
     border-right: 1px solid #2c3e50; /* Subtle separator */
@@ -14,7 +14,7 @@ QFrame#sidebar {
 QPushButton {
     background-color: #34495e; /* Midnight Blue */
     color: #ecf0f1; /* Clouds */
-    border: 1px solid #34495e;
+    border: 1px solid transparent; /* Flatter look */
     padding: 10px;
     border-radius: 6px;
     min-height: 30px;
@@ -24,11 +24,12 @@ QPushButton {
 
 QPushButton:hover {
     background-color: #4e6a85; /* Slightly lighter Midnight Blue */
-    border: 1px solid #5a7a9a;
+    border: 1px solid transparent; /* Flatter look */
 }
 
 QPushButton:pressed {
     background-color: #2c3e50; /* Darker Midnight Blue */
+    border: 1px solid transparent; /* Flatter look */
 }
 
 QPushButton:checked { /* Style for the active page button in sidebar */
@@ -76,14 +77,14 @@ QStackedWidget {
 /* QMainWindow background is set, this widget overlays it. */
 QWidget#centralWidget {
     border-radius: 15px;
-    background-color: #2c3e50; /* Wet Asphalt - content background */
+    background-color: rgba(30, 30, 30, 0.8); /* Dark grey, glassy effect */
 }
 
 /* Input Fields */
 QLineEdit {
     background-color: #3b5369; /* Slightly lighter than button */
     color: #ecf0f1;
-    border: 1px solid #2c3e50;
+    border: 1px solid #555; /* Subtle border */
     border-radius: 4px; /* Rounded corners for QLineEdit */
     padding: 8px;
     min-height: 20px;
@@ -100,7 +101,7 @@ QLineEdit:disabled {
 QComboBox {
     background-color: #3b5369;
     color: #ecf0f1;
-    border: 1px solid #2c3e50;
+    border: 1px solid #555; /* Subtle border */
     border-radius: 4px; /* Rounded corners for QComboBox */
     padding: 8px;
     min-height: 20px;
@@ -136,7 +137,7 @@ QComboBox QAbstractItemView { /* Dropdown list style */
 QTableWidget {
     background-color: #34495e;
     color: #ecf0f1;
-    border: 1px solid #2c3e50;
+    border: 1px solid #555; /* Subtle border */
     gridline-color: #4a6572;
     border-radius: 4px; /* Rounded corners for QTableWidget */
 }
@@ -144,13 +145,17 @@ QHeaderView::section {
     background-color: #3b5369;
     color: #ecf0f1;
     padding: 5px;
-    border: 1px solid #2c3e50;
+    border: 1px solid #555; /* Subtle border */
     font-weight: bold;
     /* No border-radius for header sections for a flatter, integrated look */
 }
 QTableWidget::item {
     padding: 5px;
     border-bottom: 1px solid #4a6572; /* Row separator */
+}
+QTableWidget::item:hover {
+    background-color: #4e6a85; /* Consistent hover color */
+    color: #ecf0f1;
 }
 QTableWidget::item:selected {
     background-color: #1abc9c;
@@ -161,37 +166,37 @@ QTableWidget::item:selected {
 QTextEdit {
     background-color: #3b5369;
     color: #ecf0f1;
-    border: 1px solid #2c3e50;
+    border: 1px solid #555; /* Subtle border */
     border-radius: 4px; /* Rounded corners for QTextEdit */
     padding: 5px;
 }
 
 /* ScrollBar */
 QScrollBar:vertical {
-    border: 1px solid #2c3e50;
+    border: 1px solid #555; /* Subtle border */
     background: #34495e;
-    width: 12px;
+    width: 10px; /* Thinner scrollbar */
     margin: 0px 0px 0px 0px; /* No margin */
 }
 QScrollBar::handle:vertical {
     background: #4e6a85;
     min-height: 20px;
-    border-radius: 6px; /* Rounded scrollbar handle */
+    border-radius: 5px; /* Adjusted for thinner bar */
 }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     height: 0px; /* Hide arrows for a cleaner look */
     background: none;
 }
 QScrollBar:horizontal {
-    border: 1px solid #2c3e50;
+    border: 1px solid #555; /* Subtle border */
     background: #34495e;
-    height: 12px;
+    height: 10px; /* Thinner scrollbar */
     margin: 0px 0px 0px 0px; /* No margin */
 }
 QScrollBar::handle:horizontal {
     background: #4e6a85;
     min-width: 20px;
-    border-radius: 6px; /* Rounded scrollbar handle */
+    border-radius: 5px; /* Adjusted for thinner bar */
 }
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
     width: 0px; /* Hide arrows for a cleaner look */
@@ -275,7 +280,7 @@ QTabBar::tab:hover:!selected {
 /* GroupBox */
 QGroupBox {
     color: #ecf0f1;
-    border: 1px solid #4a6572;
+    border: 1px solid #555; /* Consistent border */
     border-radius: 4px; /* Rounded corners for QGroupBox */
     margin-top: 10px; /* Space for title */
     padding: 10px 5px 5px 5px; /* Top padding smaller due to title */
@@ -285,8 +290,8 @@ QGroupBox::title {
     subcontrol-position: top left;
     padding: 0 5px;
     left: 10px; /* Position title slightly inset */
-    background-color: #2c3e50; /* Match main background */
-    color: #1abc9c; /* Turquoise title */
+    background-color: transparent; /* More integrated title background */
+    color: #ecf0f1; /* Standard text color for title */
 }
 
 /* QSplitter */
