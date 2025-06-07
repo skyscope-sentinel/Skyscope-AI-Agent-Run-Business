@@ -5,7 +5,7 @@ from PySide6.QtWidgets import (
     QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit # Added QTextEdit, QLineEdit for Log Stream
 )
 from PySide6.QtCore import Qt, QSize, QFile, QTextStream, Slot
-from PySide6.QtGui import QColor, QPalette, QIcon, QAction
+from PySide6.QtGui import QColor, QPalette, QIcon, QAction, QFont # QFont might be useful for list items
 
 from .model_hub_page import ModelHubPage
 from .settings_page import SettingsPage, SETTING_THEME, SETTING_ACRYLIC_EFFECT, SETTING_AUTOSTART, SETTING_MINIMIZE_TO_TRAY # Added keys
@@ -26,6 +26,19 @@ def load_stylesheet(filename):
 
 DARK_STYLE_PATH = "skyscope_sentinel/dark_theme.qss"
 LIGHT_STYLE_PATH = "skyscope_sentinel/light_theme.qss"
+
+# AIAgent Class Definition
+class AIAgent:
+    def __init__(self, name: str, agent_type: str, status: str = "Offline", config: dict = None):
+        self.name = name
+        self.type = agent_type
+        self.status = status
+        self.config = config if config else {}
+        # Store a unique ID if needed, for now name is unique identifier
+        # self.id = str(uuid.uuid4())
+
+    def __repr__(self):
+        return f"AIAgent(name='{self.name}', type='{self.type}', status='{self.status}')"
 
 
 class PlaceholderPage(QWidget):
@@ -70,50 +83,67 @@ class PlaceholderPage(QWidget):
 
             # Agents List Section
             agents_group = QGroupBox("Available Agents")
-            agents_group_layout = QVBoxLayout() # Renamed to avoid conflict with main 'layout'
+            agents_group_layout = QVBoxLayout()
 
             self.agent_list_widget = QListWidget()
-            self.agent_list_widget.addItems(["Website Content Agent (Offline)", "Crypto Trading Bot (Running)", "Social Media Poster (Idle)"])
             self.agent_list_widget.setToolTip("List of configured AI agents and their status.")
-            # TODO: Add styling for QListWidget items if needed via QSS or delegate later
             agents_group_layout.addWidget(self.agent_list_widget)
-
             agents_group.setLayout(agents_group_layout)
             layout.addWidget(agents_group)
 
+            # Sample Agents Data
+            self.agents = [
+                AIAgent(name="Website Content Agent", agent_type="ContentGeneration", status="Offline", config={"url": "example.com", "keywords": ["AI", "Python"]}),
+                AIAgent(name="Crypto Trading Bot", agent_type="Trading", status="Running", config={"exchange": "Binance", "pair": "BTC/USDT"}),
+                AIAgent(name="Social Media Poster", agent_type="SocialMedia", status="Idle", config={"platform": "Twitter", "schedule": "daily"}),
+                AIAgent(name="Data Entry Clerk", agent_type="DataProcessing", status="Paused", config={"source": "CSV", "target_db": "PostgreSQL"}),
+            ]
+            for agent in self.agents:
+                self.agent_list_widget.addItem(f"{agent.name} ({agent.status})")
+                # Store agent object in item data for later retrieval
+                list_item = self.agent_list_widget.item(self.agent_list_widget.count() - 1)
+                list_item.setData(Qt.UserRole, agent)
+
+
             # Agent Actions Section
             actions_layout = QHBoxLayout()
+            self.btn_start_agent = QPushButton(QIcon.fromTheme("media-playback-start"), "Start Selected")
+            self.btn_start_agent.setToolTip("Start the selected agent.")
+            self.btn_start_agent.setEnabled(False)
+            self.btn_start_agent.clicked.connect(self.start_selected_agent)
+            actions_layout.addWidget(self.btn_start_agent)
 
-            btn_start_agent = QPushButton(QIcon.fromTheme("media-playback-start"), "Start Selected")
-            btn_start_agent.setToolTip("Start the selected agent (Placeholder).")
-            btn_start_agent.setEnabled(False) # Placeholder
-            actions_layout.addWidget(btn_start_agent)
+            self.btn_stop_agent = QPushButton(QIcon.fromTheme("media-playback-stop"), "Stop Selected")
+            self.btn_stop_agent.setToolTip("Stop the selected agent.")
+            self.btn_stop_agent.setEnabled(False)
+            self.btn_stop_agent.clicked.connect(self.stop_selected_agent)
+            actions_layout.addWidget(self.btn_stop_agent)
 
-            btn_stop_agent = QPushButton(QIcon.fromTheme("media-playback-stop"), "Stop Selected")
-            btn_stop_agent.setToolTip("Stop the selected agent (Placeholder).")
-            btn_stop_agent.setEnabled(False) # Placeholder
-            actions_layout.addWidget(btn_stop_agent)
+            self.btn_config_agent = QPushButton(QIcon.fromTheme("preferences-system"), "Configure Selected")
+            self.btn_config_agent.setToolTip("Configure the selected agent.")
+            self.btn_config_agent.setEnabled(False)
+            self.btn_config_agent.clicked.connect(self.configure_selected_agent)
+            actions_layout.addWidget(self.btn_config_agent)
 
-            btn_config_agent = QPushButton(QIcon.fromTheme("preferences-system"), "Configure Selected")
-            btn_config_agent.setToolTip("Configure the selected agent (Placeholder).")
-            btn_config_agent.setEnabled(False) # Placeholder
-            actions_layout.addWidget(btn_config_agent)
-
-            btn_view_logs = QPushButton(QIcon.fromTheme("document-preview"), "View Logs")
-            btn_view_logs.setToolTip("View logs for the selected agent (Placeholder).")
-            btn_view_logs.setEnabled(False) # Placeholder
-            actions_layout.addWidget(btn_view_logs)
+            self.btn_view_logs = QPushButton(QIcon.fromTheme("document-preview"), "View Logs")
+            self.btn_view_logs.setToolTip("View logs for the selected agent.")
+            self.btn_view_logs.setEnabled(False)
+            self.btn_view_logs.clicked.connect(self.view_agent_logs)
+            actions_layout.addWidget(self.btn_view_logs)
 
             layout.addLayout(actions_layout)
 
             # Add New Agent Button
-            add_agent_btn = QPushButton(QIcon.fromTheme("list-add"), "Add New Agent...")
-            add_agent_btn.setToolTip("Define and configure a new AI agent (Placeholder).")
-            # add_agent_btn.setEnabled(False) # Placeholder, but keep it enabled for now
-            add_agent_btn.setStyleSheet("QPushButton { text-align: center; padding-left: 0px; margin-top: 10px; }")
-            layout.addWidget(add_agent_btn, 0, Qt.AlignCenter)
+            self.add_agent_btn = QPushButton(QIcon.fromTheme("list-add"), "Add New Agent...")
+            self.add_agent_btn.setToolTip("Define and configure a new AI agent.")
+            self.add_agent_btn.clicked.connect(self.add_new_agent)
+            self.add_agent_btn.setStyleSheet("QPushButton { text-align: center; padding-left: 0px; margin-top: 10px; }")
+            layout.addWidget(self.add_agent_btn, 0, Qt.AlignCenter)
 
             layout.addStretch() # Ensure content pushes to the top
+
+            # Connect agent selection change to method
+            self.agent_list_widget.currentItemChanged.connect(self.on_agent_selection_changed)
 
 
         elif name == "Log Stream":
@@ -141,35 +171,154 @@ class PlaceholderPage(QWidget):
 
             self.search_log_input = QLineEdit()
             self.search_log_input.setPlaceholderText("Search logs...")
-            self.search_log_input.setToolTip("Enter keywords to search in logs (Placeholder).")
-            self.search_log_input.setEnabled(False) # Placeholder
+            self.search_log_input.setToolTip("Enter keywords to search in logs.")
+            # self.search_log_input.setEnabled(False) # Keep disabled for now as per original, or enable for typing
+            self.search_log_input.textChanged.connect(self.on_log_search_changed) # Connect for future use
             controls_layout.addWidget(self.search_log_input)
 
-            clear_logs_btn = QPushButton(QIcon.fromTheme("edit-clear"), "Clear Logs")
-            clear_logs_btn.setToolTip("Clear the displayed logs (Placeholder).")
-            clear_logs_btn.setEnabled(False) # Placeholder
-            controls_layout.addWidget(clear_logs_btn)
+            self.clear_logs_btn = QPushButton(QIcon.fromTheme("edit-clear"), "Clear Logs")
+            self.clear_logs_btn.setToolTip("Clear the displayed logs.")
+            # self.clear_logs_btn.setEnabled(False) # Keep disabled for now, or enable
+            self.clear_logs_btn.clicked.connect(self.clear_logs_display)
+            controls_layout.addWidget(self.clear_logs_btn)
 
             layout.addLayout(controls_layout)
+
+            # Connect filter combo
+            self.log_filter_combo.currentIndexChanged.connect(self.on_log_filter_changed)
+
 
             # Log Display Area
             self.log_display_area = QTextEdit()
             self.log_display_area.setReadOnly(True)
             sample_logs = (
-                "[INFO] 2023-10-27 10:00:00 - Application successfully initialized.\n"
+                "[INFO]  2023-10-27 10:00:00 - Application successfully initialized.\n"
                 "[DEBUG] 2023-10-27 10:00:05 - Checking Ollama service status...\n"
-                "[OLLAMA] 2023-10-27 10:00:06 - Ollama service detected, version: 0.1.15\n"
+                "[OLLAMA]2023-10-27 10:00:06 - Ollama service detected, version: 0.1.15\n"
                 "[AGENT_ALPHA] 2023-10-27 10:01:00 - Starting Website Content Generation task.\n"
                 "[ERROR] 2023-10-27 10:01:30 - Agent Beta failed to connect to external API: Timeout.\n"
-                "[WARNING] 2023-10-27 10:02:00 - Low disk space detected on /var/log."
+                "[WARN]  2023-10-27 10:02:00 - Low disk space detected on /var/log.\n"
+                "[INFO]  2023-10-27 10:03:00 - User 'admin' logged in from 192.168.1.10.\n"
+                "[DEBUG] 2023-10-27 10:03:05 - Processing request ID: ax7812gf.\n"
+                "[OLLAMA]2023-10-27 10:04:10 - Model 'llama2:7b' loaded successfully.\n"
+                "[AGENT_BETA] 2023-10-27 10:05:00 - Task 'ImageAnalysis' completed. Results saved to /output/img_xyz.json.\n"
+                "[ERROR] 2023-10-27 10:05:30 - Application database connection lost. Attempting reconnect...\n"
+                "[WARN]  2023-10-27 10:06:00 - Configuration file 'settings.json' has new unrecognized keys.\n"
             )
             self.log_display_area.setPlaceholderText("Logs will appear here...")
             self.log_display_area.setText(sample_logs)
-            # Consider setFont (e.g., a monospaced font) for better log readability later
+
+            log_font = QFont("Monospace") # Or "Courier", "Consolas"
+            log_font.setStyleHint(QFont.Monospace)
+            log_font.setPointSize(10) # Slightly smaller for more content
+            self.log_display_area.setFont(log_font)
             layout.addWidget(self.log_display_area)
 
 
         self.setLayout(layout)
+
+    # --- Agent Control Page Methods ---
+    def on_agent_selection_changed(self, current_item, previous_item):
+        is_selected = current_item is not None
+        if hasattr(self, 'btn_start_agent'): # Check if buttons exist (only for Agent Control page)
+            self.btn_start_agent.setEnabled(is_selected)
+            self.btn_stop_agent.setEnabled(is_selected)
+            self.btn_config_agent.setEnabled(is_selected)
+            self.btn_view_logs.setEnabled(is_selected)
+
+        if current_item and hasattr(self, 'agents'): # Check if agent data is relevant
+            agent = current_item.data(Qt.UserRole)
+            if agent: # Ensure agent data is present
+                 print(f"Selected agent: {agent}") # For debugging
+
+    def start_selected_agent(self):
+        current_item = self.agent_list_widget.currentItem()
+        if current_item:
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to start agent: {agent.name} (Type: {agent.type}, Status: {agent.status})")
+            agent.status = "Running"
+            current_item.setText(f"{agent.name} ({agent.status})")
+            self.show_status_message(f"Agent '{agent.name}' started (simulated).", "success")
+        else:
+            print("No agent selected to start.")
+            self.show_status_message("No agent selected.", "warning")
+
+    def stop_selected_agent(self):
+        current_item = self.agent_list_widget.currentItem()
+        if current_item:
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to stop agent: {agent.name}")
+            agent.status = "Offline"
+            current_item.setText(f"{agent.name} ({agent.status})")
+            self.show_status_message(f"Agent '{agent.name}' stopped (simulated).", "info")
+        else:
+            print("No agent selected to stop.")
+            self.show_status_message("No agent selected.", "warning")
+
+    def configure_selected_agent(self):
+        current_item = self.agent_list_widget.currentItem()
+        if current_item:
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to configure agent: {agent.name}")
+            print(f"Current config: {agent.config}")
+            self.show_status_message(f"Configuration for '{agent.name}' would open here.", "info")
+        else:
+            print("No agent selected to configure.")
+            self.show_status_message("No agent selected.", "warning")
+
+    def view_agent_logs(self):
+        current_item = self.agent_list_widget.currentItem()
+        if current_item:
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to view logs for agent: {agent.name}")
+            self.show_status_message(f"Log view for '{agent.name}' would open here.", "info")
+        else:
+            print("No agent selected to view logs.")
+            self.show_status_message("No agent selected.", "warning")
+
+    def add_new_agent(self):
+        print("Attempting to add a new agent.")
+        new_agent_id = len(self.agents) + 1
+        new_agent = AIAgent(name=f"New Sample Agent {new_agent_id}", agent_type="SampleType", status="Offline")
+        self.agents.append(new_agent)
+        self.agent_list_widget.addItem(f"{new_agent.name} ({new_agent.status})")
+        new_list_item = self.agent_list_widget.item(self.agent_list_widget.count() - 1)
+        new_list_item.setData(Qt.UserRole, new_agent)
+        self.show_status_message(f"New agent '{new_agent.name}' added (simulated).", "success")
+
+    # --- Log Stream Page Methods ---
+    def on_log_filter_changed(self, index):
+        if hasattr(self, 'log_filter_combo'): # Ensure this method is called for the correct page
+            selected_filter = self.log_filter_combo.itemText(index)
+            print(f"Log filter changed to: {selected_filter}")
+            # Actual log filtering logic would go here.
+            # For now, we just show a message.
+            self.show_status_message(f"Log filter set to: {selected_filter}", "info")
+            # Example: self.update_log_display(filter_text=selected_filter)
+
+    def on_log_search_changed(self, text):
+        if hasattr(self, 'search_log_input'):
+            print(f"Log search text: {text}")
+            # Actual search/filter logic would go here.
+            # Example: self.update_log_display(search_term=text)
+            # For now, this is a placeholder.
+            if text: # Only show message if there's text, to avoid spamming on clear
+                self.show_status_message(f"Searching logs for: {text}", "info", 1500)
+
+
+    def clear_logs_display(self):
+        if hasattr(self, 'log_display_area'): # Ensure this method is called for the correct page
+            self.log_display_area.clear()
+            print("Log display cleared.")
+            self.show_status_message("Log display cleared.", "info")
+
+    def show_status_message(self, message, msg_type="info", duration=3000):
+        main_window = self.parent().parent().parent()
+        if hasattr(main_window, 'show_status_message') and callable(getattr(main_window, 'show_status_message')):
+            main_window.show_status_message(message, msg_type, duration)
+        else:
+            print(f"PlaceholderPage Status ({msg_type}): {message} (MainWindow not found or method missing)")
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -232,7 +381,7 @@ class MainWindow(QMainWindow):
             "Agent Control": "applications-system", # or "preferences-system"
             "Video Tools": "applications-multimedia", # Icon for video tools
             "Model Hub": "drive-harddisk", # or "applications-internet"
-            "Log Stream": "document-view", 
+            "Log Stream": "document-view", # Changed from "text-x-generic"
             "Settings": "preferences-configure"
         }
         tooltips = {
@@ -325,13 +474,34 @@ class MainWindow(QMainWindow):
                 current_page_matches = True
             elif section_name == "Video Tools" and isinstance(widget, VideoAgentPage): # Condition for VideoAgentPage
                 current_page_matches = True
-            elif isinstance(widget, PlaceholderPage) and widget.label.text() == target_widget_label:
-                current_page_matches = True
+            # elif isinstance(widget, PlaceholderPage) and widget.label.text() == target_widget_label: # Old problematic check
+            # Need a more robust way to identify PlaceholderPages if their title label changes or is removed.
+            # For now, we rely on the order and type for ModelHubPage and SettingsPage.
+            # For PlaceholderPage, we can check its internal 'name' attribute if we store it.
+            # Or, more simply, match by section_name directly as ModelHub/Settings are specific classes.
+
+            # Revised check for PlaceholderPage
+            elif isinstance(widget, PlaceholderPage):
+                # Access the 'name' attribute we set during PlaceholderPage creation (if we do)
+                # For now, we'll assume that if it's a PlaceholderPage and not ModelHub/Settings,
+                # it's matched by its position/order in self.sections.
+                # This part of the logic might need refinement if pages are dynamically added/removed
+                # or if PlaceholderPage's title is the only identifier.
+                # The current PlaceholderPage __init__ takes 'name', but it's used for the label.
+                # Let's assume the order in QStackedWidget matches self.sections for placeholders.
+                if self.sections[i] == section_name: # This assumes order is preserved.
+                    current_page_matches = True
 
             if current_page_matches:
                 self.content_area.setCurrentIndex(i)
                 page_found = True
-                break # Found the page
+                # Update the title label of the PlaceholderPage if it's the one being switched to
+                # This is a bit of a workaround because the label text was previously used for matching.
+                if isinstance(widget, PlaceholderPage) and hasattr(widget, 'label'):
+                    # We might want to avoid changing the "Agent Control" specific title
+                    if section_name != "Agent Control" and section_name != "Log Stream" and section_name != "Dashboard": # Avoid overwriting custom titles
+                         widget.label.setText(f"Welcome to the {section_name} Page")
+                break
         
         if page_found:
             for name, btn in self.nav_buttons.items():
@@ -339,7 +509,28 @@ class MainWindow(QMainWindow):
             print(f"Switched to {section_name}")
             self.show_status_message(f"{section_name} page loaded.", "info", 3000)
         else:
-            print(f"Warning: Page for section '{section_name}' not found.")
+            # This case should ideally not happen if all sections have a corresponding page
+            print(f"Warning: Page for section '{section_name}' not found or match logic failed for index {i}.")
+            # Fallback: try to find by objectName if set, or create if truly missing.
+            # For now, we print a warning. A robust solution would be to store pages in a dictionary.
+            # Example: self.pages[section_name] = page_object
+            # Then: self.content_area.setCurrentWidget(self.pages[section_name])
+
+            # Check if a PlaceholderPage exists with the given name (if we stored it)
+            # This is a simplified check, assuming `widget.page_name_attribute == section_name`
+            found_by_probing = False
+            for idx in range(self.content_area.count()):
+                page_widget = self.content_area.widget(idx)
+                if isinstance(page_widget, PlaceholderPage):
+                    # PlaceholderPage needs an attribute like `self.page_name = name` in its __init__
+                    # For this example, let's assume the label text is still a semi-reliable way to find it if not Agent Control
+                    if hasattr(page_widget, 'label') and page_widget.label.text().startswith(f"Welcome to the {section_name}"):
+                        self.content_area.setCurrentIndex(idx)
+                        page_found = True
+                        break
+            if not page_found:
+                 print(f"Critical Warning: Page for section '{section_name}' truly not found.")
+
 
 
     def apply_theme_from_file(self, qss_file_path):
