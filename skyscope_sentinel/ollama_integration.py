@@ -165,6 +165,103 @@ class OllamaIntegration:
         except Exception as e:
             return None, f"An unexpected error occurred while getting Ollama version: {str(e)}"
 
+    def generate_text_sync(self, model_name: str, prompt: str, system_prompt: str = None) -> tuple[str | None, str | None]:
+        """
+        Synchronously generates text using a specified Ollama model via CLI for streaming JSON.
+
+        Args:
+            model_name (str): The name of the model to use (e.g., "qwen2:0.5b").
+            prompt (str): The user prompt for the model.
+            system_prompt (str, optional): An optional system-level prompt to guide the model's behavior.
+
+        Returns:
+            tuple[str | None, str | None]: (generated_text, error_message)
+                                           generated_text is the full response if successful, None otherwise.
+                                           error_message is a string if an error occurred, None otherwise.
+        """
+        if not model_name or len(model_name.strip()) == 0:
+            return None, "Model name cannot be empty for text generation."
+        if not prompt or len(prompt.strip()) == 0:
+            return None, "Prompt cannot be empty for text generation."
+
+        command = ["ollama", "generate", model_name, "--format=json"]
+
+        payload = {"prompt": prompt}
+        if system_prompt:
+            payload["system"] = system_prompt
+
+        self._log(f"Executing Ollama command: {' '.join(command)} with prompt (first 50 chars): '{prompt[:50]}...'")
+
+        try:
+            process = subprocess.run(
+                command,
+                input=json.dumps(payload), # Send payload as JSON string via stdin
+                capture_output=True,
+                text=True,
+                check=False # Don't raise exception for non-zero exit codes immediately
+            )
+
+            if process.returncode != 0:
+                error_msg = f"Ollama CLI error (code {process.returncode}) for model '{model_name}': {process.stderr.strip()}"
+                self._log(error_msg, level="error")
+                return None, error_msg
+
+            full_response_text = ""
+            json_error_count = 0
+
+            # Output from `ollama generate ... --format=json` is a stream of JSON objects, one per line.
+            # Each JSON object represents a part of the response. Concatenate the 'response' fields.
+            for line in process.stdout.strip().split('\n'):
+                if not line.strip(): # Skip empty lines
+                    continue
+                try:
+                    json_part = json.loads(line)
+                    full_response_text += json_part.get("response", "")
+                    # Check for error in the 'done' message which might contain final error details
+                    if json_part.get("done", False) and json_part.get("error"):
+                        error_msg = f"Ollama generation error in 'done' response for model '{model_name}': {json_part['error']}"
+                        self._log(error_msg, level="error")
+                        # If an error occurs in the "done" part, it might supersede any partial text
+                        return None, error_msg
+                except json.JSONDecodeError:
+                    json_error_count += 1
+                    self._log(f"Warning: JSONDecodeError for line: '{line}' during generation with '{model_name}'.", level="warning")
+
+            if json_error_count > 0:
+                 self._log(f"Warning: Encountered {json_error_count} JSON decoding errors processing stream from '{model_name}'.", level="warning")
+                 # Depending on strictness, one might return an error here or proceed with potentially incomplete text.
+
+            if not full_response_text.strip() and process.stderr.strip():
+                # If no text and there was stderr not caught by returncode (less common for generate)
+                error_msg = f"Ollama generation for '{model_name}' produced no text, stderr: {process.stderr.strip()}"
+                self._log(error_msg, level="error")
+                return None, error_msg
+
+            if not full_response_text.strip() and not process.stderr.strip() and process.returncode == 0 :
+                # This case can happen if the model generates nothing (e.g. empty prompt for some models)
+                # or if the output stream was empty for other reasons.
+                self._log(f"Warning: Ollama generation for '{model_name}' produced no text output, but no explicit CLI error.", level="warning")
+                # Return empty string and no error, as the command itself succeeded.
+                return "", None
+
+
+            self._log(f"Successfully generated text with '{model_name}' (first 100 chars): '{full_response_text[:100]}...'")
+            return full_response_text, None
+
+        except FileNotFoundError:
+            error_msg = "Ollama CLI not found. Please ensure it's installed and in your PATH."
+            self._log(error_msg, level="error")
+            return None, error_msg
+        except Exception as e:
+            error_msg = f"An unexpected error occurred during Ollama text generation with '{model_name}': {e}"
+            self._log(error_msg, level="error")
+            return None, error_msg
+
+    def _log(self, message: str, level: str = "info"):
+        """Internal simple logger for the class integration methods."""
+        # In a real app, this might use the application's logging framework.
+        print(f"[OllamaIntegration] [{level.upper()}] {message}")
+
 
 if __name__ == '__main__':
     # This basic test suite can be run with `python -m skyscope_sentinel.ollama_integration`
@@ -180,27 +277,72 @@ if __name__ == '__main__':
         print(f"  SUCCESS: Ollama Version: {version}")
 
     print("\n[TEST] Synchronous List Models:")
-    models, error = ollama_api.list_models_sync()
+    models_list_data, error = ollama_api.list_models_sync() # Renamed to avoid conflict
     if error:
         print(f"  ERROR: {error}")
     else:
-        print(f"  SUCCESS: Found {len(models)} models.")
-        if models:
-            print(f"    Models: {[m.get('name') for m in models]}")
+        print(f"  SUCCESS: Found {len(models_list_data)} models.")
+        if models_list_data:
+            print(f"    Models: {[m.get('name') for m in models_list_data]}")
         else:
             print("    No local models found or Ollama service might not be running.")
 
-    if models:
-        print(f"\n[TEST] Synchronous Show Model Info (for first model: {models[0].get('name')}):")
-        first_model_name = models[0].get('name')
+    test_generation_model_name = None
+    if models_list_data:
+        first_model_name = models_list_data[0].get('name')
+        print(f"\n[TEST] Synchronous Show Model Info (for first model: {first_model_name}):")
         info, error = ollama_api.show_model_info_sync(first_model_name)
         if error:
             print(f"  ERROR: {error}")
         else:
             print(f"  SUCCESS: Info for {first_model_name} retrieved.")
             print(f"    Family: {info.get('details', {}).get('family')}, Size: {info.get('details', {}).get('parameter_size')}")
+        test_generation_model_name = first_model_name # Use this model for generation test
     else:
         print("\n[INFO] Skipping Show Model Info test as no local models were found.")
+        # Try a common small model if no local models are found
+        # User should ensure this model is available if they want the test to pass.
+        print("\n[INFO] Attempting generation test with a default small model 'qwen2:0.5b'.")
+        print("[INFO] If 'qwen2:0.5b' is not available, this test may fail or take time to download.")
+        test_generation_model_name = "qwen2:0.5b"
+
+
+    if test_generation_model_name:
+        print(f"\n[TEST] Synchronous Text Generation (Model: {test_generation_model_name}):")
+        prompt1 = "Explain the concept of a Large Language Model in one simple paragraph."
+        system_prompt1 = "You are an AI assistant that explains complex topics simply."
+
+        print(f"  Test 1: Prompt: '{prompt1[:50]}...', System Prompt: '{system_prompt1[:50]}...'")
+        generated_text, gen_error = ollama_api.generate_text_sync(test_generation_model_name, prompt1, system_prompt1)
+        if gen_error:
+            print(f"    ERROR generating text: {gen_error}")
+        else:
+            print(f"    SUCCESS. Generated text (first 100 chars): {generated_text[:100]}...")
+
+        print(f"\n  Test 2: Prompt only: 'What are the planets in our solar system?'")
+        generated_text_no_sys, gen_error_no_sys = ollama_api.generate_text_sync(test_generation_model_name, "What are the planets in our solar system?")
+        if gen_error_no_sys:
+            print(f"    ERROR generating text (no system prompt): {gen_error_no_sys}")
+        else:
+            print(f"    SUCCESS. Generated text (no system prompt, first 100 chars): {generated_text_no_sys[:100]}...")
+
+        print(f"\n  Test 3: Using a non-existent model 'thismodeldoesnotexist:latest'")
+        _, gen_error_non_existent = ollama_api.generate_text_sync("thismodeldoesnotexist:latest", "Hello?")
+        if gen_error_non_existent:
+            print(f"    SUCCESS: Correctly caught error for non-existent model: {gen_error_non_existent[:100]}...")
+        else:
+            print(f"    WARNING: Text generation with non-existent model did not return an error as expected.")
+
+        print(f"\n  Test 4: Empty prompt string")
+        _, gen_error_empty_prompt = ollama_api.generate_text_sync(test_generation_model_name, "")
+        if gen_error_empty_prompt:
+            print(f"    SUCCESS: Correctly caught error for empty prompt: {gen_error_empty_prompt}")
+        else:
+            print(f"    WARNING: Text generation with empty prompt did not return an error as expected.")
+
+    else:
+        print("\n[INFO] Skipping Text Generation test as no model could be determined.")
+
 
     print("\n--- Asynchronous Tests (Setup) ---")
     print("Note: Asynchronous tests require a running Qt event loop to fully execute.")
