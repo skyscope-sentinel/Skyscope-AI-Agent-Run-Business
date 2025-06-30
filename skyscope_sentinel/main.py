@@ -2,7 +2,7 @@ import sys
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QStackedWidget, QFrame, QStatusBar, QSystemTrayIcon, QMenu, QGridLayout, QSizePolicy,
-    QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit # Added QTextEdit, QLineEdit for Log Stream
+    QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit, QMessageBox # Added QMessageBox
 )
 from PySide6.QtCore import Qt, QSize, QFile, QTextStream, Slot
 from PySide6.QtGui import QColor, QPalette, QIcon, QAction, QFont # QFont might be useful for list items
@@ -34,6 +34,125 @@ from .agents.metagpt_reviewer_agent import ReviewerAgent
 from .owl_integration.owl_base_agent import OwlBaseAgent
 # We'll also need OllamaIntegration if we want to initialize these agents fully here for display
 from .ollama_integration import OllamaIntegration
+# For research task page
+from .autogen_interface import initiate_research_via_autogen
+import asyncio # For running autogen interface
+from PySide6.QtCore import QThread, Signal # For running async tasks in background
+from .config import Config # Import the Config class
+
+# Global config instance to be used by other modules
+# This should be one of the first things initialized so other modules can import it.
+# However, it needs to be updated by SettingsManager from the GUI later.
+global_config = Config()
+
+
+# --- QThread for running asyncio tasks ---
+class AsyncRunnerThread(QThread):
+    task_completed = Signal(object) # Signal to emit result
+    task_failed = Signal(str)       # Signal to emit error message
+
+    def __init__(self, coro, *args, parent=None):
+        super().__init__(parent)
+        self.coro = coro
+        self.args = args
+
+    def run(self):
+        try:
+            # Create a new event loop for this thread if one doesn't exist,
+            # or get the existing one if already set by a higher-level async manager for Qt.
+            # For simple cases, asyncio.run() creates and closes its own loop.
+            # However, for QThread, it's often better to manage the loop explicitly
+            # if there are multiple async tasks or complex interactions.
+            # For this specific case where we run one main async function,
+            # asyncio.run() might be sufficient if it handles loop creation/closing cleanly.
+            # A more robust approach for Qt+asyncio is often libraries like qasync or asyncqt.
+            # Sticking to asyncio.run() for now for simplicity.
+            result = asyncio.run(self.coro(*self.args))
+            self.task_completed.emit(result)
+        except Exception as e:
+            self.task_failed.emit(str(e))
+
+
+class ResearchTaskPage(QWidget):
+    status_message_requested = Signal(str, str, int)
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setObjectName("researchTaskPage")
+        layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(15)
+
+        title_label = QLabel("Market Opportunity Research Task")
+        title_label.setStyleSheet("font-size: 20px; font-weight: bold; margin-bottom: 10px;")
+        title_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(title_label)
+
+        form_layout = QGridLayout()
+        form_layout.setSpacing(10)
+
+        topic_label = QLabel("Research Topic:")
+        self.topic_input = QLineEdit()
+        self.topic_input.setPlaceholderText("e.g., AI tools for content creation")
+        form_layout.addWidget(topic_label, 0, 0)
+        form_layout.addWidget(self.topic_input, 0, 1)
+
+        layout.addLayout(form_layout)
+
+        self.run_button = QPushButton(QIcon.fromTheme("system-run"), "Start Research")
+        self.run_button.setToolTip("Initiate the multi-agent research crew to investigate the topic.")
+        self.run_button.clicked.connect(self.handle_run_research)
+        layout.addWidget(self.run_button, 0, Qt.AlignCenter)
+
+        results_group = QGroupBox("Research Results")
+        results_layout = QVBoxLayout(results_group)
+        self.results_display = QTextEdit()
+        self.results_display.setReadOnly(True)
+        self.results_display.setPlaceholderText("Research findings will appear here...")
+        results_layout.addWidget(self.results_display)
+        layout.addWidget(results_group)
+
+        self.async_thread = None # To hold the thread
+
+    def handle_run_research(self):
+        topic = self.topic_input.text().strip()
+        if not topic:
+            self.status_message_requested.emit("Research topic cannot be empty.", "warning", 3000)
+            QMessageBox.warning(self, "Input Error", "Please enter a research topic.")
+            return
+
+        self.run_button.setEnabled(False)
+        self.results_display.setText(f"Researching topic: '{topic}'...\nPlease wait, this may take some time.")
+        QApplication.processEvents() # Update UI
+
+        # Run the async function in a separate thread
+        if self.async_thread and self.async_thread.isRunning():
+            self.status_message_requested.emit("A research task is already in progress.", "warning", 3000)
+            # Optionally, add logic to queue or cancel previous task
+            return
+
+        self.async_thread = AsyncRunnerThread(initiate_research_via_autogen, topic)
+        self.async_thread.task_completed.connect(self.on_research_completed)
+        self.async_thread.task_failed.connect(self.on_research_failed)
+        self.async_thread.start()
+        self.status_message_requested.emit(f"Research task started for '{topic}'.", "info", 0)
+
+
+    @Slot(object)
+    def on_research_completed(self, result):
+        self.results_display.setText(str(result))
+        self.run_button.setEnabled(True)
+        self.status_message_requested.emit("Research task completed successfully.", "success", 5000)
+        QMessageBox.information(self, "Research Complete", "The research task has finished.")
+        self.async_thread = None
+
+    @Slot(str)
+    def on_research_failed(self, error_message):
+        self.results_display.append(f"\n\n--- ERROR ---\n{error_message}")
+        self.run_button.setEnabled(True)
+        self.status_message_requested.emit(f"Research task failed: {error_message}", "error", 7000)
+        QMessageBox.critical(self, "Research Failed", f"An error occurred during the research task:\n{error_message}")
+        self.async_thread = None
 
 
 class PlaceholderPage(QWidget):
@@ -426,7 +545,8 @@ class MainWindow(QMainWindow):
         self.settings_manager = SettingsManager() # Initialize settings manager for main window use
 
         self.nav_buttons = {}
-        self.sections = ["Dashboard", "Agent Control", "Video Tools", "Model Hub", "Log Stream", "Settings"] # Added "Video Tools"
+        # Added "Opportunity Research" to sections
+        self.sections = ["Dashboard", "Opportunity Research", "Agent Control", "Video Tools", "Model Hub", "Log Stream", "Settings"]
         
         app_title_label = QLabel("Skyscope Sentinel")
         app_title_label.setAlignment(Qt.AlignCenter)
@@ -437,17 +557,19 @@ class MainWindow(QMainWindow):
         # These might not show up on Windows if a proper icon theme isn't installed or if the names are Linux-specific.
         # For production, embedding actual icon files (SVGs) would be more reliable.
         icon_map = {
-            "Dashboard": "view-dashboard",  # Common theme name
-            "Agent Control": "applications-system", # or "preferences-system"
-            "Video Tools": "applications-multimedia", # Icon for video tools
-            "Model Hub": "drive-harddisk", # or "applications-internet"
-            "Log Stream": "document-view", # Changed from "text-x-generic"
+            "Dashboard": "view-dashboard",
+            "Opportunity Research": "system-search", # Using a search icon
+            "Agent Control": "applications-system",
+            "Video Tools": "applications-multimedia",
+            "Model Hub": "drive-harddisk",
+            "Log Stream": "document-view",
             "Settings": "preferences-configure"
         }
         tooltips = {
             "Dashboard": "View system overview and key metrics",
+            "Opportunity Research": "Run AI agents to research market opportunities",
             "Agent Control": "Manage and configure AI agents",
-            "Video Tools": "Access video processing utilities", # Tooltip for Video Tools
+            "Video Tools": "Access video processing utilities",
             "Model Hub": "Explore and manage Ollama models",
             "Log Stream": "Monitor real-time application and agent logs",
             "Settings": "Configure application settings"
@@ -476,8 +598,12 @@ class MainWindow(QMainWindow):
                 self.content_area.addWidget(self.settings_page)
             elif section_name == "Video Tools": # Condition for Video Tools
                 self.video_agent_page = VideoAgentPage()
-                self.video_agent_page.status_message_requested.connect(self.show_status_message) # Connect the signal
+                self.video_agent_page.status_message_requested.connect(self.show_status_message)
                 self.content_area.addWidget(self.video_agent_page)
+            elif section_name == "Opportunity Research":
+                self.research_task_page = ResearchTaskPage()
+                self.research_task_page.status_message_requested.connect(self.show_status_message_slot) # Connect its status signal
+                self.content_area.addWidget(self.research_task_page)
             else:
                 page = PlaceholderPage(section_name)
                 self.content_area.addWidget(page)
@@ -510,7 +636,24 @@ class MainWindow(QMainWindow):
         self.show_status_message("Welcome to Skyscope Sentinel!", "info", 5000)
 
         # --- Initialize Theme and Settings ---
-        self.load_initial_settings()
+        self.load_initial_settings() # Loads theme, acrylic based on SettingsManager
+
+        # Update the global_config with values from SettingsManager
+        # This ensures that any GUI-set API keys or Ollama settings are propagated
+        # to the config object that other modules (like crews, autogen_interface) will use.
+        if hasattr(self, 'settings_manager') and self.settings_manager:
+            global_config.update_from_settings_manager(self.settings_manager)
+            # Also, ensure environment variables are set if possible, so tools relying on os.getenv() directly get them.
+            # This is a bit of a workaround for tools that don't take config objects directly.
+            # Be cautious with this if keys are sensitive and many modules use os.getenv().
+            if global_config.get_serper_api_key():
+                os.environ["SERPER_API_KEY"] = global_config.get_serper_api_key()
+            if global_config.get_openai_api_key():
+                os.environ["OPENAI_API_KEY"] = global_config.get_openai_api_key()
+            # Ollama settings are usually passed directly to LLM configs, but if some tool expected env vars:
+            # os.environ["OLLAMA_MODEL"] = global_config.get_ollama_model_name()
+            # os.environ["OLLAMA_BASE_URL"] = global_config.get_ollama_base_url()
+
         
         # --- System Tray Icon ---
         self.create_system_tray_icon()
@@ -543,7 +686,9 @@ class MainWindow(QMainWindow):
                 current_page_matches = True
             elif section_name == "Settings" and isinstance(widget, SettingsPage):
                 current_page_matches = True
-            elif section_name == "Video Tools" and isinstance(widget, VideoAgentPage): # Condition for VideoAgentPage
+            elif section_name == "Video Tools" and isinstance(widget, VideoAgentPage):
+                current_page_matches = True
+            elif section_name == "Opportunity Research" and isinstance(widget, ResearchTaskPage): # Match ResearchTaskPage
                 current_page_matches = True
             # elif isinstance(widget, PlaceholderPage) and widget.label.text() == target_widget_label: # Old problematic check
             # Need a more robust way to identify PlaceholderPages if their title label changes or is removed.
@@ -767,13 +912,21 @@ class MainWindow(QMainWindow):
         
         status_color = ""
         # Ensure current_theme_path is initialized
-        theme_path = getattr(self, 'current_theme_path', DARK_STYLE_PATH)
+        if not hasattr(self, 'current_theme_path') or not self.current_theme_path:
+             # Ensure settings_manager is available or load default directly
+            if hasattr(self, 'settings_manager') and self.settings_manager:
+                initial_theme_name = self.settings_manager.load_setting(SETTING_THEME, "dark")
+                self.current_theme_path = DARK_STYLE_PATH if initial_theme_name == "dark" else LIGHT_STYLE_PATH
+            else: # Fallback if called before settings_manager fully init (should not happen in normal flow)
+                self.current_theme_path = DARK_STYLE_PATH # Default to dark path
 
-        if theme_path == DARK_STYLE_PATH:
+        theme_path_to_check = self.current_theme_path
+
+        if theme_path_to_check == DARK_STYLE_PATH:
             if msg_type == "error": status_color = "color: #E74C3C;" # Red
             elif msg_type == "success": status_color = "color: #2ECC71;" # Green
             else: status_color = "color: #ECF0F1;" # Default light text
-        else: # Light theme
+        else: # Light theme (theme_path_to_check == LIGHT_STYLE_PATH)
             if msg_type == "error": status_color = "color: #C0392B;" # Darker Red
             elif msg_type == "success": status_color = "color: #27AE60;" # Darker Green
             else: status_color = "color: #2C3E50;" # Default dark text
@@ -781,7 +934,20 @@ class MainWindow(QMainWindow):
         self.status_bar.setStyleSheet(status_color)
         self.status_bar.showMessage(message, duration if duration > 0 else 0) # Show indefinitely if duration is 0 or less
 
+    @Slot(str, str, int) # Slot for direct connection from other pages
+    def show_status_message_slot(self, message, msg_type="info", duration=7000):
+        self.show_status_message(message, msg_type, duration)
+
 if __name__ == "__main__":
+    import os # Ensure os is imported
+    # Fix for Wayland:
+    # Check if running under Wayland and XDG_SESSION_TYPE is not set
+    # This is a common workaround for Qt apps on some Wayland setups.
+    if os.environ.get("XDG_SESSION_TYPE") == "wayland":
+        if not os.environ.get("QT_QPA_PLATFORM"):
+            # os.environ["QT_QPA_PLATFORM"] = "wayland" # Enable this if 'wayland' is preferred and works
+            pass # Or let Qt auto-detect; often works. Forcing xcb might also be an option if wayland native is problematic.
+
     app = QApplication(sys.argv)
     # Ensure the application doesn't quit when the last window is closed, if using tray icon extensively
     app.setQuitOnLastWindowClosed(False) # Modify based on desired tray behavior

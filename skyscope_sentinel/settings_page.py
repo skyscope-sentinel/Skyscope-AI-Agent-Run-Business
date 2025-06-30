@@ -60,7 +60,8 @@ class SettingsPage(QWidget):
         self.tab_widget.addTab(self.create_appearance_tab(), QIcon.fromTheme("preferences-desktop-theme"), "Appearance")
         self.tab_widget.addTab(self.create_ollama_tab(), QIcon.fromTheme("network-server"), "Ollama")
         self.tab_widget.addTab(self.create_agents_tab(), QIcon.fromTheme("applications-science"), "Agents")
-        self.tab_widget.addTab(self.create_financials_tab(), QIcon.fromTheme("wallet-open-symbolic", QIcon.fromTheme("emblem-money")), "Financials") # Added Financials tab
+        self.tab_widget.addTab(self.create_api_keys_tab(), QIcon.fromTheme("dialog-password", QIcon.fromTheme("security-high")), "API Keys") # New API Keys tab
+        self.tab_widget.addTab(self.create_financials_tab(), QIcon.fromTheme("wallet-open-symbolic", QIcon.fromTheme("emblem-money")), "Financials")
         self.tab_widget.addTab(self.create_advanced_tab(), QIcon.fromTheme("preferences-other"), "Advanced")
 
         self.load_all_settings()
@@ -285,8 +286,49 @@ class SettingsPage(QWidget):
             self.le_bank_account.setText(self.settings_manager.load_setting("financials/bank_account_number", ""))
             self.le_payid.setText(self.settings_manager.load_setting("financials/payid", ""))
 
+        # API Keys - Load saved values
+        if hasattr(self, 'le_openai_api_key'): # Check if API Keys tab elements are initialized
+            self.le_openai_api_key.setText(self.settings_manager.load_setting("api_keys/openai_api_key", ""))
+        if hasattr(self, 'le_serper_api_key'):
+            self.le_serper_api_key.setText(self.settings_manager.load_setting("api_keys/serper_api_key", ""))
+
         self.status_message_requested.emit("Settings loaded.", "info")
 
+    # --- API Keys Tab Creator ---
+    def create_api_keys_tab(self):
+        api_keys_tab, layout = self._create_tab_content_widget()
+
+        api_instructions = QLabel(
+            "Enter your API keys for various services here. These keys are stored locally and securely.\n"
+            "Some features or agents may require these keys to function correctly."
+        )
+        api_instructions.setWordWrap(True)
+        api_instructions.setStyleSheet("font-style: italic; color: #888888; margin-bottom: 10px;")
+        layout.addRow(api_instructions)
+
+        # OpenAI API Key
+        self.le_openai_api_key = QLineEdit()
+        self.le_openai_api_key.setPlaceholderText("sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.le_openai_api_key.setToolTip("Your OpenAI API Key (used by some agents or if cloud LLMs are preferred).")
+        self.le_openai_api_key.setEchoMode(QLineEdit.Password)
+        self.le_openai_api_key.editingFinished.connect(
+            lambda: self.save_setting_value("api_keys/openai_api_key", self.le_openai_api_key.text().strip())
+        )
+        layout.addRow("OpenAI API Key:", self.le_openai_api_key)
+
+        # Serper API Key
+        self.le_serper_api_key = QLineEdit()
+        self.le_serper_api_key.setPlaceholderText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.le_serper_api_key.setToolTip("Your Serper.dev API Key for the SerperDevTool (enhanced web search).")
+        self.le_serper_api_key.setEchoMode(QLineEdit.Password)
+        self.le_serper_api_key.editingFinished.connect(
+            lambda: self.save_setting_value("api_keys/serper_api_key", self.le_serper_api_key.text().strip())
+        )
+        layout.addRow("Serper API Key:", self.le_serper_api_key)
+
+        # Add more API key fields here as needed in the future
+
+        return api_keys_tab
 
     # --- Financials Tab Creator and Methods ---
     def create_financials_tab(self):

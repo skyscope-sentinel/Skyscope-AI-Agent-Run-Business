@@ -9,3 +9,18 @@ moviepy>=1.0.3
 # For image manipulation tasks, used by various components including video processing.
 # Also a dependency for moviepy.
 Pillow>=9.0.0
+
+# --- Agent Frameworks & Related ---
+# CrewAI for role-based agent orchestration
+crewai>=0.30.0 # Specify a recent version or use as per latest stable
+crewai[tools]>=0.1.0 # For built-in tools, adjust version as needed
+
+# AutoGen for multi-agent conversations and user proxy
+autogen-agentchat>=0.2.18 # Specify a recent version or use as per latest stable
+autogen-ext[openai]>=0.0.1 # For OpenAI client compatibility (can target Ollama)
+
+# For loading .env files during development (API keys etc.)
+python-dotenv>=1.0.0
+
+# For web search capabilities (alternative/fallback for SerperDevTool)
+duckduckgo-search>=5.0.0
