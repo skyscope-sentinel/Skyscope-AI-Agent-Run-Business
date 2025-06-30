@@ -287,10 +287,13 @@ class SettingsPage(QWidget):
             self.le_payid.setText(self.settings_manager.load_setting("financials/payid", ""))
 
         # API Keys - Load saved values
-        if hasattr(self, 'le_openai_api_key'): # Check if API Keys tab elements are initialized
+        # API Keys - Load saved values
+        if hasattr(self, 'le_openai_api_key'):
             self.le_openai_api_key.setText(self.settings_manager.load_setting("api_keys/openai_api_key", ""))
         if hasattr(self, 'le_serper_api_key'):
             self.le_serper_api_key.setText(self.settings_manager.load_setting("api_keys/serper_api_key", ""))
+        if hasattr(self, 'le_e2b_api_key'): # Load E2B API Key
+            self.le_e2b_api_key.setText(self.settings_manager.load_setting("api_keys/e2b_api_key", ""))
 
         self.status_message_requested.emit("Settings loaded.", "info")
 
@@ -325,6 +328,16 @@ class SettingsPage(QWidget):
             lambda: self.save_setting_value("api_keys/serper_api_key", self.le_serper_api_key.text().strip())
         )
         layout.addRow("Serper API Key:", self.le_serper_api_key)
+
+        # E2B API Key
+        self.le_e2b_api_key = QLineEdit()
+        self.le_e2b_api_key.setPlaceholderText("e2b_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.le_e2b_api_key.setToolTip("Your E2B API Key for secure sandboxed code execution.")
+        self.le_e2b_api_key.setEchoMode(QLineEdit.Password)
+        self.le_e2b_api_key.editingFinished.connect(
+            lambda: self.save_setting_value("api_keys/e2b_api_key", self.le_e2b_api_key.text().strip())
+        )
+        layout.addRow("E2B API Key:", self.le_e2b_api_key)
 
         # Add more API key fields here as needed in the future
 

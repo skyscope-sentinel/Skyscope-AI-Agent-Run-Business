@@ -14,7 +14,8 @@ class Config:
         self.ollama_model_name_env = os.getenv("OLLAMA_MODEL")
         self.ollama_base_url_env = os.getenv("OLLAMA_BASE_URL")
         self.serper_api_key_env = os.getenv("SERPER_API_KEY")
-        self.openai_api_key_env = os.getenv("OPENAI_API_KEY") # For AutoGen or other tools if needed
+        self.openai_api_key_env = os.getenv("OPENAI_API_KEY")
+        self.e2b_api_key_env = os.getenv("E2B_API_KEY") # New E2B API Key
 
         # Default values if environment variables are not set
         self.default_ollama_model = "ollama/qwen2:0.5b" # A reasonable default
@@ -25,6 +26,7 @@ class Config:
         self.current_ollama_url = self.ollama_base_url_env or self.default_ollama_url
         self.current_serper_api_key = self.serper_api_key_env
         self.current_openai_api_key = self.openai_api_key_env
+        self.current_e2b_api_key = self.e2b_api_key_env # Initialize current value
 
         print(f"[Config] Initialized. OLLAMA_MODEL env: {self.ollama_model_name_env}, OLLAMA_BASE_URL env: {self.ollama_base_url_env}")
         print(f"[Config] Effective Ollama Model: {self.current_ollama_model}, URL: {self.current_ollama_url}")
@@ -36,18 +38,21 @@ class Config:
         GUI settings will take precedence over environment variables or defaults if set.
         """
         gui_ollama_model = settings_manager.load_setting("ollama/model_name", None) # Key from settings_page.py
-        gui_ollama_url = settings_manager.load_setting("ollama/service_url", None)   # Key from settings_page.py
-        gui_serper_key = settings_manager.load_setting("api_keys/serper_api_key", None) # Key from settings_page.py
-        gui_openai_key = settings_manager.load_setting("api_keys/openai_api_key", None) # Key from settings_page.py
+        gui_ollama_url = settings_manager.load_setting("ollama/service_url", None)
+        gui_serper_key = settings_manager.load_setting("api_keys/serper_api_key", None)
+        gui_openai_key = settings_manager.load_setting("api_keys/openai_api_key", None)
+        gui_e2b_key = settings_manager.load_setting("api_keys/e2b_api_key", None) # Load E2B key
 
         if gui_ollama_model:
             self.current_ollama_model = gui_ollama_model
         if gui_ollama_url:
             self.current_ollama_url = gui_ollama_url
-        if gui_serper_key: # If GUI provides a key, it overrides env var for this session's config
+        if gui_serper_key:
             self.current_serper_api_key = gui_serper_key
         if gui_openai_key:
             self.current_openai_api_key = gui_openai_key
+        if gui_e2b_key: # Update current E2B key
+            self.current_e2b_api_key = gui_e2b_key
 
         # Optionally, update environment variables so other modules using os.getenv() directly also benefit
         # This can be useful but also has side effects. For now, just update internal state.
@@ -58,7 +63,7 @@ class Config:
         print(f"[Config] Updated from SettingsManager. Effective Ollama Model: {self.current_ollama_model}, URL: {self.current_ollama_url}")
         print(f"[Config] Effective SERPER_API_KEY: {'Set' if self.current_serper_api_key else 'Not Set'}")
         print(f"[Config] Effective OPENAI_API_KEY: {'Set' if self.current_openai_api_key else 'Not Set'}")
-
+        print(f"[Config] Effective E2B_API_KEY: {'Set' if self.current_e2b_api_key else 'Not Set'}") # Print status of E2B key
 
     def get_ollama_model_name(self) -> str:
         """Returns the configured Ollama model name, preferring env var, then default."""
@@ -88,6 +93,10 @@ class Config:
         """Returns the effective OpenAI API key if set, otherwise None."""
         return self.current_openai_api_key
 
+    def get_e2b_api_key(self) -> str | None:
+        """Returns the effective E2B API key if set, otherwise None."""
+        return self.current_e2b_api_key
+
 if __name__ == '__main__':
    from dotenv import load_dotenv
    load_dotenv() # Load .env file if present for testing this module directly
@@ -97,3 +106,4 @@ if __name__ == '__main__':
    print(f"Ollama Base URL: {conf.get_ollama_base_url()}")
    print(f"Serper API Key: {'Set' if conf.get_serper_api_key() else 'Not Set'}")
    print(f"OpenAI API Key: {'Set' if conf.get_openai_api_key() else 'Not Set'}")
+   print(f"E2B API Key: {'Set' if conf.get_e2b_api_key() else 'Not Set'}")

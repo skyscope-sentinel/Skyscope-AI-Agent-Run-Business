@@ -27,3 +27,6 @@ duckduckgo-search>=5.0.0
 
 # Swarms - Enterprise-Grade Multi-Agent Orchestration Framework
 swarms>=6.8.1 # Check for latest stable version, 6.8.1 was noted as recent.
+
+# E2B Code Interpreter for sandboxed code execution
+e2b_code_interpreter>=0.15.0 # Check for latest stable version
