@@ -123,8 +123,51 @@ if __name__ == '__main__':
     # Example: Create a simple search tool for testing
     from crewai_tools import DuckDuckGoSearchRun # swarms might have its own tool registry or base class
                                              # For now, using a known simple tool.
-                                             # We'll need to adapt/wrap tools for swarms properly later.
+                                             # We'll need to adapt/wrap tools for swarms properly later.feature/phase1-agent-gui-owl-setup
+    # Note: swarms.Agent expects tools to be callables or instances of its own BaseTool or similar.
+    # We will use the callable functions we defined.
 
+    # Import the tools
+    from skyscope_sentinel.tools.search_tools import duckduckgo_search_function, serper_search_function
+    from skyscope_sentinel.tools.browser_tools import browse_web_page_and_extract_text
+    from skyscope_sentinel.tools.code_execution_tools import execute_python_code_in_e2b
+    from skyscope_sentinel.tools.file_io_tools import write_file, read_file, list_files
+
+    # Prepare the tools list
+    # For testing, we'll use DuckDuckGo by default. Serper would require SERPER_API_KEY.
+    # E2B tool would require E2B_API_KEY.
+
+    available_tools = [duckduckgo_search_function, browse_web_page_and_extract_text, write_file, read_file, list_files]
+
+    # Conditionally add Serper if key is available (from .env for this standalone test)
+    if os.getenv("SERPER_API_KEY"):
+        available_tools.insert(0, serper_search_function) # Prioritize if available
+        print("[Test] SERPER_API_KEY found, adding Serper tool.")
+    else:
+        print("[Test] SERPER_API_KEY not found, Serper tool will not be available to test agent.")
+
+    # Conditionally add E2B tool if key is available
+    if os.getenv("E2B_API_KEY"):
+        available_tools.append(execute_python_code_in_e2b)
+        print("[Test] E2B_API_KEY found, adding E2B code execution tool.")
+    else:
+        print("[Test] E2B_API_KEY not found, E2B tool will not be available to test agent.")
+
+
+    try:
+        research_specialist_with_tools = SkyscopeSwarmAgent(
+            agent_id="SSA_ToolTester001",
+            department="Researchers",
+            role="Autonomous Research and Task Execution Agent",
+            goal="Utilize available tools to find information, process it, and store it.",
+            tools=available_tools,
+            verbose=True,
+            # Crucially, for swarms.Agent to use tools effectively with many LLMs,
+            # we might need to ensure the LLM supports function calling or that
+            # swarms formats the tool descriptions in a way the LLM can generate structured calls.
+            # The `Ollama` model class in swarms is built on LiteLLM, which can handle this.
+        )
+        print(research_specialist_with_tools.get_skyscope_identity_summary())
     # Note: swarms.Agent expects tools to be instances of its own BaseTool or similar.
     # For this basic test, we might not pass a tool or pass a very simple one.
     # Let's try without a complex tool first to test initialization and LLM.
@@ -139,10 +182,26 @@ if __name__ == '__main__':
             verbose=True
         )
         print(research_specialist.get_skyscope_identity_summary())
+main
         print(f"Swarm Agent Name: {research_specialist.agent_name}")
         print(f"Swarm Agent Description: {research_specialist.agent_description}")
         print(f"Swarm System Prompt: {research_specialist.system_prompt[:200]}...") # Print first 200 chars
 
+ feature/phase1-agent-gui-owl-setup
+        # Test a simple run that might use a search tool
+        # The default swarms.Agent.run() takes a task string.
+        # Ensure your Ollama server is running with the configured model.
+        task_output_search = research_specialist_with_tools.run("Search for the current weather in Paris and write it to a file named 'paris_weather.txt'. Then read the file and tell me its content.")
+        print(f"\nTask Output for 'Search, Write, Read Paris Weather':\n{task_output_search}")
+
+        # Test a task that might use code execution (if E2B key is present and tool added)
+        if execute_python_code_in_e2b in research_specialist_with_tools.tools:
+            task_output_code = research_specialist_with_tools.run(
+                "Write a python script to calculate 2 + 2 and print the result. Then execute this script."
+            )
+            print(f"\nTask Output for 'Code Execution Test':\n{task_output_code}")
+        else:
+            print("\nSkipping code execution test as E2B tool is not available.")
         # Test a simple run
         # The default swarms.Agent.run() takes a task string.
         # Ensure your Ollama server is running with the configured model.
@@ -151,6 +210,7 @@ if __name__ == '__main__':
 
         task_output_tech = research_specialist.run("Explain quantum computing in simple terms.")
         print(f"\nTask Output for 'Quantum Computing':\n{task_output_tech}")
+main
 
 
     except Exception as e:
