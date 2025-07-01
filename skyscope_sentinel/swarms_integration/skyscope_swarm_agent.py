@@ -122,9 +122,10 @@ if __name__ == '__main__':
 
     # Example: Create a simple search tool for testing
     from crewai_tools import DuckDuckGoSearchRun # swarms might have its own tool registry or base class
-                                             # For now, using a known simple tool.
+                                             # For now, using a known simple tool. feature/phase1-agent-gui-owl-setup
                                              # We'll need to adapt/wrap tools for swarms properly later.
-
+        
+                                             # We'll need to adapt/wrap tools for swarms properly later.feature/phase1-agent-gui-owl-setup main
     # Note: swarms.Agent expects tools to be callables or instances of its own BaseTool or similar.
     # We will use the callable functions we defined.
 
@@ -169,10 +170,32 @@ if __name__ == '__main__':
             # The `Ollama` model class in swarms is built on LiteLLM, which can handle this.
         )
         print(research_specialist_with_tools.get_skyscope_identity_summary())
+feature/phase1-agent-gui-owl-setup
+
+    # Note: swarms.Agent expects tools to be instances of its own BaseTool or similar.
+    # For this basic test, we might not pass a tool or pass a very simple one.
+    # Let's try without a complex tool first to test initialization and LLM.
+
+    try:
+        research_specialist = SkyscopeSwarmAgent(
+            agent_id="SSA_Res001",
+            department="Researchers",
+            role="Information Retrieval Specialist", # Overrides title from identity for this specific role
+            goal="Find the latest information on a given topic.",
+            # tools=[DuckDuckGoSearchRun()] # Example tool, ensure it's compatible or wrapped for swarms
+            verbose=True
+        )
+        print(research_specialist.get_skyscope_identity_summary())
+main
+main
         print(f"Swarm Agent Name: {research_specialist.agent_name}")
         print(f"Swarm Agent Description: {research_specialist.agent_description}")
         print(f"Swarm System Prompt: {research_specialist.system_prompt[:200]}...") # Print first 200 chars
 
+feature/phase1-agent-gui-owl-setup
+
+ feature/phase1-agent-gui-owl-setup
+main
         # Test a simple run that might use a search tool
         # The default swarms.Agent.run() takes a task string.
         # Ensure your Ollama server is running with the configured model.
@@ -187,6 +210,18 @@ if __name__ == '__main__':
             print(f"\nTask Output for 'Code Execution Test':\n{task_output_code}")
         else:
             print("\nSkipping code execution test as E2B tool is not available.")
+ feature/phase1-agent-gui-owl-setup
+
+        # Test a simple run
+        # The default swarms.Agent.run() takes a task string.
+        # Ensure your Ollama server is running with the configured model.
+        task_output = research_specialist.run("What is the capital of France?")
+        print(f"\nTask Output for 'Capital of France':\n{task_output}")
+
+        task_output_tech = research_specialist.run("Explain quantum computing in simple terms.")
+        print(f"\nTask Output for 'Quantum Computing':\n{task_output_tech}")
+main
+ main
 
 
     except Exception as e:
