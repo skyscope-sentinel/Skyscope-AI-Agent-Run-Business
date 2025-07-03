@@ -27,6 +27,20 @@ def load_stylesheet(filename):
 DARK_STYLE_PATH = "skyscope_sentinel/dark_theme.qss"
 LIGHT_STYLE_PATH = "skyscope_sentinel/light_theme.qss"
 
+ feat/foundational-agent-system
+# AIAgent Class Definition
+class AIAgent:
+    def __init__(self, name: str, agent_type: str, status: str = "Offline", config: dict = None):
+        self.name = name
+        self.type = agent_type
+        self.status = status
+        self.config = config if config else {}
+        # Store a unique ID if needed, for now name is unique identifier
+        # self.id = str(uuid.uuid4())
+
+    def __repr__(self):
+        return f"AIAgent(name='{self.name}', type='{self.type}', status='{self.status}')"
+
 # Agent imports - remove the old AIAgent class definition
 from .agents.metagpt_pm_agent import ProductManagerAgent
 from .agents.metagpt_engineer_agent import EngineerAgent
@@ -179,6 +193,7 @@ class ResearchTaskPage(QWidget):
         self.status_message_requested.emit(f"Task failed: {error_message}", "error", 7000)
         QMessageBox.critical(self, "Task Failed", f"An error occurred during the AI task:\n{error_message}")
         self.async_thread = None
+ main
 
 
 class PlaceholderPage(QWidget):
@@ -231,6 +246,21 @@ class PlaceholderPage(QWidget):
             agents_group.setLayout(agents_group_layout)
             layout.addWidget(agents_group)
 
+ feat/foundational-agent-system
+            # Sample Agents Data
+            self.agents = [
+                AIAgent(name="Website Content Agent", agent_type="ContentGeneration", status="Offline", config={"url": "example.com", "keywords": ["AI", "Python"]}),
+                AIAgent(name="Crypto Trading Bot", agent_type="Trading", status="Running", config={"exchange": "Binance", "pair": "BTC/USDT"}),
+                AIAgent(name="Social Media Poster", agent_type="SocialMedia", status="Idle", config={"platform": "Twitter", "schedule": "daily"}),
+                AIAgent(name="Data Entry Clerk", agent_type="DataProcessing", status="Paused", config={"source": "CSV", "target_db": "PostgreSQL"}),
+            ]
+            for agent in self.agents:
+                self.agent_list_widget.addItem(f"{agent.name} ({agent.status})")
+                # Store agent object in item data for later retrieval
+                list_item = self.agent_list_widget.item(self.agent_list_widget.count() - 1)
+                list_item.setData(Qt.UserRole, agent)
+
+
             # Instantiate OllamaIntegration (assuming it's light enough to do here)
             # In a real app, this might be a shared instance.
             self.ollama_integration_instance = OllamaIntegration() # Ensure this doesn't block
@@ -271,6 +301,7 @@ class PlaceholderPage(QWidget):
                 list_item = self.agent_list_widget.item(self.agent_list_widget.count() - 1)
                 list_item.setData(Qt.UserRole, agent_instance) # Store the actual agent object
 
+ main
             # Agent Actions Section
             actions_layout = QHBoxLayout()
             self.btn_start_agent = QPushButton(QIcon.fromTheme("media-playback-start"), "Start Selected")
@@ -400,6 +431,13 @@ class PlaceholderPage(QWidget):
     def start_selected_agent(self):
         current_item = self.agent_list_widget.currentItem()
         if current_item:
+feat/foundational-agent-system
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to start agent: {agent.name} (Type: {agent.type}, Status: {agent.status})")
+            agent.status = "Running"
+            current_item.setText(f"{agent.name} ({agent.status})")
+            self.show_status_message(f"Agent '{agent.name}' started (simulated).", "success")
+
             agent_instance = current_item.data(Qt.UserRole)
             agent_name = f"{agent_instance.identity.get('first_name', 'Agent')} {agent_instance.identity.get('last_name', agent_instance.agent_id)}"
             agent_title = agent_instance.identity.get('employee_title', 'N/A')
@@ -407,6 +445,7 @@ class PlaceholderPage(QWidget):
             agent_instance.status = "Running" # Simulate status change
             current_item.setText(f"{agent_name} ({agent_title}) - Status: {agent_instance.status}")
             self.show_status_message(f"Agent '{agent_name}' started (simulated).", "success")
+ main
         else:
             print("No agent selected to start.")
             self.show_status_message("No agent selected.", "warning")
@@ -414,6 +453,13 @@ class PlaceholderPage(QWidget):
     def stop_selected_agent(self):
         current_item = self.agent_list_widget.currentItem()
         if current_item:
+ feat/foundational-agent-system
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to stop agent: {agent.name}")
+            agent.status = "Offline"
+            current_item.setText(f"{agent.name} ({agent.status})")
+            self.show_status_message(f"Agent '{agent.name}' stopped (simulated).", "info")
+
             agent_instance = current_item.data(Qt.UserRole)
             agent_name = f"{agent_instance.identity.get('first_name', 'Agent')} {agent_instance.identity.get('last_name', agent_instance.agent_id)}"
             agent_title = agent_instance.identity.get('employee_title', 'N/A')
@@ -421,6 +467,7 @@ class PlaceholderPage(QWidget):
             agent_instance.status = "Offline" # Simulate status change
             current_item.setText(f"{agent_name} ({agent_title}) - Status: {agent_instance.status}")
             self.show_status_message(f"Agent '{agent_name}' stopped (simulated).", "info")
+ main
         else:
             print("No agent selected to stop.")
             self.show_status_message("No agent selected.", "warning")
@@ -428,6 +475,12 @@ class PlaceholderPage(QWidget):
     def configure_selected_agent(self):
         current_item = self.agent_list_widget.currentItem()
         if current_item:
+ feat/foundational-agent-system
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to configure agent: {agent.name}")
+            print(f"Current config: {agent.config}")
+            self.show_status_message(f"Configuration for '{agent.name}' would open here.", "info")
+
             agent_instance = current_item.data(Qt.UserRole)
             agent_name = f"{agent_instance.identity.get('first_name', 'Agent')} {agent_instance.identity.get('last_name', agent_instance.agent_id)}"
             print(f"Attempting to configure agent: {agent_name}")
@@ -445,6 +498,7 @@ class PlaceholderPage(QWidget):
 
             print(f"Current config/details: {config_details}")
             self.show_status_message(f"Configuration for '{agent_name}' would open here (details in console).", "info")
+ main
         else:
             print("No agent selected to configure.")
             self.show_status_message("No agent selected.", "warning")
@@ -452,6 +506,11 @@ class PlaceholderPage(QWidget):
     def view_agent_logs(self):
         current_item = self.agent_list_widget.currentItem()
         if current_item:
+ feat/foundational-agent-system
+            agent = current_item.data(Qt.UserRole)
+            print(f"Attempting to view logs for agent: {agent.name}")
+            self.show_status_message(f"Log view for '{agent.name}' would open here.", "info")
+
             agent_instance = current_item.data(Qt.UserRole)
             agent_name = f"{agent_instance.identity.get('first_name', 'Agent')} {agent_instance.identity.get('last_name', agent_instance.agent_id)}"
             print(f"Attempting to view logs for agent: {agent_name}")
@@ -459,11 +518,22 @@ class PlaceholderPage(QWidget):
             # For now, just a message. We can use agent_instance.message_log (from BaseAgent)
             print(f"Simulated log view for {agent_name}. Message log: {agent_instance.message_log[-5:] if agent_instance.message_log else 'Empty'}")
             self.show_status_message(f"Log view for '{agent_name}' would open here (sample in console).", "info")
+ main
         else:
             print("No agent selected to view logs.")
             self.show_status_message("No agent selected.", "warning")
 
     def add_new_agent(self):
+ feat/foundational-agent-system
+        print("Attempting to add a new agent.")
+        new_agent_id = len(self.agents) + 1
+        new_agent = AIAgent(name=f"New Sample Agent {new_agent_id}", agent_type="SampleType", status="Offline")
+        self.agents.append(new_agent)
+        self.agent_list_widget.addItem(f"{new_agent.name} ({new_agent.status})")
+        new_list_item = self.agent_list_widget.item(self.agent_list_widget.count() - 1)
+        new_list_item.setData(Qt.UserRole, new_agent)
+        self.show_status_message(f"New agent '{new_agent.name}' added (simulated).", "success")
+
         # This function will now add a generic OwlBaseAgent as a placeholder.
         # A more complex UI would be needed to choose agent type, department, etc.
         self.show_status_message("Adding a new generic agent (simulated)...", "info")
@@ -490,6 +560,7 @@ class PlaceholderPage(QWidget):
             print(f"Error adding new agent: {e}")
             self.show_status_message(f"Failed to add new agent: {e}", "error")
 
+ main
 
     # --- Log Stream Page Methods ---
     def on_log_filter_changed(self, index):
@@ -583,12 +654,20 @@ class MainWindow(QMainWindow):
         # These might not show up on Windows if a proper icon theme isn't installed or if the names are Linux-specific.
         # For production, embedding actual icon files (SVGs) would be more reliable.
         icon_map = {
+ feat/foundational-agent-system
+            "Dashboard": "view-dashboard",  # Common theme name
+            "Agent Control": "applications-system", # or "preferences-system"
+            "Video Tools": "applications-multimedia", # Icon for video tools
+            "Model Hub": "drive-harddisk", # or "applications-internet"
+            "Log Stream": "document-view", # Changed from "text-x-generic"
+
             "Dashboard": "view-dashboard",
             "Opportunity Research": "system-search", # Using a search icon
             "Agent Control": "applications-system",
             "Video Tools": "applications-multimedia",
             "Model Hub": "drive-harddisk",
             "Log Stream": "document-view",
+ main
             "Settings": "preferences-configure"
         }
         tooltips = {
@@ -714,8 +793,11 @@ class MainWindow(QMainWindow):
                 current_page_matches = True
             elif section_name == "Video Tools" and isinstance(widget, VideoAgentPage):
                 current_page_matches = True
+ feat/foundational-agent-system
+
             elif section_name == "Opportunity Research" and isinstance(widget, ResearchTaskPage): # Match ResearchTaskPage
                 current_page_matches = True
+ main
             # elif isinstance(widget, PlaceholderPage) and widget.label.text() == target_widget_label: # Old problematic check
             # Need a more robust way to identify PlaceholderPages if their title label changes or is removed.
             # For now, we rely on the order and type for ModelHubPage and SettingsPage.

@@ -1,6 +1,22 @@
 import sys
 import os
 import json
+ feat/foundational-agent-system
+from skyscope_sentinel.agents.base_agent import BaseAgent
+from skyscope_sentinel.ollama_integration import OllamaIntegration
+from skyscope_sentinel.agents.messaging import AgentMessageQueue # For type hinting
+
+class ProductManagerAgent(BaseAgent):
+    def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b"):
+        super().__init__(agent_id)
+        self.ollama_integration = ollama_integration_instance if ollama_integration_instance else OllamaIntegration()
+        self.model_name = model_name
+        self.status = "idle_pm"
+        self.log(f"initialized with model '{self.model_name}'.")
+
+    def log(self, message: str):
+        print(f"[ProductManagerAgent {self.agent_id}] {message}")
+
 # from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
 from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
 from skyscope_sentinel.ollama_integration import OllamaIntegration
@@ -29,6 +45,7 @@ class ProductManagerAgent(OwlBaseAgent):
     # def log(self, message: str):
     #     print(f"[ProductManagerAgent {self.agent_id}] {message}")
 
+ main
 
     def generate_prd(self, user_requirement_text: str) -> dict | None:
         self.log(f"Received user requirement: '{user_requirement_text[:100]}...'")

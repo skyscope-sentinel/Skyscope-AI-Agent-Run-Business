@@ -7,6 +7,21 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
+ feat/foundational-agent-system
+from skyscope_sentinel.agents.base_agent import BaseAgent
+from skyscope_sentinel.ollama_integration import OllamaIntegration
+
+class ReviewerAgent(BaseAgent):
+    def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b"): # Default model
+        super().__init__(agent_id)
+        self.ollama_integration = ollama_integration_instance if ollama_integration_instance else OllamaIntegration()
+        self.model_name = model_name
+        self.status = "idle_reviewer"
+        self.log(f"initialized with model '{self.model_name}'.")
+
+    def log(self, message: str):
+        print(f"[ReviewerAgent {self.agent_id}] {message}")
+
 # from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
 from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
 from skyscope_sentinel.ollama_integration import OllamaIntegration
@@ -27,6 +42,7 @@ class ReviewerAgent(OwlBaseAgent):
     # Using self.log() from OwlBaseAgent for consistent logging format.
     # def log(self, message: str):
     #     print(f"[ReviewerAgent {self.agent_id}] {message}")
+ main
 
     def review_prd(self, prd_data: dict) -> dict:
         self.log(f"Reviewing PRD for project: '{prd_data.get('project_name', 'Unknown Project')}' using Ollama model '{self.model_name}'.")
