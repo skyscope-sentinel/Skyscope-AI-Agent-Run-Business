@@ -170,6 +170,50 @@ class TestVectorStoreUtils(unittest.TestCase):
         # Embedding for the query itself would still be called
         mock_embedding.assert_called_once_with(model=vector_store_utils.get_ollama_embedding_model_name(), input=["anything"])
 
+    @patch('skyscope_sentinel.tools.vector_store_utils.query_reports')
+    def test_get_contextual_information_for_topic_found(self, mock_query_reports):
+        """Test getting contextual info when results are found."""
+        mock_query_reports.return_value = [
+            {"document": "Content of report 1 snippet.", "metadata": {"filename": "report1.md", "topic": "Test Topic 1"}},
+            {"document": "Content of report 2 snippet.", "metadata": {"filename": "report2.md", "topic": "Test Topic 2"}},
+        ]
+
+        context_str = vector_store_utils.get_contextual_information_for_topic("Test Topic", n_results=2)
+
+        self.assertIn("Context from past related reports:", context_str)
+        self.assertIn("Context Snippet 1", context_str)
+        self.assertIn("report1.md", context_str)
+        self.assertIn("Content of report 1 snippet.", context_str)
+        self.assertIn("Context Snippet 2", context_str)
+        self.assertIn("report2.md", context_str)
+        self.assertIn("Content of report 2 snippet.", context_str)
+        self.assertIn("--- End of Contextual Information ---", context_str)
+        mock_query_reports.assert_called_once_with(query_text="Test Topic", n_results=2)
+
+    @patch('skyscope_sentinel.tools.vector_store_utils.query_reports')
+    def test_get_contextual_information_for_topic_not_found(self, mock_query_reports):
+        """Test getting contextual info when no results are found."""
+        mock_query_reports.return_value = []
+
+        context_str = vector_store_utils.get_contextual_information_for_topic("NonExistent Topic")
+        self.assertEqual(context_str, "No relevant past reports found for this topic.")
+        mock_query_reports.assert_called_once_with(query_text="NonExistent Topic", n_results=2) # Default n_results
+
+    def test_get_contextual_information_for_empty_topic(self):
+        """Test getting contextual info with an empty topic."""
+        context_str = vector_store_utils.get_contextual_information_for_topic("")
+        self.assertEqual(context_str, "No specific topic provided for contextual search.")
+
+        context_str_space = vector_store_utils.get_contextual_information_for_topic("   ")
+        self.assertEqual(context_str_space, "No specific topic provided for contextual search.")
+
+    @patch('skyscope_sentinel.tools.vector_store_utils.query_reports', side_effect=Exception("DB error"))
+    def test_get_contextual_information_for_topic_query_error(self, mock_query_reports):
+        """Test getting contextual info when query_reports raises an exception."""
+        context_str = vector_store_utils.get_contextual_information_for_topic("Error Topic")
+        self.assertEqual(context_str, "Error retrieving contextual information from past reports.")
+        mock_query_reports.assert_called_once_with(query_text="Error Topic", n_results=2)
+
 
 if __name__ == '__main__':
     unittest.main()
