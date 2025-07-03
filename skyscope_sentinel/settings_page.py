@@ -58,8 +58,10 @@ class SettingsPage(QWidget):
         # Create tabs with icons
         self.tab_widget.addTab(self.create_general_tab(), QIcon.fromTheme("preferences-system"), "General")
         self.tab_widget.addTab(self.create_appearance_tab(), QIcon.fromTheme("preferences-desktop-theme"), "Appearance")
-        self.tab_widget.addTab(self.create_ollama_tab(), QIcon.fromTheme("network-server"), "Ollama") # Changed icon
-        self.tab_widget.addTab(self.create_agents_tab(), QIcon.fromTheme("applications-science"), "Agents") # Changed icon
+        self.tab_widget.addTab(self.create_ollama_tab(), QIcon.fromTheme("network-server"), "Ollama")
+        self.tab_widget.addTab(self.create_agents_tab(), QIcon.fromTheme("applications-science"), "Agents")
+        self.tab_widget.addTab(self.create_api_keys_tab(), QIcon.fromTheme("dialog-password", QIcon.fromTheme("security-high")), "API Keys") # New API Keys tab
+        self.tab_widget.addTab(self.create_financials_tab(), QIcon.fromTheme("wallet-open-symbolic", QIcon.fromTheme("emblem-money")), "Financials")
         self.tab_widget.addTab(self.create_advanced_tab(), QIcon.fromTheme("preferences-other"), "Advanced")
 
         self.load_all_settings()
@@ -271,10 +273,149 @@ class SettingsPage(QWidget):
         import os
         from PySide6.QtCore import QStandardPaths
         default_data_path = QStandardPaths.writableLocation(QStandardPaths.AppDataLocation)
-        self.le_data_folder.setText(self.settings_manager.load_setting(SETTING_DATA_FOLDER, os.path.join(default_data_path, "data")))
-        
+        data_folder_value = self.settings_manager.load_setting(SETTING_DATA_FOLDER, os.path.join(default_data_path, "data"))
+        if hasattr(self, 'le_data_folder'): # Check if advanced tab and its elements are initialized
+            self.le_data_folder.setText(data_folder_value)
+
+        # Financials - Load saved values or defaults
+        if hasattr(self, 'le_paypal_email'): # Check if financial tab elements are initialized
+            self.le_paypal_email.setText(self.settings_manager.load_setting("financials/paypal_email", ""))
+            self.le_btc_address.setText(self.settings_manager.load_setting("financials/btc_address", ""))
+            self.le_eth_address.setText(self.settings_manager.load_setting("financials/eth_address", ""))
+            self.le_bank_bsb.setText(self.settings_manager.load_setting("financials/bank_bsb", ""))
+            self.le_bank_account.setText(self.settings_manager.load_setting("financials/bank_account_number", ""))
+            self.le_payid.setText(self.settings_manager.load_setting("financials/payid", ""))
+
+        # API Keys - Load saved values
+        # API Keys - Load saved values
+        if hasattr(self, 'le_openai_api_key'):
+            self.le_openai_api_key.setText(self.settings_manager.load_setting("api_keys/openai_api_key", ""))
+        if hasattr(self, 'le_serper_api_key'):
+            self.le_serper_api_key.setText(self.settings_manager.load_setting("api_keys/serper_api_key", ""))
+        if hasattr(self, 'le_e2b_api_key'): # Load E2B API Key
+            self.le_e2b_api_key.setText(self.settings_manager.load_setting("api_keys/e2b_api_key", ""))
+
         self.status_message_requested.emit("Settings loaded.", "info")
 
+    # --- API Keys Tab Creator ---
+    def create_api_keys_tab(self):
+        api_keys_tab, layout = self._create_tab_content_widget()
+
+        api_instructions = QLabel(
+            "Enter your API keys for various services here. These keys are stored locally and securely.\n"
+            "Some features or agents may require these keys to function correctly."
+        )
+        api_instructions.setWordWrap(True)
+        api_instructions.setStyleSheet("font-style: italic; color: #888888; margin-bottom: 10px;")
+        layout.addRow(api_instructions)
+
+        # OpenAI API Key
+        self.le_openai_api_key = QLineEdit()
+        self.le_openai_api_key.setPlaceholderText("sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.le_openai_api_key.setToolTip("Your OpenAI API Key (used by some agents or if cloud LLMs are preferred).")
+        self.le_openai_api_key.setEchoMode(QLineEdit.Password)
+        self.le_openai_api_key.editingFinished.connect(
+            lambda: self.save_setting_value("api_keys/openai_api_key", self.le_openai_api_key.text().strip())
+        )
+        layout.addRow("OpenAI API Key:", self.le_openai_api_key)
+
+        # Serper API Key
+        self.le_serper_api_key = QLineEdit()
+        self.le_serper_api_key.setPlaceholderText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.le_serper_api_key.setToolTip("Your Serper.dev API Key for the SerperDevTool (enhanced web search).")
+        self.le_serper_api_key.setEchoMode(QLineEdit.Password)
+        self.le_serper_api_key.editingFinished.connect(
+            lambda: self.save_setting_value("api_keys/serper_api_key", self.le_serper_api_key.text().strip())
+        )
+        layout.addRow("Serper API Key:", self.le_serper_api_key)
+
+        # E2B API Key
+        self.le_e2b_api_key = QLineEdit()
+        self.le_e2b_api_key.setPlaceholderText("e2b_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.le_e2b_api_key.setToolTip("Your E2B API Key for secure sandboxed code execution.")
+        self.le_e2b_api_key.setEchoMode(QLineEdit.Password)
+        self.le_e2b_api_key.editingFinished.connect(
+            lambda: self.save_setting_value("api_keys/e2b_api_key", self.le_e2b_api_key.text().strip())
+        )
+        layout.addRow("E2B API Key:", self.le_e2b_api_key)
+
+        # Add more API key fields here as needed in the future
+
+        return api_keys_tab
+
+    # --- Financials Tab Creator and Methods ---
+    def create_financials_tab(self):
+        financials_tab, layout = self._create_tab_content_widget()
+
+        instructions = QLabel(
+            "Enter your payment details below. This information will be used by agents to receive earnings.\n"
+            "Skyscope Sentinel Intelligence and its founder are not responsible for the security of this information if your system is compromised.\n"
+            "Ensure your system is secure. All details are stored locally."
+        )
+        instructions.setWordWrap(True)
+        instructions.setStyleSheet("font-style: italic; color: #888888; margin-bottom: 10px;")
+        layout.addRow(instructions)
+
+        # PayPal
+        self.le_paypal_email = QLineEdit()
+        self.le_paypal_email.setPlaceholderText("your.email@example.com")
+        self.le_paypal_email.setToolTip("Your PayPal email address for receiving payments.")
+        self.le_paypal_email.editingFinished.connect(
+            lambda: self.save_setting_value("financials/paypal_email", self.le_paypal_email.text().strip())
+        )
+        layout.addRow("PayPal Email:", self.le_paypal_email)
+
+        # Crypto Wallets
+        crypto_group = QGroupBox("Cryptocurrency Wallets")
+        crypto_layout = QFormLayout(crypto_group)
+
+        self.le_btc_address = QLineEdit()
+        self.le_btc_address.setPlaceholderText("1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa")
+        self.le_btc_address.setToolTip("Your Bitcoin (BTC) wallet address.")
+        self.le_btc_address.editingFinished.connect(
+            lambda: self.save_setting_value("financials/btc_address", self.le_btc_address.text().strip())
+        )
+        crypto_layout.addRow("Bitcoin (BTC) Address:", self.le_btc_address)
+
+        self.le_eth_address = QLineEdit()
+        self.le_eth_address.setPlaceholderText("0xAb5801a7D398351b8bE11C439e05C5B3259aeC9B")
+        self.le_eth_address.setToolTip("Your Ethereum (ETH) or ERC-20 compatible wallet address.")
+        self.le_eth_address.editingFinished.connect(
+            lambda: self.save_setting_value("financials/eth_address", self.le_eth_address.text().strip())
+        )
+        crypto_layout.addRow("Ethereum (ETH) Address:", self.le_eth_address)
+        layout.addRow(crypto_group)
+
+        # Australian Bank Details
+        bank_group = QGroupBox("Australian Bank Details (OSKO/PayID)")
+        bank_layout = QFormLayout(bank_group)
+
+        self.le_bank_bsb = QLineEdit()
+        self.le_bank_bsb.setPlaceholderText("XXX-XXX")
+        self.le_bank_bsb.setToolTip("Your BSB (Bank-State-Branch) number.")
+        self.le_bank_bsb.editingFinished.connect(
+            lambda: self.save_setting_value("financials/bank_bsb", self.le_bank_bsb.text().strip())
+        )
+        bank_layout.addRow("BSB:", self.le_bank_bsb)
+
+        self.le_bank_account = QLineEdit()
+        self.le_bank_account.setPlaceholderText("XXXXXXXXX")
+        self.le_bank_account.setToolTip("Your bank account number.")
+        self.le_bank_account.editingFinished.connect(
+            lambda: self.save_setting_value("financials/bank_account_number", self.le_bank_account.text().strip())
+        )
+        bank_layout.addRow("Account Number:", self.le_bank_account)
+
+        self.le_payid = QLineEdit()
+        self.le_payid.setPlaceholderText("your.email@example.com or +614XX XXX XXX")
+        self.le_payid.setToolTip("Your PayID (often an email or phone number).")
+        self.le_payid.editingFinished.connect(
+            lambda: self.save_setting_value("financials/payid", self.le_payid.text().strip())
+        )
+        bank_layout.addRow("PayID (Optional):", self.le_payid)
+        layout.addRow(bank_group)
+
+        return financials_tab
 
     @Slot()
     def check_for_updates_placeholder(self):
