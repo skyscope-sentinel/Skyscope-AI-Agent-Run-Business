@@ -34,7 +34,6 @@ class SkyscopeSwarmAgent(SwarmsBaseAgent):
     """
     def __init__(
         self,
- feature/phase1-agent-gui-owl-setup
         # Skyscope specific parameters for identity and context
         department_name: str, # Renamed from 'department' for clarity with specialized agents
         role_in_department: str = None, # Specific role for this agent instance
@@ -46,20 +45,11 @@ class SkyscopeSwarmAgent(SwarmsBaseAgent):
         agent_description: str = None, # Description for swarms.Agent, derived if None
         system_prompt: str = None, # System prompt, constructed from identity if None
         llm = None, # LLM instance, will be configured internally using Ollama if None
-
-        agent_id: str, # Skyscope specific internal ID
-        department: str,
-        role: str = None, # Specific role for the system prompt, derived from identity if None
-        goal: str = "Achieve objectives as part of the Skyscope Sentinel enterprise.", # Generic goal
-        # swarms.Agent specific parameters:
-        llm = None, # Will be configured internally if None
- main
         max_loops: int = 5,
         autosave: bool = False,
         verbose: bool = True,
         tools: list = None,
         long_term_memory=None,
-feature/phase1-agent-gui-owl-setup
         # Removed system_prompt, agent_name, agent_description from here as they are now higher up
         **kwargs
     ):
@@ -101,37 +91,6 @@ feature/phase1-agent-gui-owl-setup
         )
 
         # Configure LLM if not provided (llm parameter)
-
-        system_prompt: str = None, # Will be constructed if None
-        agent_name: str = None, # Will be derived from identity if None
-        agent_description: str = None, # Will be derived from identity if None
-        **kwargs
-    ):
-        self.skyscope_identity = generate_agent_identity(department=department)
-        self.agent_id = agent_id # Skyscope's internal agent_id
-
-        # Construct agent_name, agent_description, and system_prompt for swarms.Agent
-        # from the Skyscope identity if not provided.
-
-        # Name for swarms.Agent (can be more descriptive than just agent_id)
-        _agent_name = agent_name or f"{self.skyscope_identity.get('first_name', 'Agent')}_{self.skyscope_identity.get('last_name', self.agent_id)}"
-
-        _agent_description = agent_description or (
-            f"An AI agent from the {self.skyscope_identity.get('department', 'General')} department, "
-            f"working as a {self.skyscope_identity.get('employee_title', 'Specialist')} for Skyscope Sentinel Intelligence."
-        )
-
-        _role = role or self.skyscope_identity.get('employee_title', 'Autonomous Agent')
-
-        _system_prompt = system_prompt or (
-            f"You are {_agent_name}, a {self.skyscope_identity.get('employee_title', 'Specialist')} "
-            f"in the {self.skyscope_identity.get('department', 'General')} department of Skyscope Sentinel Intelligence. "
-            f"Your expertise includes: {', '.join(self.skyscope_identity.get('expertise', []))}. "
-            f"Your current goal is: {goal}. Strive for excellence and collaboration."
-        )
-
-        # Configure LLM if not provided
- main
         _llm = llm
         if _llm is None:
             # Fetch Ollama configuration from Skyscope's global config
@@ -145,7 +104,6 @@ feature/phase1-agent-gui-owl-setup
                 # swarms.models.Ollama expects model name without "ollama/"
                 cleaned_model_name = ollama_model_str.replace("ollama/", "")
                 _llm = Ollama(model=cleaned_model_name, base_url=ollama_base_url)
- feature/phase1-agent-gui-owl-setup
                 print(f"[{_agent_name_for_swarms}] SkyscopeSwarmAgent: Using Ollama LLM: {cleaned_model_name} at {ollama_base_url}")
             else:
                 print(f"[{_agent_name_for_swarms}] SkyscopeSwarmAgent: Warning - Ollama model not configured in Skyscope Config. LLM might not be set.")
@@ -155,18 +113,6 @@ feature/phase1-agent-gui-owl-setup
             agent_name=_agent_name_for_swarms,
             agent_description=_agent_description_for_swarms,
             system_prompt=_system_prompt_for_swarms,
-
-                print(f"[{_agent_name}] SkyscopeSwarmAgent: Using Ollama LLM: {cleaned_model_name} at {ollama_base_url}")
-            else:
-                print(f"[{_agent_name}] SkyscopeSwarmAgent: Warning - Ollama model not configured in Skyscope Config. LLM might not be set.")
-                # Potentially fall back to a default if swarms.Agent doesn't have one
-                # or raise an error. For now, swarms.Agent might use its own default if _llm is None.
-
-        super().__init__(
-            agent_name=_agent_name,
-            agent_description=_agent_description,
-            system_prompt=_system_prompt,
- main
             llm=_llm,
             max_loops=max_loops,
             autosave=autosave,
@@ -177,16 +123,11 @@ feature/phase1-agent-gui-owl-setup
             **kwargs
         )
 
- feature/phase1-agent-gui-owl-setup
         print(f"[SkyscopeSwarmAgent {_agent_name_for_swarms}] Initialized. Skyscope ID: {self.agent_id}, Role: {effective_role}, Department: {self.skyscope_identity.get('department')}")
-
-        print(f"[SkyscopeSwarmAgent {_agent_name}] Initialized. Skyscope ID: {self.agent_id}, Role: {_role}, Department: {self.skyscope_identity.get('department')}")
- main
 
     def get_skyscope_identity_summary(self) -> str:
         """Returns a short summary of the Skyscope agent's identity."""
         return (f"SkyscopeID: {self.agent_id}, Name: {self.skyscope_identity.get('first_name')} {self.skyscope_identity.get('last_name')}, "
- feature/phase1-agent-gui-owl-setup
                 f"Title: {self.skyscope_identity.get('employee_title')}, Dept: {self.skyscope_identity.get('department')}, Swarms Agent Name: {self.agent_name}")
 
 if __name__ == '__main__':
@@ -206,27 +147,13 @@ if __name__ == '__main__':
     print("--- Testing SkyscopeSwarmAgent ---")
 
     # This test assumes Ollama is running and serving a model like 'mistral' (or whatever default is in config.py)
-
-                f"Title: {self.skyscope_identity.get('employee_title')}, Dept: {self.skyscope_identity.get('department')}")
-
-if __name__ == '__main__':
-    print("--- Testing SkyscopeSwarmAgent ---")
-
-    # This test assumes Ollama is running and serving a model like 'qwen2:0.5b' (or whatever default is in config.py)
- main
     # It also assumes that if SERPER_API_KEY is needed for a tool, it's in .env
 
     # Example: Create a simple search tool for testing
     from crewai_tools import DuckDuckGoSearchRun # swarms might have its own tool registry or base class
- feature/phase1-agent-gui-owl-setup
                                              # For now, using a known simple tool.
                                              # We'll need to adapt/wrap tools for swarms properly later.
 
-                                             # For now, using a known simple tool. feature/phase1-agent-gui-owl-setup
-                                             # We'll need to adapt/wrap tools for swarms properly later.
-        
-                                             # We'll need to adapt/wrap tools for swarms properly later.feature/phase1-agent-gui-owl-setup main
- main
     # Note: swarms.Agent expects tools to be callables or instances of its own BaseTool or similar.
     # We will use the callable functions we defined.
 
@@ -259,15 +186,9 @@ if __name__ == '__main__':
 
     try:
         research_specialist_with_tools = SkyscopeSwarmAgent(
- feature/phase1-agent-gui-owl-setup
             # agent_id="SSA_ToolTester001", # Will be auto-generated
             department_name="Market Research & Analysis", # Use department_name
             role_in_department="Lead Tooling Specialist", # Use role_in_department
-
-            agent_id="SSA_ToolTester001",
-            department="Researchers",
-            role="Autonomous Research and Task Execution Agent",
- main
             goal="Utilize available tools to find information, process it, and store it.",
             tools=available_tools,
             verbose=True,
@@ -277,7 +198,6 @@ if __name__ == '__main__':
             # The `Ollama` model class in swarms is built on LiteLLM, which can handle this.
         )
         print(research_specialist_with_tools.get_skyscope_identity_summary())
- feature/phase1-agent-gui-owl-setup
         # The underlying swarms.Agent has agent_name, agent_description, system_prompt attributes
         print(f"Swarms Agent Name: {research_specialist_with_tools.agent_name}")
         # print(f"Swarms Agent Description: {research_specialist_with_tools.agent_description}") # This might be long
@@ -304,60 +224,6 @@ if __name__ == '__main__':
                 print("\nSkipping code execution test as E2B tool is not available.")
         else:
             print("\n[Test] Ollama model not configured. Skipping agent run tests.")
-
-feature/phase1-agent-gui-owl-setup
-
-    # Note: swarms.Agent expects tools to be instances of its own BaseTool or similar.
-    # For this basic test, we might not pass a tool or pass a very simple one.
-    # Let's try without a complex tool first to test initialization and LLM.
-
-    try:
-        research_specialist = SkyscopeSwarmAgent(
-            agent_id="SSA_Res001",
-            department="Researchers",
-            role="Information Retrieval Specialist", # Overrides title from identity for this specific role
-            goal="Find the latest information on a given topic.",
-            # tools=[DuckDuckGoSearchRun()] # Example tool, ensure it's compatible or wrapped for swarms
-            verbose=True
-        )
-        print(research_specialist.get_skyscope_identity_summary())
-main
-main
-        print(f"Swarm Agent Name: {research_specialist.agent_name}")
-        print(f"Swarm Agent Description: {research_specialist.agent_description}")
-        print(f"Swarm System Prompt: {research_specialist.system_prompt[:200]}...") # Print first 200 chars
-
-feature/phase1-agent-gui-owl-setup
-
- feature/phase1-agent-gui-owl-setup
-main
-        # Test a simple run that might use a search tool
-        # The default swarms.Agent.run() takes a task string.
-        # Ensure your Ollama server is running with the configured model.
-        task_output_search = research_specialist_with_tools.run("Search for the current weather in Paris and write it to a file named 'paris_weather.txt'. Then read the file and tell me its content.")
-        print(f"\nTask Output for 'Search, Write, Read Paris Weather':\n{task_output_search}")
-
-        # Test a task that might use code execution (if E2B key is present and tool added)
-        if execute_python_code_in_e2b in research_specialist_with_tools.tools:
-            task_output_code = research_specialist_with_tools.run(
-                "Write a python script to calculate 2 + 2 and print the result. Then execute this script."
-            )
-            print(f"\nTask Output for 'Code Execution Test':\n{task_output_code}")
-        else:
-            print("\nSkipping code execution test as E2B tool is not available.")
- feature/phase1-agent-gui-owl-setup
-
-        # Test a simple run
-        # The default swarms.Agent.run() takes a task string.
-        # Ensure your Ollama server is running with the configured model.
-        task_output = research_specialist.run("What is the capital of France?")
-        print(f"\nTask Output for 'Capital of France':\n{task_output}")
-
-        task_output_tech = research_specialist.run("Explain quantum computing in simple terms.")
-        print(f"\nTask Output for 'Quantum Computing':\n{task_output_tech}")
-main
- main
- main
 
 
     except Exception as e:

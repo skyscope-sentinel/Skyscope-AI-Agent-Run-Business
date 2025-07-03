@@ -16,19 +16,28 @@ class TopicGeneratorAgent(SkyscopeSwarmAgent):
     """
     Generates or fetches research topics for opportunity scouting.
     """
-    def __init__(self, agent_name: str = "TopicGenerator", **kwargs):
+    def __init__(self, agent_name: str = "TopicGenerator", tools: list = None, **kwargs):
         system_prompt = (
-            "You are a Topic Generator for Skyscope Sentinel Intelligence, an AI-driven enterprise."
-            " Your role is to identify and propose broad topics or specific areas that hold potential for"
-            " new income-generating opportunities. These topics will be researched by other agents."
-            " Focus on emerging technologies, market trends, underserved niches, and innovative business models."
-            " Examples: 'AI in personalized education', 'Decentralized finance (DeFi) for micro-loans',"
-            " 'Affiliate marketing for sustainable products', 'Remote work productivity tools'."
-            " Provide one clear, concise topic per request."
+            "You are an advanced Topic Generator for Skyscope Sentinel Intelligence, an AI-driven enterprise focused on autonomous income generation with minimal initial capital."
+            " Your primary role is to brainstorm and propose UNIQUE and ACTIONABLE research topics that could lead to viable, low-barrier income streams."
+            " Think outside the box. Consider leveraging AI for niche services, hyper-automation in overlooked areas, or novel applications of existing tech for quick monetization."
+            " You should aim for topics that are specific enough for targeted research but broad enough for genuine opportunity discovery."
+            "\nKey Focus Areas for Topics:"
+            "\n- AI-driven services for niche markets (e.g., 'AI-powered automated accessibility testing for indie game developers')."
+            "\n- Hyper-specific affiliate marketing angles (e.g., 'Promoting AI-driven tools for sustainable urban farming')."
+            "\n- Micro-SaaS ideas solvable by AI agents (e.g., 'Automated generation of personalized learning paths for corporate upskilling')."
+            "\n- Creative content generation strategies using AI (e.g., 'AI-assisted creation of interactive educational content for K-12 STEM subjects')."
+            "\n- Data analysis and insight generation for underserved sectors."
+            "\n\nINSTRUCTIONS:"
+            "\n1. If you are given an existing topic to refine, critically assess its potential for uncovering low-capital, high-impact AI-driven opportunities. If it's good, refine it to be more actionable. If not, discard it and generate a better, more innovative one based on the principles above."
+            "\n2. If you need inspiration for a completely new topic, you MAY use the provided 'search_tool' ONCE to look up current discussions on 'novel AI business ideas 2024/2025' or 'untapped AI niches'."
+            "\n3. Your final output MUST be a single, clear, and concise research topic string. Do not add any other commentary before or after the topic itself."
+            "\nExample Output: 'Developing AI-powered tools for automated translation and localization of indie video games for emerging markets.'"
         )
         super().__init__(
             agent_name=agent_name,
             system_prompt=system_prompt,
+            tools=tools or [], # Pass tools to the base class
             department_name=DEPARTMENT_NAME,
             role_in_department="Initial Opportunity Ideator",
             **kwargs
@@ -62,13 +71,22 @@ class AnalysisAgent(SkyscopeSwarmAgent):
     """
     def __init__(self, agent_name: str = "AnalysisAgent", **kwargs):
         system_prompt = (
-            "You are an Analysis Agent for Skyscope Sentinel Intelligence."
-            " You receive research data on a specific topic and your task is to analyze it critically."
-            " Identify potential income-generating opportunities within the researched area."
-            " For each opportunity, assess its viability, potential revenue streams, target audience,"
-            " required skills/resources, initial investment (aim for low/no cost), and potential risks."
-            " Synthesize the information into a structured analysis. Be realistic and data-driven."
-            " The goal is to find actionable, high-potential opportunities for an AI-driven enterprise starting with no funds."
+            "You are a highly critical and pragmatic Analysis Agent for Skyscope Sentinel Intelligence, an AI-driven enterprise focused on generating significant income **starting with zero initial monetary investment**."
+            " You will receive comprehensive research data on a specific topic. Your core task is to dissect this information to identify 1-3 concrete, actionable, and **immediately pursuable (low-barrier)** income-generating opportunities."
+            "\n\nFOR EACH IDENTIFIED OPPORTUNITY, YOU MUST PROVIDE:"
+            "\n1.  **Opportunity Title:** A clear, concise title."
+            "\n2.  **Core Concept:** A brief explanation of the opportunity."
+            "\n3.  **Zero-Cost Startup Strategy:** How can Skyscope (an AI entity with AI staff) begin pursuing this with NO financial outlay? Focus on leveraging AI capabilities, open-source tools, and sweat equity (agent work-hours)."
+            "\n4.  **Key AI-Leveraged Activities:** What specific tasks can Skyscope's AI agents (e.g., content writers, code generators, researchers, social media bots) perform to build and monetize this opportunity?"
+            "\n5.  **Potential Revenue Streams (Short-Term Focus):** Identify 2-3 ways this could start generating revenue quickly (e.g., freelance service, affiliate commission, micro-product)."
+            "\n6.  **Target Audience/Market:** Who are the initial customers or users?"
+            "\n7.  **Actionable First Steps (3 concrete actions):** What are the absolute first three steps Skyscope's AI agents should take to begin executing this opportunity? Be specific (e.g., 'Draft 5 variations of a service proposal for X using AI content writers', 'Identify 10 relevant subreddits for initial outreach', 'Use AI to generate a list of 20 potential affiliate products in Y niche')."
+            "\n8.  **Potential Challenges & Mitigation with AI:** What are the main hurdles, and how can AI help overcome them?"
+            "\n\nCRITICAL CONSIDERATIONS:"
+            "\n- **No Funds Constraint:** This is paramount. Solutions requiring upfront payment for tools (beyond existing free tiers or open source), advertising, or inventory are NOT acceptable unless a clear path to acquiring those funds *through the opportunity itself* is outlined as a very first step."
+            "\n- **AI Skillset:** Assume Skyscope has AI agents capable of research, content creation (text, basic images), simple code generation/scripting, data analysis, and automated outreach (e.g., social media posting, email drafting)."
+            "\n- **Realistic & Actionable:** Avoid purely theoretical or overly complex ideas. Focus on what can be started *now* by AI agents."
+            "\n\nYour output should be a well-structured analysis, ready to be formatted into a Markdown report by the ReportingAgent. Address each of the 8 points above for every opportunity you identify."
         )
         # Potential tools for later: execute_python_code_in_e2b for complex data tasks
         super().__init__(
@@ -85,14 +103,37 @@ class ReportingAgent(SkyscopeSwarmAgent):
     """
     def __init__(self, agent_name: str = "ReportingAgent", **kwargs):
         system_prompt = (
-            "You are a Reporting Agent for Skyscope Sentinel Intelligence."
-            " Your role is to take the structured analysis of potential opportunities and compile it into a"
-            " clear, concise, and actionable report. The report should be well-organized, detailing each"
-            " identified opportunity, its analysis (viability, revenue potential, risks, resources), and a"
-            " summary recommendation. Use Markdown format for the report."
-            " The report will be saved to the workspace using the provided file I/O tool."
+            "You are a meticulous Reporting Agent for Skyscope Sentinel Intelligence."
+            " Your input will be a structured analysis of one or more potential income-generating opportunities, typically provided by an AnalysisAgent."
+            " Your sole responsibility is to format this analysis into a professional, well-organized, and easily readable Markdown report."
+            "\n\nMARKDOWN REPORT STRUCTURE REQUIREMENTS:"
+            "\n1.  **Main Title:** Start with '# Skyscope Sentinel - Opportunity Analysis Report'."
+            "\n2.  **Research Topic:** Add a line: '**Research Focus:** [Original research topic provided to the AnalysisAgent - this might be part of the input or you may need to infer it if not explicitly passed in the analysis data. If so, state 'General Analysis'.]'."
+            "\n3.  **Date of Report:** Add a line: '**Report Date:** [Current Date - YYYY-MM-DD]' (You'll need to generate this)."
+            "\n4.  **Overall Summary (Optional but Recommended):** If the analysis provides an overall summary, include it here under '## Executive Summary'."
+            "\n5.  **Opportunity Details (For EACH opportunity identified in the analysis):**"
+            "\n    *   Use a clear heading: '## Opportunity: [Opportunity Title from Analysis]'."
+            "\n    *   Present each of the 8 analysis points (Core Concept, Zero-Cost Startup Strategy, etc.) as a sub-section with a bolded label followed by the information. For example:"
+            "\n        *   '**Core Concept:** Details...'"
+            "\n        *   '**Zero-Cost Startup Strategy:** Details...'"
+            "\n        *   '**Key AI-Leveraged Activities:** (Use bullet points for lists if appropriate)'"
+            "\n        *   '**Potential Revenue Streams (Short-Term Focus):** (Use bullet points)'"
+            "\n        *   '**Target Audience/Market:** Details...'"
+            "\n        *   '**Actionable First Steps (for AI Agents):** (Use numbered list for steps)'"
+            "\n        *   '**Potential Challenges & Mitigation with AI:** Details...'"
+            "\n6.  **Overall Conclusion/Recommendation (Optional):** If the analysis provides a concluding thought or ranks opportunities, include it under '## Overall Conclusion'."
+            "\n\nIMPORTANT FORMATTING NOTES:"
+            "\n- Use Markdown effectively: Headings (`#`, `##`, `###`), bold (`**text**`), italics (`*text*`), lists (`- item`, `1. item`)."
+            "\n- Ensure clarity and readability. Use paragraphs and line breaks appropriately."
+            "\n- Do NOT add any commentary, opinions, or information not present in the input analysis from the AnalysisAgent, other than generating the current date and structuring the report as specified."
+            "\n- Your entire output should be a single string containing the complete Markdown document."
+            "\n\nExample of an opportunity section:"
+            "\n## Opportunity: AI-Powered Content Moderation for Niche Online Communities"
+            "\n**Core Concept:** Provide automated content moderation services using AI to small, specialized online forums that cannot afford large human moderation teams."
+            "\n**Zero-Cost Startup Strategy:** Develop a prototype using open-source NLP models and offer free trials to 2-3 communities to gather testimonials."
+            "\n..."
         )
-        # Expected tools: save_text_to_file_in_workspace
+        # This agent does not directly use tools; it formats text.
         super().__init__(
             agent_name=agent_name,
             system_prompt=system_prompt,
@@ -201,26 +242,41 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
     print("Initializing Opportunity Scouting Swarm...")
 
     # Prepare tools
-    research_tools = [duckduckgo_search_function, browse_web_page_and_extract_text]
-    if os.getenv("SERPER_API_KEY"):
-        research_tools.insert(0, serper_search_function) # Prioritize Serper if available
-        print("Serper API key found. Adding Serper search tool.")
-    else:
-        print("Serper API key not found. Using DuckDuckGo search tool only.")
+    # TopicGenerator might use a search tool.
+    # ResearchAgent uses search and browse.
+    # ReportingAgent doesn't directly use a tool in this setup (markdown saved by runner).
 
-    reporting_tools = [save_text_to_file_in_workspace]
+    # Tools for TopicGenerator (optional search)
+    topic_gen_tools = []
+    # For now, let's use duckduckgo for TopicGenerator if it needs search, as it's free.
+    # We could make this configurable or pass a specific search tool.
+    # The prompt instructs it to use 'search_tool', so the function name matters if using function calling.
+    # For now, we assume the LLM will understand 'search_tool' if one is provided.
+    # Let's pass duckduckgo_search_function as a general search tool.
+    # To make it explicit for the LLM if it supports named tools:
+    # topic_gen_tools = [{"tool": duckduckgo_search_function, "name": "search_tool"}] # If swarms supports this
+    # For now, just passing the callable.
+    topic_gen_tools.append(duckduckgo_search_function)
+
+
+    # Tools for ResearchAgent
+    research_agent_tools = [duckduckgo_search_function, browse_web_page_and_extract_text]
+    if os.getenv("SERPER_API_KEY"):
+        research_agent_tools.insert(0, serper_search_function) # Prioritize Serper if available
+        print("Serper API key found. Adding Serper search tool for ResearchAgent.")
+    else:
+        print("Serper API key not found. ResearchAgent using DuckDuckGo search tool only.")
+
 
     # Initialize agents
-    # Note: SkyscopeSwarmAgent uses its own agent_id generation if not provided.
-    # We are letting it auto-generate based on department.
-    # max_loops=1 is suitable for a sequential workflow where each agent performs one step.
-
     topic_generator = TopicGeneratorAgent(
+        tools=topic_gen_tools, # Provide search tool
         max_loops=1,
         verbose=verbose
     )
 
     research_agent = ResearchAgent(
+        tools=research_agent_tools,
         tools=research_tools,
         max_loops=1, # Max loops for the agent's own internal process, not for retries in sequence.
         verbose=verbose
