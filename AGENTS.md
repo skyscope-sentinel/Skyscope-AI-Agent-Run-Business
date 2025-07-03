@@ -31,6 +31,10 @@ The project utilizes several AI agent frameworks and libraries:
 
 5.  **Ollama**: The primary local LLM provider. Integration is managed via `OllamaIntegration` class and configured through the GUI settings, affecting `litellm` configurations used by agent frameworks.
 
+6.  **ChromaDB (Vector Store)**: Used for local RAG capabilities.
+    *   Integrated via `skyscope_sentinel/tools/vector_store_utils.py`.
+    *   Opportunity reports are automatically chunked, embedded (using Ollama via `litellm`), and stored for future contextual retrieval.
+
 ## Implemented Swarms
 
 ### 1. Opportunity Scouting Swarm
@@ -38,6 +42,12 @@ The project utilizes several AI agent frameworks and libraries:
 *   **Purpose**: To autonomously research and identify potential income-generating opportunities based on an initial topic (user-provided or self-generated).
 *   **Location**: `skyscope_sentinel/swarms_integration/opportunity_scouting_swarm.py`
 *   **Workflow**: Utilizes `swarms.SequentialWorkflow`.
+    1.  **`TopicGeneratorAgent`**: Generates or refines research topics. Enhanced to potentially use a search tool for inspiration and produce more unique, actionable ideas for low-capital AI ventures.
+    2.  **`ResearchAgent`**: Gathers information on the topic using search tools (DuckDuckGo, Serper if API key is available) and web browsing tools (Playwright via `browse_web_page_and_extract_text`). Tools now include basic error handling.
+    3.  **`AnalysisAgent`**: Analyzes gathered information. Enhanced to focus critically on zero-cost startup strategies and provide a detailed 8-point analysis for each opportunity, including actionable first steps for AI agents.
+    4.  **`ReportingAgent`**: Consolidates analysis into a structured Markdown report. Enhanced to follow a specific, detailed Markdown template for clarity and professionalism.
+*   **Output**: Reports are saved in the `workspace/opportunity_reports/` directory. These reports are also automatically added to a ChromaDB vector store for RAG.
+*   **GUI Integration**: Triggered from the "Opportunity Research" tab. Users can select "Swarm Opportunity Scouting" mode. Generated Markdown reports are now rendered directly in the GUI.
     1.  **`TopicGeneratorAgent`**: Generates or refines a research topic.
     2.  **`ResearchAgent`**: Gathers information on the topic using search tools (DuckDuckGo, Serper if API key is available) and web browsing tools (Playwright via `browse_web_page_and_extract_text`).
     3.  **`AnalysisAgent`**: Analyzes the gathered information to identify viable opportunities, assess potential revenue, risks, and resource requirements (aiming for low/no-cost).
@@ -53,6 +63,17 @@ The project utilizes several AI agent frameworks and libraries:
     *   `skyscope_sentinel/owl_integration/owl_base_agent.py` (OWL/CAMEL conceptual base)
     *   `skyscope_sentinel/swarms_integration/skyscope_swarm_agent.py` (Current base for swarms)
 *   **Configuration**: `skyscope_sentinel/config.py` (handles API keys, workspace paths, default models) and `skyscope_sentinel/settings_manager.py` (GUI settings persistence).
+*   **Tools**: Utility functions for search, browsing, file I/O, code execution, and vector store operations are in `skyscope_sentinel/tools/`.
+*   **Identity Management**: `skyscope_sentinel/agent_identity.py` (generates identities for agents).
+*   **Unit Tests**: Located in `tests/`. Contains tests for some utility functions.
+*   **Design Documents**: Located in `docs/swarms/` for planned future swarms.
+
+## Working with an Agentic Environment
+
+*   **Tool Usage**: When implementing new agent capabilities, prefer creating reusable tool functions (like those in `skyscope_sentinel/tools/`) and providing them to agents rather than having agents generate complex code for common tasks like web searches or file I/O directly.
+*   **Error Handling**: Ensure robust error handling, especially for operations involving external APIs, file system access, or web interactions. Search and browser tools now have basic error catching.
+*   **Asynchronous Operations**: GUI interactions that trigger long-running agent tasks MUST be run in separate threads (e.g., using `AsyncRunnerThread` in `main.py`) to keep the UI responsive.
+*   **RAG System**: Be aware of the ChromaDB vector store for opportunity reports. Future agents might query this store for contextual information.
 *   **Tools**: Utility functions for search, browsing, file I/O, code execution are in `skyscope_sentinel/utils/`.
 *   **Identity Management**: `skyscope_sentinel/agent_identity.py` (generates identities for agents).
 

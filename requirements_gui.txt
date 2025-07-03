@@ -39,3 +39,6 @@ playwright>=1.40.0 # Check for latest stable version
 
 # Instructor for structured outputs from LLMs
 instructor>=1.0.0 # Check for latest stable
+
+# ChromaDB for local vector storage (RAG)
+chromadb>=0.4.24 # As of Phase E1

@@ -7,21 +7,29 @@ if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
 import json # To format the PRD for the prompt
+# from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
+from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
  feat/foundational-agent-system
 from skyscope_sentinel.agents.base_agent import BaseAgent
 from skyscope_sentinel.ollama_integration import OllamaIntegration
 from skyscope_sentinel.agents.messaging import AgentMessageQueue # For type hinting
 
-class EngineerAgent(BaseAgent):
-    def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b"): # Using a small model, can be configured
-        super().__init__(agent_id)
+class EngineerAgent(OwlBaseAgent):
+    def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b", owl_toolkits: list = None): # Using a small model, can be configured
+        super().__init__(
+            agent_id,
+            department="Developers", # Assigning to Developers department
+            role_description="An AI agent that generates Python code based on Product Requirement Documents (PRDs) and refines it based on reviews.",
+            owl_toolkits=owl_toolkits
+        )
         self.ollama_integration = ollama_integration_instance if ollama_integration_instance else OllamaIntegration()
         self.model_name = model_name # Model to use for code generation
         self.status = "idle_eng"
-        self.log(f"initialized with model '{self.model_name}'.")
+        self.log(f"EngineerAgent initialized with model '{self.model_name}'. Identity: {self.identity.get('first_name')} {self.identity.get('last_name')}, Title: {self.identity.get('employee_title')}")
 
-    def log(self, message: str):
-        print(f"[EngineerAgent {self.agent_id}] {message}")
+    # Using self.log() from OwlBaseAgent for consistent logging format.
+    # def log(self, message: str):
+    #     print(f"[EngineerAgent {self.agent_id}] {message}")
 
 # from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
 from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
