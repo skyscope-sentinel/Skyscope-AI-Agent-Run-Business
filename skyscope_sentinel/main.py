@@ -36,6 +36,7 @@ from .owl_integration.owl_base_agent import OwlBaseAgent
 from .ollama_integration import OllamaIntegration
 # For research task page
 from .autogen_interface import initiate_research_via_autogen
+from .swarms_integration.opportunity_scouting_swarm import run_opportunity_scouting_swarm # Import swarm runner
 import asyncio # For running autogen interface
 from PySide6.QtCore import QThread, Signal # For running async tasks in background
 from .config import Config # Import the Config class
@@ -91,67 +92,92 @@ class ResearchTaskPage(QWidget):
         form_layout = QGridLayout()
         form_layout.setSpacing(10)
 
+        # Research Mode Selection
+        mode_label = QLabel("Research Mode:")
+        self.mode_selection_combo = QComboBox()
+        self.mode_selection_combo.addItems(["CrewAI Research", "Swarm Opportunity Scouting"])
+        self.mode_selection_combo.setToolTip("Select the AI agent system to perform the research.")
+        form_layout.addWidget(mode_label, 0, 0)
+        form_layout.addWidget(self.mode_selection_combo, 0, 1)
+
         topic_label = QLabel("Research Topic:")
         self.topic_input = QLineEdit()
-        self.topic_input.setPlaceholderText("e.g., AI tools for content creation")
-        form_layout.addWidget(topic_label, 0, 0)
-        form_layout.addWidget(self.topic_input, 0, 1)
+        self.topic_input.setPlaceholderText("e.g., AI tools for content creation (optional for Swarm)")
+        form_layout.addWidget(topic_label, 1, 0)
+        form_layout.addWidget(self.topic_input, 1, 1)
 
         layout.addLayout(form_layout)
 
-        self.run_button = QPushButton(QIcon.fromTheme("system-run"), "Start Research")
-        self.run_button.setToolTip("Initiate the multi-agent research crew to investigate the topic.")
-        self.run_button.clicked.connect(self.handle_run_research)
+        self.run_button = QPushButton(QIcon.fromTheme("system-run"), "Start Task") # Renamed button
+        self.run_button.setToolTip("Initiate the selected AI agent system to investigate the topic.")
+        self.run_button.clicked.connect(self.handle_run_task) # Renamed handler
         layout.addWidget(self.run_button, 0, Qt.AlignCenter)
 
-        results_group = QGroupBox("Research Results")
+        results_group = QGroupBox("Task Output") # Renamed group
         results_layout = QVBoxLayout(results_group)
         self.results_display = QTextEdit()
         self.results_display.setReadOnly(True)
-        self.results_display.setPlaceholderText("Research findings will appear here...")
+        self.results_display.setPlaceholderText("Task output will appear here...") # Updated placeholder
         results_layout.addWidget(self.results_display)
         layout.addWidget(results_group)
 
         self.async_thread = None # To hold the thread
 
-    def handle_run_research(self):
+    def handle_run_task(self): # Renamed from handle_run_research
         topic = self.topic_input.text().strip()
-        if not topic:
-            self.status_message_requested.emit("Research topic cannot be empty.", "warning", 3000)
-            QMessageBox.warning(self, "Input Error", "Please enter a research topic.")
+        selected_mode = self.mode_selection_combo.currentText()
+
+        if selected_mode == "CrewAI Research" and not topic:
+            self.status_message_requested.emit("Research topic cannot be empty for CrewAI Research.", "warning", 3000)
+            QMessageBox.warning(self, "Input Error", "Please enter a research topic for CrewAI mode.")
             return
+
+        # For Swarm mode, topic is optional. If empty, run_opportunity_scouting_swarm will handle it.
 
         self.run_button.setEnabled(False)
-        self.results_display.setText(f"Researching topic: '{topic}'...\nPlease wait, this may take some time.")
+        task_description = f"Task started using {selected_mode}."
+        if topic:
+            task_description += f" Topic: '{topic}'."
+        self.results_display.setText(f"{task_description}\nPlease wait, this may take some time.")
         QApplication.processEvents() # Update UI
 
-        # Run the async function in a separate thread
         if self.async_thread and self.async_thread.isRunning():
-            self.status_message_requested.emit("A research task is already in progress.", "warning", 3000)
-            # Optionally, add logic to queue or cancel previous task
+            self.status_message_requested.emit("A task is already in progress.", "warning", 3000)
             return
 
-        self.async_thread = AsyncRunnerThread(initiate_research_via_autogen, topic)
-        self.async_thread.task_completed.connect(self.on_research_completed)
-        self.async_thread.task_failed.connect(self.on_research_failed)
+        if selected_mode == "CrewAI Research":
+            self.async_thread = AsyncRunnerThread(initiate_research_via_autogen, topic)
+            target_function_name = "CrewAI Research"
+        elif selected_mode == "Swarm Opportunity Scouting":
+            # run_opportunity_scouting_swarm takes initial_topic and verbose
+            # We pass the topic (which can be None/empty for the swarm)
+            self.async_thread = AsyncRunnerThread(run_opportunity_scouting_swarm, topic, True) # verbose=True
+            target_function_name = "Swarm Scouting"
+        else:
+            self.status_message_requested.emit(f"Unknown research mode: {selected_mode}", "error", 5000)
+            self.run_button.setEnabled(True)
+            return
+
+        self.async_thread.task_completed.connect(self.on_task_completed) # Renamed slot
+        self.async_thread.task_failed.connect(self.on_task_failed)       # Renamed slot
         self.async_thread.start()
-        self.status_message_requested.emit(f"Research task started for '{topic}'.", "info", 0)
+        self.status_message_requested.emit(f"{target_function_name} task started for topic '{topic if topic else 'auto-generated'}'.", "info", 0)
 
 
     @Slot(object)
-    def on_research_completed(self, result):
-        self.results_display.setText(str(result))
+    def on_task_completed(self, result): # Renamed from on_research_completed
+        self.results_display.setText(str(result)) # Result could be markdown report or file path
         self.run_button.setEnabled(True)
-        self.status_message_requested.emit("Research task completed successfully.", "success", 5000)
-        QMessageBox.information(self, "Research Complete", "The research task has finished.")
+        self.status_message_requested.emit("Task completed successfully.", "success", 5000)
+        QMessageBox.information(self, "Task Complete", "The AI task has finished.")
         self.async_thread = None
 
     @Slot(str)
-    def on_research_failed(self, error_message):
+    def on_task_failed(self, error_message): # Renamed from on_research_failed
         self.results_display.append(f"\n\n--- ERROR ---\n{error_message}")
         self.run_button.setEnabled(True)
-        self.status_message_requested.emit(f"Research task failed: {error_message}", "error", 7000)
-        QMessageBox.critical(self, "Research Failed", f"An error occurred during the research task:\n{error_message}")
+        self.status_message_requested.emit(f"Task failed: {error_message}", "error", 7000)
+        QMessageBox.critical(self, "Task Failed", f"An error occurred during the AI task:\n{error_message}")
         self.async_thread = None
 
 
