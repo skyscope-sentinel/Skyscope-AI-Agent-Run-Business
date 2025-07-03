@@ -25,17 +25,32 @@ python-dotenv>=1.0.0
 # For web search capabilities (alternative/fallback for SerperDevTool)
 duckduckgo-search>=5.0.0
 
+feature/phase1-agent-gui-owl-setup
 # For Serper Google Search API access (used by search_tools.py)
 google-search-results>=2.4.2 # SerpApi client
 
+ main
 # Swarms - Enterprise-Grade Multi-Agent Orchestration Framework
 swarms>=6.8.1 # Check for latest stable version, 6.8.1 was noted as recent.
 
 # E2B Code Interpreter for sandboxed code execution
 e2b_code_interpreter>=0.15.0 # Check for latest stable version
+feature/phase1-agent-gui-owl-setup
+
+ feature/phase1-agent-gui-owl-setup
+ main
 
 # Playwright for browser automation
 playwright>=1.40.0 # Check for latest stable version
 
 # Instructor for structured outputs from LLMs
 instructor>=1.0.0 # Check for latest stable
+feature/phase1-agent-gui-owl-setup
+
+feature/phase1-agent-gui-owl-setup
+
+# Playwright for browser automation
+playwright>=1.40.0 # Check for latest stable version
+main
+ main
+ main

@@ -36,7 +36,10 @@ from .owl_integration.owl_base_agent import OwlBaseAgent
 from .ollama_integration import OllamaIntegration
 # For research task page
 from .autogen_interface import initiate_research_via_autogen
+ feature/phase1-agent-gui-owl-setup
 from .swarms_integration.opportunity_scouting_swarm import run_opportunity_scouting_swarm # Import swarm runner
+
+ main
 import asyncio # For running autogen interface
 from PySide6.QtCore import QThread, Signal # For running async tasks in background
 from .config import Config # Import the Config class
@@ -92,6 +95,7 @@ class ResearchTaskPage(QWidget):
         form_layout = QGridLayout()
         form_layout.setSpacing(10)
 
+ feature/phase1-agent-gui-owl-setup
         # Research Mode Selection
         mode_label = QLabel("Research Mode:")
         self.mode_selection_combo = QComboBox()
@@ -118,11 +122,32 @@ class ResearchTaskPage(QWidget):
         self.results_display = QTextEdit()
         self.results_display.setReadOnly(True)
         self.results_display.setPlaceholderText("Task output will appear here...") # Updated placeholder
+
+        topic_label = QLabel("Research Topic:")
+        self.topic_input = QLineEdit()
+        self.topic_input.setPlaceholderText("e.g., AI tools for content creation")
+        form_layout.addWidget(topic_label, 0, 0)
+        form_layout.addWidget(self.topic_input, 0, 1)
+
+        layout.addLayout(form_layout)
+
+        self.run_button = QPushButton(QIcon.fromTheme("system-run"), "Start Research")
+        self.run_button.setToolTip("Initiate the multi-agent research crew to investigate the topic.")
+        self.run_button.clicked.connect(self.handle_run_research)
+        layout.addWidget(self.run_button, 0, Qt.AlignCenter)
+
+        results_group = QGroupBox("Research Results")
+        results_layout = QVBoxLayout(results_group)
+        self.results_display = QTextEdit()
+        self.results_display.setReadOnly(True)
+        self.results_display.setPlaceholderText("Research findings will appear here...")
+ main
         results_layout.addWidget(self.results_display)
         layout.addWidget(results_group)
 
         self.async_thread = None # To hold the thread
 
+feature/phase1-agent-gui-owl-setup
     def handle_run_task(self): # Renamed from handle_run_research
         topic = self.topic_input.text().strip()
         selected_mode = self.mode_selection_combo.currentText()
@@ -178,6 +203,46 @@ class ResearchTaskPage(QWidget):
         self.run_button.setEnabled(True)
         self.status_message_requested.emit(f"Task failed: {error_message}", "error", 7000)
         QMessageBox.critical(self, "Task Failed", f"An error occurred during the AI task:\n{error_message}")
+
+    def handle_run_research(self):
+        topic = self.topic_input.text().strip()
+        if not topic:
+            self.status_message_requested.emit("Research topic cannot be empty.", "warning", 3000)
+            QMessageBox.warning(self, "Input Error", "Please enter a research topic.")
+            return
+
+        self.run_button.setEnabled(False)
+        self.results_display.setText(f"Researching topic: '{topic}'...\nPlease wait, this may take some time.")
+        QApplication.processEvents() # Update UI
+
+        # Run the async function in a separate thread
+        if self.async_thread and self.async_thread.isRunning():
+            self.status_message_requested.emit("A research task is already in progress.", "warning", 3000)
+            # Optionally, add logic to queue or cancel previous task
+            return
+
+        self.async_thread = AsyncRunnerThread(initiate_research_via_autogen, topic)
+        self.async_thread.task_completed.connect(self.on_research_completed)
+        self.async_thread.task_failed.connect(self.on_research_failed)
+        self.async_thread.start()
+        self.status_message_requested.emit(f"Research task started for '{topic}'.", "info", 0)
+
+
+    @Slot(object)
+    def on_research_completed(self, result):
+        self.results_display.setText(str(result))
+        self.run_button.setEnabled(True)
+        self.status_message_requested.emit("Research task completed successfully.", "success", 5000)
+        QMessageBox.information(self, "Research Complete", "The research task has finished.")
+        self.async_thread = None
+
+    @Slot(str)
+    def on_research_failed(self, error_message):
+        self.results_display.append(f"\n\n--- ERROR ---\n{error_message}")
+        self.run_button.setEnabled(True)
+        self.status_message_requested.emit(f"Research task failed: {error_message}", "error", 7000)
+        QMessageBox.critical(self, "Research Failed", f"An error occurred during the research task:\n{error_message}")
+ main
         self.async_thread = None
 
 
@@ -243,6 +308,7 @@ class PlaceholderPage(QWidget):
 
                 eng_agent = EngineerAgent(agent_id="ENG001", ollama_integration_instance=self.ollama_integration_instance)
                 self.agents.append(eng_agent)
+ feature/phase1-agent-gui-owl-setup
 
                 rev_agent = ReviewerAgent(agent_id="REV001", ollama_integration_instance=self.ollama_integration_instance)
                 self.agents.append(rev_agent)
@@ -264,6 +330,28 @@ class PlaceholderPage(QWidget):
                 self.agents.append(error_agent)
 
 
+
+                rev_agent = ReviewerAgent(agent_id="REV001", ollama_integration_instance=self.ollama_integration_instance)
+                self.agents.append(rev_agent)
+
+                research_agent = OwlBaseAgent(agent_id="RES001", department="Researchers", role_description="Conducts web research.")
+                self.agents.append(research_agent)
+
+                hr_agent = OwlBaseAgent(agent_id="HR001", department="HR", role_description="Manages personnel records (simulated).")
+                self.agents.append(hr_agent)
+
+            except Exception as e:
+                print(f"Error instantiating sample agents for GUI: {e}")
+                # Add a placeholder if agent instantiation fails
+                error_agent = OwlBaseAgent(agent_id="ERR999", department="System")
+                error_agent.identity['first_name'] = "Error"
+                error_agent.identity['last_name'] = "State"
+                error_agent.identity['employee_title'] = "Agent Init Failed"
+                error_agent.status = "Error"
+                self.agents.append(error_agent)
+
+
+ main
             for agent_instance in self.agents:
                 display_text = f"{agent_instance.identity.get('first_name', 'N/A')} {agent_instance.identity.get('last_name', '')} " \
                                f"({agent_instance.identity.get('employee_title', 'N/A')}) - Status: {agent_instance.status}"
@@ -945,9 +1033,14 @@ class MainWindow(QMainWindow):
                 self.current_theme_path = DARK_STYLE_PATH if initial_theme_name == "dark" else LIGHT_STYLE_PATH
             else: # Fallback if called before settings_manager fully init (should not happen in normal flow)
                 self.current_theme_path = DARK_STYLE_PATH # Default to dark path
+feature/phase1-agent-gui-owl-setup
 
         theme_path_to_check = self.current_theme_path
 
+
+        theme_path_to_check = self.current_theme_path
+
+ main
         if theme_path_to_check == DARK_STYLE_PATH:
             if msg_type == "error": status_color = "color: #E74C3C;" # Red
             elif msg_type == "success": status_color = "color: #2ECC71;" # Green
