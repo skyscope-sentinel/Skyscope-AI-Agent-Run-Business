@@ -9,6 +9,10 @@ from skyscope_sentinel.tools.browser_tools import browse_web_page_and_extract_te
 from skyscope_sentinel.tools.file_io_tools import save_text_to_file_in_workspace # Corrected path
 # from skyscope_sentinel.tools.code_execution_tools import execute_python_code_in_e2b # Corrected path for future
 from skyscope_sentinel.tools.vector_store_utils import add_report_to_collection # For RAG
+from skyscope_sentinel.utils.search_tools import duckduckgo_search_function, serper_search_function
+from skyscope_sentinel.utils.browser_tools import browse_web_page_and_extract_text
+from skyscope_sentinel.utils.file_io_tools import save_text_to_file_in_workspace
+# from skyscope_sentinel.utils.code_execution_tools import execute_python_code_in_e2b # For later if needed by AnalysisAgent
 
 # Placeholder for department, will be refined
 DEPARTMENT_NAME = "Strategic Opportunity Identification"
@@ -279,6 +283,7 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
     research_agent = ResearchAgent(
         tools=research_agent_tools,
         # tools=research_tools, # Removed redundant/incorrect tools parameter
+        tools=research_tools,
         max_loops=1, # Max loops for the agent's own internal process, not for retries in sequence.
         verbose=verbose
     )
@@ -327,6 +332,9 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
         current_task = f"Refine and confirm this topic for research: '{initial_topic}'. If suitable, output the topic. If not, generate a better one based on your advanced criteria." # Updated task for TopicGenerator
     else:
         current_task = "Generate one promising and unique topic for identifying new AI-driven income-generating opportunities with low initial capital, using your search tool if needed for inspiration." # Updated task
+        current_task = f"Refine and confirm this topic for research: '{initial_topic}'. If suitable, output the topic. If not, generate a better one."
+    else:
+        current_task = "Generate one promising topic for identifying new income-generating opportunities."
 
     final_report_markdown = workflow.run(current_task)
 
