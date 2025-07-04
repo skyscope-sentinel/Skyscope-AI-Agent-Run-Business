@@ -19,6 +19,9 @@ class BaseAgent:
     """
 
     def __init__(self, agent_id: str, department: str = None):
+    """
+
+    def __init__(self, agent_id: str, department: str = None):
  feat/foundational-agent-system
     """
 
@@ -114,6 +117,9 @@ main
     def __str__(self):
         return (f"BaseAgent(id='{self.agent_id}', name='{self.identity.get('first_name')} {self.identity.get('last_name')}', "
                 f"title='{self.identity.get('employee_title')}', status='{self.status}')")
+
+    def __repr__(self):
+        return f"BaseAgent(agent_id='{self.agent_id}', name='{self.identity.get('first_name')}')"
 
     def __repr__(self):
         return f"BaseAgent(agent_id='{self.agent_id}', name='{self.identity.get('first_name')}')"
