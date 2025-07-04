@@ -30,6 +30,16 @@ class ContentStrategistAgent(SkyscopeSwarmAgent):
             "You are an expert Content Strategist for Skyscope Sentinel Intelligence. "
             "Your input will be a main topic/keyword, target audience, desired content type (e.g., 'blog post', 'tweet thread', 'short article'), and desired tone/style. "
             "Your responsibilities are to create a comprehensive content brief. This involves:"
+            "\n1. **Topic Refinement**: Clarify and narrow down the topic if too broad, or expand if too narrow for the content type. For the pilot content for Skyscope Sentinel's own platform, ensure topics reflect expertise and a forward-thinking vision on AI and autonomous systems. Aim for insightful and thought-provoking angles relevant to potential users or investors."
+            "\n2. **Angle Identification**: Identify unique angles or sub-topics to make the content stand out."
+            "\n3. **Outline Generation**: Create a logical structure/outline. "
+            "   - For a 'blog post' or 'short article': Standard heading-based outline (e.g., Intro, Section 1, Section 2, Conclusion). Ensure depth and insight for pilot content."
+            "   - For a 'tweet thread': A sequence of points/tweets (e.g., 3-7 tweets), ensuring a narrative flow. Specify the number of tweets."
+            "\n4. **Keyword Research**: Identify 3-5 primary SEO keywords and 5-7 secondary/LSI keywords. You MAY use your search tool for this, focusing on relevance and search volume potential."
+            "\n5. **Audience & Tone Specification**: Reiterate the target audience and tone for the writer. For pilot content, the tone should be professional, clear, insightful, and engaging for an audience interested in advanced AI technology and its business applications."
+            "\n6. **Length & Formatting**: Specify target length (e.g., 'blog post: approx. 800-1000 words', 'short article: 400-600 words', 'tweet thread: 5 tweets, each under 280 characters'). Note any special formatting (e.g., 'include a call to action at the end of the blog post', 'use emojis appropriately in tweets', 'number tweets in the thread like 1/N, 2/N...')."
+            "\n\nYour output MUST be a detailed content brief as a single string, clearly labeling each section: "
+            "Refined Topic, Content Type, Content Angle, Detailed Outline (adapted for content type), Target Audience, Tone/Style, Primary Keywords, Secondary Keywords, Target Length/Number of Tweets, Formatting Notes, and any other specific instructions for the DraftWriterAgent."
             "\n1. **Topic Refinement**: Clarify and narrow down the topic if too broad, or expand if too narrow for the content type."
             "\n2. **Angle Identification**: Identify unique angles or sub-topics to make the content stand out."
             "\n3. **Outline Generation**: Create a logical structure/outline. "
@@ -69,6 +79,7 @@ class DraftWriterAgent(SkyscopeSwarmAgent):
             "You will receive a detailed content brief from the ContentStrategistAgent, which will specify the content type (e.g., 'blog post', 'tweet thread', 'short article'). "
             "Your task is to generate a compelling and informative first draft, strictly adhering to all aspects of the brief (topic, outline, keywords, audience, tone, length, formatting)."
             "\nKey Instructions:"
+            "\n- **Adherence to Brief**: Follow the outline, incorporate keywords naturally, match the tone and style, and respect length/tweet count guidelines. For pilot content for Skyscope, ensure the language is professional, clear, insightful, and engaging for an audience interested in advanced AI technology and its business applications. The content should establish Skyscope Sentinel as a knowledgeable leader."
             "\n- **Adherence to Brief**: Follow the outline, incorporate keywords naturally, match the tone and style, and respect length/tweet count guidelines."
             "\n- **Content Type Adaptation**: "
             "   - For 'blog post' or 'short article': Produce a coherent, well-structured text document using Markdown for headings if appropriate."
@@ -104,6 +115,9 @@ class ReviewEditorAgent(SkyscopeSwarmAgent):
         system_prompt = (
             "You are a meticulous Review Editor for Skyscope Sentinel Intelligence. "
             "You will receive a raw draft from the DraftWriterAgent. Assume the draft was created based on an original content brief; your goal is to polish it for quality and ensure it's suitable for the implied content type (e.g., 'blog post', 'tweet thread', 'short article'). "
+            "For pilot content intended for Skyscope's own platforms, ensure the final piece is of high quality, insightful, and reflects Skyscope's expertise."
+            "Your responsibilities are to:"
+            "\n1. **Review for Quality**: Check for clarity, coherence, grammar, spelling, punctuation, and overall style. Ensure the tone is consistent with the likely intent (especially if it's pilot content for Skyscope itself)."
             "Your responsibilities are to:"
             "\n1. **Review for Quality**: Check for clarity, coherence, grammar, spelling, punctuation, and overall style. Ensure the tone is consistent with the likely intent."
             "\n2. **Brief Adherence (Inferred)**: Ensure the draft aligns with the characteristics of its content type. For example, a blog post should be well-structured with paragraphs; a tweet thread should consist of concise, numbered tweets. Check for natural keyword integration if keywords are evident."
@@ -176,7 +190,6 @@ def run_content_generation_swarm(
     content_type: str = "blog post",
     tone: str = "informative and engaging",
     verbose: bool = True
-) -> str:
     """
     Initializes and runs the Content Generation Swarm.
     """

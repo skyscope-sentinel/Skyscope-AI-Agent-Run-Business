@@ -22,6 +22,9 @@ class BaseAgent:
     """
 
     def __init__(self, agent_id: str, department: str = None):
+    """
+
+    def __init__(self, agent_id: str, department: str = None):
  feat/foundational-agent-system
     """
 
@@ -126,6 +129,9 @@ main
 
     def __repr__(self):
         return f"BaseAgent(agent_id='{self.agent_id}', name='{self.identity.get('first_name')}')"
+
+    def __repr__(self):
+        return f"BaseAgent(agent_id='{self.agent_id}', name='{self.identity.get('first_name')}')"
  feat/foundational-agent-system
         return f"BaseAgent(id='{self.agent_id}', status='{self.status}')"
 
@@ -144,6 +150,9 @@ if __name__ == '__main__':
     print("\n--- Testing BaseAgent ---")
 
     agent1 = BaseAgent(agent_id="Agent001-Test", department="Developers")
+    print(f"Initial status of {agent1.agent_id}: {agent1.get_status()}")
+    print(f"Identity Summary: {agent1.get_identity_summary()}")
+    # print(f"Full Identity for Agent1: {agent1.identity}") # Can be verbose, uncomment if needed
  feat/foundational-agent-system
     agent1 = BaseAgent(agent_id="Agent001-Test")
     print(f"Initial status of {agent1.agent_id}: {agent1.get_status()}")

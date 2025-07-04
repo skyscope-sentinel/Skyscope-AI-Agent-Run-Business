@@ -261,6 +261,11 @@ from skyscope_sentinel.agent_identity import initialize_identity_manager, set_fo
 
 # Load environment variables (e.g., for SERPER_API_KEY)
 from dotenv import load_dotenv
+import functools # For functools.partial
+
+load_dotenv()
+
+def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = True, max_search_results_override: int = 5):
 load_dotenv()
 
 def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = True):
@@ -271,10 +276,12 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
         initial_topic (str, optional): The initial topic for the TopicGeneratorAgent.
                                        If None, TopicGenerator will try to generate one.
         verbose (bool, optional): Enables verbose output from agents. Defaults to True.
+        max_search_results_override (int, optional): Max search results for DuckDuckGo. Defaults to 5.
 
     Returns:
         str: Path to the generated report or a summary message.
     """
+    print(f"Initializing Opportunity Scouting Swarm (Max Search Results for DDG: {max_search_results_override})...")
     print("Initializing Opportunity Scouting Swarm...")
 
     # Prepare tools
@@ -296,6 +303,19 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
 
 
     # Tools for ResearchAgent
+    # Apply max_search_results_override to DuckDuckGo
+    custom_ddg_search = functools.partial(duckduckgo_search_function, max_results=max_search_results_override)
+
+    research_agent_tools = [custom_ddg_search, browse_web_page_and_extract_text]
+
+    # SerperDevTool used by serper_search_function typically has a fixed number of results or
+    # one set at tool instantiation, not easily changed per call by the agent.
+    # So, max_search_results_override primarily affects DuckDuckGo here.
+    if os.getenv("SERPER_API_KEY"):
+        research_agent_tools.insert(0, serper_search_function) # Add Serper (will use its default/tool-set result count)
+        print(f"Serper API key found. Adding Serper search tool (uses its own result count settings). DDG set to {max_search_results_override} results.")
+    else:
+        print(f"Serper API key not found. ResearchAgent using DuckDuckGo (set to {max_search_results_override} results) and browser tool only.")
     research_agent_tools = [duckduckgo_search_function, browse_web_page_and_extract_text]
     if os.getenv("SERPER_API_KEY"):
         research_agent_tools.insert(0, serper_search_function) # Prioritize Serper if available
@@ -306,12 +326,14 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
 
     # Initialize agents
     topic_generator = TopicGeneratorAgent(
+        tools=topic_gen_tools,
         tools=topic_gen_tools, # Provide search tool
         max_loops=1,
         verbose=verbose
     )
 
     research_agent = ResearchAgent(
+        tools=research_agent_tools, # Pass the potentially customized DDG tool
         tools=research_agent_tools,
         max_loops=1,
         verbose=verbose
