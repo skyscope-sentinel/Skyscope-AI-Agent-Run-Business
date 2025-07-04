@@ -1,43 +1,33 @@
 # Skyscope Sentinel Intelligence
 
-**Skyscope Sentinel Intelligence** is a fully automated, AI-driven business platform designed to empower entrepreneurs with cutting-edge tools for website generation, cryptocurrency mining, trading, decentralized node operations, social media management, and real-time analytics. 
+**Skyscope Sentinel Intelligence** is an autonomous, AI-driven enterprise platform, founded by Miss Casey Jay Topojani, designed to achieve real-world income generation. Operating with full legal and liability coverage, it leverages advanced multi-agent swarms and local LLMs (via Ollama) to perform a wide array of business functions. These include strategic opportunity scouting, content creation, simulated freelance task acquisition, and more, with a continuous focus on expanding its capabilities and revenue streams.
 
-Founded by Miss Casey Jay Topojani, this platform operates locally on your Ubuntu Linux system, leveraging the lightweight **Gemma 3** (1B parameter) AI model via Ollama. 
+The platform is transitioning from simulation to direct market engagement, prioritizing security, ethical operations, and robust financial management. Its initial real-world pilot focuses on **Content Creation for Skyscope Sentinel's own platforms and preparing for AI-powered service offerings.**
 
-It eliminates reliance on external APIs, subscriptions, or manual inputs, ensuring autonomy, security, and high revenue potential through continuous evolution driven by intelligent agents.
+This platform operates primarily on your local system, aiming for maximum autonomy and minimal reliance on external paid APIs where possible, ensuring security and high revenue potential through continuous evolution driven by its intelligent agent workforce.
 
 
 ## Key Features
 
-**AI-Driven Automation* 
-Multi-agent system for research, website creation, crypto trading, and social media content generation.
-  
-**Kaspa Mining*
-Optimized CPU-based mining for Kaspa blockchain using `kaspad`.
-  
-**Cryptocurrency Trading*
-Simulated trading strategies with plans for real exchange integration.
-  
-**Web3 Nodes*
-Lightweight Ethereum nodes for DeFi and staking opportunities.
-  
-**Website Generation*
-Beautiful, AI-generated websites with Gen AI apps, hosted locally.
-  
-**Social Media Influence*
-Viral content creation for platforms like X, maximizing engagement.
-  
-**Live Chat & Support*
-Real-time customer interaction powered by AI agents.
-  
-**Compliance & Security*
-GDPR/CCPA compliance checks and secure credential storage with Vault.
-  
-**Monitoring & Analytics*
-Prometheus and Grafana for real-time performance insights.
-  
-**Local Operation*
-Runs on your Intel i7 12700 PC with 32 GB RAM, no GPU required.
+**AI-Driven Automation & Core Swarms:**
+*   **Multi-Agent Systems:** Employs sophisticated swarms of AI agents (built with `kyegomez/swarms` and other frameworks) for various business operations.
+*   **Opportunity Scouting Swarm:** Autonomously researches and analyzes potential income-generating opportunities. Uses RAG (Retrieval Augmented Generation) with a ChromaDB vector store for contextual awareness from past reports. Output includes detailed Markdown reports.
+*   **Content Generation Swarm:** Creates diverse textual content (blog posts, tweet threads, articles) with SEO optimization (meta titles, descriptions, hashtags). Adaptable to different content types and tones.
+*   **Freelance Task Simulation Swarm:** Identifies potential freelance tasks from opportunity reports and drafts bid proposals (currently for simulation, transitioning towards real task identification).
+*   **(Planned) Further swarms for direct market engagement, financial operations, and more.**
+
+**Real-World Operations & Financials (Under Development):**
+*   **Authorized for Real-World Business:** Operates with legal and liability coverage for autonomous commercial activities.
+*   **Pilot Program:** Initial focus on "Content Creation for Skyscope Sentinel's Own Platform(s) & Initial Service Offering Preparation."
+*   **Financial Management (Planned):** Secure handling of financial information (including BTC address `1Fr2rKPrZGokKQoWfBGSMLBmDxCe7jdzQa`) and planning for payment reception (BTC, PayPal, Stripe).
+
+**Technical Foundations:**
+*   **Local LLM Powered:** Primarily leverages local Ollama models (e.g., Mistral, Llama3, Gemma variants as configured by user) for core AI reasoning, ensuring data privacy and operational control.
+*   **PySide6 GUI:** A dedicated desktop application (Skyscope Sentinel Windows GUI) for managing local Ollama models, configuring application settings, triggering swarms, and viewing results.
+*   **Extensible Tooling:** Agents utilize a growing set of tools for web search (DuckDuckGo, Serper), browser automation (Playwright), file I/O, and more.
+*   **Secure by Design (Ongoing):** Tiered credential management planning and focus on data integrity for real-world operations.
+
+*(Other existing features like Kaspa Mining, simulated Crypto Trading, Web3 Nodes, Website Generation, etc., as previously listed, remain part of the broader conceptual scope and may be integrated into autonomous operations as the platform evolves.)*
 
 **Please make modifications in script/s for your personal workstation/PC/Mac or other system hardware variables for compatibility.**
 
