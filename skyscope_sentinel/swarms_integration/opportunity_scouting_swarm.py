@@ -367,6 +367,33 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
     # If initial_topic is provided, TopicGenerator's first task is to refine/use it.
     # If not, its task is to generate a new one.
     # The output of TopicGenerator will be the input for ResearchAgent.
+    # The output of ResearchAgent will be the input for AnalysisAgent.
+    # The output of AnalysisAgent will be the input for ReportingAgent.
+
+    if initial_topic:
+        current_task_for_topic_generator = f"Refine and confirm this topic for research: '{initial_topic}'. If suitable, output the topic. If not, generate a better one based on your advanced criteria."
+    else:
+        current_task_for_topic_generator = "Generate one promising and unique topic for identifying new AI-driven income-generating opportunities with low initial capital, using your search tool if needed for inspiration."
+
+    # To effectively log input to AnalysisAgent, we need to capture intermediate outputs or structure the workflow differently.
+    # For SequentialWorkflow, the input to AnalysisAgent is the direct output of ResearchAgent.
+    # We can't easily intercept and log it without a custom workflow or modifying SequentialWorkflow.
+    # However, the `verbose=True` on the workflow and agents should provide substantial logging from the swarms library itself.
+    # The AnalysisAgent's prompt instructs it to use the RAG tool with the "core research topic".
+    # The "core research topic" comes from TopicGeneratorAgent's output, which becomes ResearchAgent's task.
+    # ResearchAgent's output (research data) becomes AnalysisAgent's task. AnalysisAgent needs to infer the topic from this.
+
+    print(f"\n[OPP_SWARM_RUNNER] Starting sequential workflow with initial task for TopicGenerator: '{current_task_for_topic_generator}'")
+    # The AnalysisAgent will receive the output of ResearchAgent.
+    # The prompt for AnalysisAgent is designed to make it use its RAG tool with the topic it infers from its input.
+
+    final_report_markdown = workflow.run(current_task_for_topic_generator)
+
+    print(f"\n[OPP_SWARM_RUNNER] Raw output from final agent (ReportingAgent) in workflow: \n{final_report_markdown[:300]}...\n")
+
+
+    if final_report_markdown and isinstance(final_report_markdown, str):
+        print("\n[OPP_SWARM_RUNNER] Workflow completed. Final output (Report Markdown):")
 
     if initial_topic:
         current_task = f"Refine and confirm this topic for research: '{initial_topic}'. If suitable, output the topic. If not, generate a better one based on your advanced criteria." # Updated task for TopicGenerator
