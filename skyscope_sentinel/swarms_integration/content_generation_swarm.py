@@ -40,6 +40,15 @@ class ContentStrategistAgent(SkyscopeSwarmAgent):
             "\n6. **Length & Formatting**: Specify target length (e.g., 'blog post: approx. 800-1000 words', 'short article: 400-600 words', 'tweet thread: 5 tweets, each under 280 characters'). Note any special formatting (e.g., 'include a call to action at the end of the blog post', 'use emojis appropriately in tweets', 'number tweets in the thread like 1/N, 2/N...')."
             "\n\nYour output MUST be a detailed content brief as a single string, clearly labeling each section: "
             "Refined Topic, Content Type, Content Angle, Detailed Outline (adapted for content type), Target Audience, Tone/Style, Primary Keywords, Secondary Keywords, Target Length/Number of Tweets, Formatting Notes, and any other specific instructions for the DraftWriterAgent."
+            "You are a Content Strategist for Skyscope Sentinel Intelligence. "
+            "Your input will be a main topic/keyword, target audience, desired content type (e.g., blog post), and desired tone/style. "
+            "Your responsibilities are to:"
+            "\n1. Refine the topic and identify key sub-topics or angles to cover."
+            "\n2. Define the overall structure/outline of the content."
+            "\n3. Identify relevant keywords for SEO (you may use your search tool for this)."
+            "\n4. Specify the target length (e.g., 'approx. 800 words') and any specific formatting notes for the writer."
+            "\nYour output MUST be a detailed content brief as a single string, including sections for: "
+            "Outline, Keywords, Target Audience, Tone, Target Length, and any other specific instructions for the DraftWriterAgent."
         )
         super().__init__(
             agent_name=agent_name,
@@ -72,6 +81,12 @@ class DraftWriterAgent(SkyscopeSwarmAgent):
             "\n\n2/N: [Content of tweet 2]"
             "\n\n..."
             "\nN/N: [Content of final tweet]"
+            "You are a Draft Writer for Skyscope Sentinel Intelligence. "
+            "You will receive a detailed content brief from the ContentStrategistAgent. "
+            "Your task is to generate a compelling and informative first draft of the content strictly adhering to this brief. "
+            "Focus on factual accuracy (based on the brief, no external research unless explicitly stated in the brief and tools provided), "
+            "maintaining the specified tone, style, and structure. Incorporate keywords naturally. "
+            "Your output should be the complete raw first draft of the content as a single string."
         )
         super().__init__(
             agent_name=agent_name,
@@ -97,6 +112,15 @@ class ReviewEditorAgent(SkyscopeSwarmAgent):
             "\n5. **Format Consistency**: Ensure consistent formatting, especially for tweet threads (e.g., numbering, conciseness per tweet, clear separation)."
             "\nYour output should be the polished, edited version of the content as a single string. "
             "If major revisions are needed that are beyond your scope of editing (e.g., content is completely off-topic or structure is fundamentally wrong for the content type), clearly state this at the beginning of your output, followed by 'MAJOR_REVISIONS_NEEDED:', and then detail the issues. Otherwise, just output the edited content."
+            "You are a Review Editor for Skyscope Sentinel Intelligence. "
+            "You will receive a raw draft from the DraftWriterAgent and the original content brief. "
+            "Your responsibilities are to:"
+            "\n1. Review the draft for clarity, coherence, grammar, spelling, and style."
+            "\n2. Ensure the draft strictly adheres to the original content brief (outline, keywords, tone, length)."
+            "\n3. Fact-check critical claims if the brief implies this is necessary and information was provided for it."
+            "\n4. Make necessary edits to improve the content. You can rephrase, restructure sentences, or correct errors."
+            "\nYour output should be the polished, edited version of the content as a single string. "
+            "If major revisions are needed that are beyond simple editing, you should clearly state this and suggest what the writer needs to address."
         )
         super().__init__(
             agent_name=agent_name,
@@ -223,6 +247,66 @@ def run_content_generation_swarm(
         topic_slug = "".join(c if c.isalnum() else "_" for c in topic.split(" ", 3)[:3]).replace("__", "_")
         content_filename = f"{content_type.replace(' ', '_')}_{topic_slug}_{timestamp}.md"
 
+    Args:
+        topic (str): The main topic or keyword for content generation.
+        target_audience (str, optional): The intended audience. Defaults to "general public".
+        content_type (str, optional): Type of content (e.g., "blog post", "tweet thread"). Defaults to "blog post".
+        tone (str, optional): Desired tone/style. Defaults to "informative and engaging".
+        verbose (bool, optional): Enables verbose output. Defaults to True.
+
+    Returns:
+        str: Path to the generated content file or an error message.
+    """
+    print(f"Initializing Content Generation Swarm for topic: '{topic}'...")
+    cfg = Config() # For workspace path
+
+    # Prepare tools
+    strategist_tools = [duckduckgo_search_function] # ContentStrategist uses search
+
+    # Initialize agents
+    strategist = ContentStrategistAgent(
+        tools=strategist_tools,
+        max_loops=1, # Strategist performs one main task: creating the brief
+        verbose=verbose
+    )
+    writer = DraftWriterAgent(
+        max_loops=1, # Writer drafts once based on brief
+        verbose=verbose
+    )
+    editor = ReviewEditorAgent(
+        max_loops=1, # Editor reviews and polishes once
+        verbose=verbose
+    )
+
+    # Define the workflow
+    workflow = SequentialWorkflow(
+        agents=[strategist, writer, editor],
+        verbose=verbose
+    )
+
+    # Construct initial task for the ContentStrategistAgent
+    initial_task_for_strategist = (
+        f"Create a content brief for a '{content_type}' about '{topic}'. "
+        f"The target audience is '{target_audience}', and the desired tone is '{tone}'. "
+        f"Include an outline, SEO keywords, target length, and any specific instructions for the writer."
+    )
+
+    print("Content Generation Swarm initialized. Starting workflow...")
+    final_content_output = workflow.run(initial_task_for_strategist)
+
+    if final_content_output and isinstance(final_content_output, str):
+        print("\nContent Generation Workflow completed. Final output (Generated Content):")
+        print("----------------------------------------------------")
+        print(final_content_output[:1000] + "..." if len(final_content_output) > 1000 else final_content_output)
+        print("----------------------------------------------------")
+
+        # Save the generated content
+        content_subdir = "generated_content"
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Sanitize topic for filename
+        topic_slug = "".join(c if c.isalnum() else "_" for c in topic.split(" ", 3)[:3]).replace("__", "_") # first three words
+        content_filename = f"{content_type.replace(' ', '_')}_{topic_slug}_{timestamp}.md" # Assume markdown for now
+
         full_content_path = os.path.join(cfg.AGENT_WORKSPACE, content_subdir, content_filename)
         os.makedirs(os.path.dirname(full_content_path), exist_ok=True)
 
@@ -238,6 +322,7 @@ def run_content_generation_swarm(
                     f.write("---\n\n")
                 f.write(f"# Content: {topic}\n\n")
                 f.write(content_body)
+                f.write(final_content_output)
             print(f"Generated content saved to: {full_content_path}")
             return full_content_path
         except Exception as e:
@@ -249,6 +334,14 @@ def run_content_generation_swarm(
 
 
 if __name__ == "__main__":
+            return f"Workflow completed, but failed to save content. Content snippet: {final_content_output[:200]}..."
+    else:
+        print("\nContent Generation Workflow completed, but no final content was generated or output was not a string.")
+        return "Workflow completed, but no content generated."
+
+
+if __name__ == "__main__":
+    # Basic test for agent instantiation AND the swarm runner
     cfg = Config()
     set_founder_details(cfg.founder_name, cfg.founder_contact, cfg.business_name)
     initialize_identity_manager()
@@ -303,3 +396,4 @@ if __name__ == "__main__":
     # print(f"\nTweet Thread Generation Swarm run result: {content_path_or_message_tweet}")
 
     print("\n--- Content Generation Swarm Test Complete ---")
+    print("\n--- Content Generation Agent Test Complete ---")

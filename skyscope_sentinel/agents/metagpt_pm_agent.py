@@ -3,6 +3,8 @@ import os
 import json
 # from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
 from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
+ feat/foundational-agent-system
+from skyscope_sentinel.agents.base_agent import BaseAgent
 from skyscope_sentinel.ollama_integration import OllamaIntegration
 from skyscope_sentinel.agents.messaging import AgentMessageQueue # For type hinting
 
@@ -29,6 +31,36 @@ class ProductManagerAgent(OwlBaseAgent):
     # def log(self, message: str):
     #     print(f"[ProductManagerAgent {self.agent_id}] {message}")
 
+
+# from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
+from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
+from skyscope_sentinel.ollama_integration import OllamaIntegration
+from skyscope_sentinel.agents.messaging import AgentMessageQueue # For type hinting
+
+class ProductManagerAgent(OwlBaseAgent):
+    def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b", owl_toolkits: list = None):
+        # PMs could be part of "Strategists" or a dedicated "Product" department.
+        # For now, assigning to "Strategists" as it's one of the defined departments.
+        super().__init__(
+            agent_id,
+            department="Strategists", # Assigning a department
+            role_description="An AI agent that translates user requirements into detailed Product Requirement Documents (PRDs).",
+            owl_toolkits=owl_toolkits
+        )
+        self.ollama_integration = ollama_integration_instance if ollama_integration_instance else OllamaIntegration()
+        self.model_name = model_name
+        # self.status is managed by OwlBaseAgent, initialized to "idle_owl"
+        # We can set a more specific status if needed, e.g., self.status = "idle_pm"
+        self.status = "idle_pm"
+        self.log(f"ProductManagerAgent initialized with model '{self.model_name}'. Identity: {self.identity.get('first_name')} {self.identity.get('last_name')}, Title: {self.identity.get('employee_title')}")
+
+    # OwlBaseAgent provides a log method: self.log(message)
+    # which prefixes with agent_id and name. If a different format is needed, this can be overridden.
+    # For consistency, we'll use the one from OwlBaseAgent.
+    # def log(self, message: str):
+    #     print(f"[ProductManagerAgent {self.agent_id}] {message}")
+
+ main
 
     def generate_prd(self, user_requirement_text: str) -> dict | None:
         self.log(f"Received user requirement: '{user_requirement_text[:100]}...'")
