@@ -268,6 +268,39 @@ This is a fantastic concept for making money with AI. It involves robots and AI.
     print("To fully test embeddings, ensure your Ollama service is running and the model specified in config.py (for embeddings) is available.")
     print("The default embedding model used here is derived from your main Ollama model config.")
 
+
+def get_contextual_information_for_topic(topic: str, n_results: int = 2) -> str:
+    """
+    Queries the vector store for past reports related to the given topic
+    and formats the results into a string for prompt injection.
+
+    Args:
+        topic (str): The topic to search for contextual information.
+        n_results (int): Number of results to fetch from the vector store.
+
+    Returns:
+        str: A formatted string containing contextual information, or an empty string if none found.
+    """
+    if not topic or not topic.strip():
+        return "No specific topic provided for contextual search."
+
+    print(f"[RAG Tool] Fetching contextual info for topic: '{topic}'")
+    try:
+        query_results = query_reports(query_text=topic, n_results=n_results)
+
+        if not query_results:
+            return "No relevant past reports found for this topic."
+
+        context_str = "Context from past related reports:\n"
+        for i, res in enumerate(query_results):
+            context_str += f"\n--- Context Snippet {i+1} (from report: {res.get('metadata', {}).get('filename', 'N/A')}, topic: {res.get('metadata', {}).get('topic', 'N/A')}) ---\n"
+            context_str += res.get('document', 'No content.')[:500] + "...\n" # Limit snippet length
+        context_str += "\n--- End of Contextual Information ---\n"
+        return context_str
+    except Exception as e:
+        print(f"[RAG Tool] Error fetching contextual information: {e}")
+        return "Error retrieving contextual information from past reports."
+
 # Note: The `litellm.embedding()` call will use the Ollama model specified in `config.py`
 # if it's prefixed with "ollama/" or if LiteLLM is otherwise configured for Ollama.
 # Ensure that model can generate embeddings or use a specific embedding model.

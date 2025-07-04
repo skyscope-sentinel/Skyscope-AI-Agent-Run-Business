@@ -83,4 +83,4 @@ The project utilizes several AI agent frameworks and libraries:
 *   **Error Handling**: Ensure robust error handling, especially for operations involving external APIs, file system access, or web interactions.
 *   **Asynchronous Operations**: GUI interactions that trigger long-running agent tasks MUST be run in separate threads (e.g., using `AsyncRunnerThread` in `main.py`) to keep the UI responsive.
 
-This document will be updated as the project evolves. If you make significant architectural changes or add new core agent systems, please update this file accordingly.
+This document will be updated as the project evolves. 

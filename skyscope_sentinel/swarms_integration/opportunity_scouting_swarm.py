@@ -8,6 +8,7 @@ from skyscope_sentinel.tools.search_tools import duckduckgo_search_function, ser
 from skyscope_sentinel.tools.browser_tools import browse_web_page_and_extract_text # Corrected path
 from skyscope_sentinel.tools.file_io_tools import save_text_to_file_in_workspace # Corrected path
 # from skyscope_sentinel.tools.code_execution_tools import execute_python_code_in_e2b # Corrected path for future
+from skyscope_sentinel.tools.vector_store_utils import add_report_to_collection, get_contextual_information_for_topic # For RAG
 from skyscope_sentinel.tools.vector_store_utils import add_report_to_collection # For RAG
 from skyscope_sentinel.utils.search_tools import duckduckgo_search_function, serper_search_function
 from skyscope_sentinel.utils.browser_tools import browse_web_page_and_extract_text
@@ -72,6 +73,36 @@ class ResearchAgent(SkyscopeSwarmAgent):
 
 class AnalysisAgent(SkyscopeSwarmAgent):
     """
+    Analyzes gathered information to identify viable opportunities, potentially using context from past reports.
+    """
+    def __init__(self, agent_name: str = "AnalysisAgent", tools: list = None, **kwargs):
+        system_prompt = (
+            "You are a highly critical and pragmatic Analysis Agent for Skyscope Sentinel Intelligence, an AI-driven enterprise focused on generating significant income **starting with zero initial monetary investment**."
+            " Your primary task is to analyze research data on a given topic and identify 1-3 concrete, actionable, and low-barrier income-generating opportunities."
+            "\n\nYOUR PROCESS:"
+            "\n1.  **Receive Research Data:** This will be the primary input for your analysis, typically from a ResearchAgent."
+            "\n2.  **Retrieve Context (Tool Use):** Use the `get_contextual_information_for_topic` tool with the core research topic to fetch relevant insights from past reports. This context might highlight synergies, past successes/failures, or related ideas."
+            "\n3.  **Synthesize & Analyze:** Combine the fresh research data with any retrieved contextual information."
+            "\n4.  **Identify Opportunities & Detail (8-Point Structure):** For each opportunity (1-3 max), provide the following:"
+            "\n    1.  **Opportunity Title:** Clear and concise."
+            "\n    2.  **Core Concept:** Brief explanation."
+            "\n    3.  **Zero-Cost Startup Strategy:** How to start with NO financial outlay, leveraging AI and agent work-hours."
+            "\n    4.  **Key AI-Leveraged Activities:** Specific tasks for Skyscope's AI agents."
+            "\n    5.  **Potential Revenue Streams (Short-Term Focus):** 2-3 quick monetization ideas."
+            "\n    6.  **Target Audience/Market:** Initial customers/users."
+            "\n    7.  **Actionable First Steps (3 concrete actions):** Specific initial actions for AI agents."
+            "\n    8.  **Potential Challenges & Mitigation with AI:** Main hurdles and AI-driven solutions."
+            "\n\nCRITICAL CONSIDERATIONS:"
+            "\n- **No Funds Constraint:** This is paramount. No upfront payment for tools (beyond free tiers/open source), ads, or inventory, unless the path to funding is part of the very first steps."
+            "\n- **AI Skillset:** Assume AI agents for research, content creation, simple coding, data analysis, and automated outreach."
+            "\n- **Realistic & Actionable:** Focus on what can be started NOW by AI agents."
+            "\n- **Contextual Awareness:** Clearly state if and how the retrieved contextual information (from past reports) influenced your analysis or the shaping of the opportunities."
+            "\n\nYour output should be a well-structured analysis, detailing each point for every identified opportunity, ready for the ReportingAgent. If no opportunities are found, clearly state that and explain why based on the data and context."
+        )
+        super().__init__(
+            agent_name=agent_name,
+            system_prompt=system_prompt,
+            tools=tools or [],
     Analyzes gathered information to identify viable opportunities.
     """
     def __init__(self, agent_name: str = "AnalysisAgent", **kwargs):
@@ -282,6 +313,15 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
 
     research_agent = ResearchAgent(
         tools=research_agent_tools,
+        max_loops=1,
+        verbose=verbose
+    )
+
+    # Tools for AnalysisAgent (RAG tool)
+    analysis_agent_tools = [get_contextual_information_for_topic]
+
+    analysis_agent = AnalysisAgent(
+        tools=analysis_agent_tools,
         # tools=research_tools, # Removed redundant/incorrect tools parameter
         tools=research_tools,
         max_loops=1, # Max loops for the agent's own internal process, not for retries in sequence.
