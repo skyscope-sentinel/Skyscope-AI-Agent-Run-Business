@@ -48,6 +48,12 @@ The project utilizes several AI agent frameworks and libraries:
     4.  **`ReportingAgent`**: Consolidates analysis into a structured Markdown report. Enhanced to follow a specific, detailed Markdown template for clarity and professionalism.
 *   **Output**: Reports are saved in the `workspace/opportunity_reports/` directory. These reports are also automatically added to a ChromaDB vector store for RAG.
 *   **GUI Integration**: Triggered from the "Opportunity Research" tab. Users can select "Swarm Opportunity Scouting" mode. Generated Markdown reports are now rendered directly in the GUI.
+    1.  **`TopicGeneratorAgent`**: Generates or refines a research topic.
+    2.  **`ResearchAgent`**: Gathers information on the topic using search tools (DuckDuckGo, Serper if API key is available) and web browsing tools (Playwright via `browse_web_page_and_extract_text`).
+    3.  **`AnalysisAgent`**: Analyzes the gathered information to identify viable opportunities, assess potential revenue, risks, and resource requirements (aiming for low/no-cost).
+    4.  **`ReportingAgent`**: Consolidates the analysis into a structured Markdown report.
+*   **Output**: Reports are saved in the `workspace/opportunity_reports/` directory with filenames like `opportunity_report_[topic_slug]_[timestamp].md`.
+*   **GUI Integration**: Triggered from the "Opportunity Research" tab. Users can select "Swarm Opportunity Scouting" mode and optionally provide an initial topic.
 
 ## Key Code Locations
 
@@ -68,5 +74,13 @@ The project utilizes several AI agent frameworks and libraries:
 *   **Error Handling**: Ensure robust error handling, especially for operations involving external APIs, file system access, or web interactions. Search and browser tools now have basic error catching.
 *   **Asynchronous Operations**: GUI interactions that trigger long-running agent tasks MUST be run in separate threads (e.g., using `AsyncRunnerThread` in `main.py`) to keep the UI responsive.
 *   **RAG System**: Be aware of the ChromaDB vector store for opportunity reports. Future agents might query this store for contextual information.
+*   **Tools**: Utility functions for search, browsing, file I/O, code execution are in `skyscope_sentinel/utils/`.
+*   **Identity Management**: `skyscope_sentinel/agent_identity.py` (generates identities for agents).
 
-This document will be updated as the project evolves. If you make significant architectural changes or add new core agent systems, please update this file accordingly.
+## Working with an Agentic Environment
+
+*   **Tool Usage**: When implementing new agent capabilities, prefer creating reusable tool functions (like those in `utils/`) and providing them to agents rather than having agents generate complex code for common tasks like web searches or file I/O directly.
+*   **Error Handling**: Ensure robust error handling, especially for operations involving external APIs, file system access, or web interactions.
+*   **Asynchronous Operations**: GUI interactions that trigger long-running agent tasks MUST be run in separate threads (e.g., using `AsyncRunnerThread` in `main.py`) to keep the UI responsive.
+
+This document will be updated as the project evolves. 

@@ -9,6 +9,11 @@ from skyscope_sentinel.tools.browser_tools import browse_web_page_and_extract_te
 from skyscope_sentinel.tools.file_io_tools import save_text_to_file_in_workspace # Corrected path
 # from skyscope_sentinel.tools.code_execution_tools import execute_python_code_in_e2b # Corrected path for future
 from skyscope_sentinel.tools.vector_store_utils import add_report_to_collection, get_contextual_information_for_topic # For RAG
+from skyscope_sentinel.tools.vector_store_utils import add_report_to_collection # For RAG
+from skyscope_sentinel.utils.search_tools import duckduckgo_search_function, serper_search_function
+from skyscope_sentinel.utils.browser_tools import browse_web_page_and_extract_text
+from skyscope_sentinel.utils.file_io_tools import save_text_to_file_in_workspace
+# from skyscope_sentinel.utils.code_execution_tools import execute_python_code_in_e2b # For later if needed by AnalysisAgent
 
 # Placeholder for department, will be refined
 DEPARTMENT_NAME = "Strategic Opportunity Identification"
@@ -98,6 +103,31 @@ class AnalysisAgent(SkyscopeSwarmAgent):
             agent_name=agent_name,
             system_prompt=system_prompt,
             tools=tools or [],
+    Analyzes gathered information to identify viable opportunities.
+    """
+    def __init__(self, agent_name: str = "AnalysisAgent", **kwargs):
+        system_prompt = (
+            "You are a highly critical and pragmatic Analysis Agent for Skyscope Sentinel Intelligence, an AI-driven enterprise focused on generating significant income **starting with zero initial monetary investment**."
+            " You will receive comprehensive research data on a specific topic. Your core task is to dissect this information to identify 1-3 concrete, actionable, and **immediately pursuable (low-barrier)** income-generating opportunities."
+            "\n\nFOR EACH IDENTIFIED OPPORTUNITY, YOU MUST PROVIDE:"
+            "\n1.  **Opportunity Title:** A clear, concise title."
+            "\n2.  **Core Concept:** A brief explanation of the opportunity."
+            "\n3.  **Zero-Cost Startup Strategy:** How can Skyscope (an AI entity with AI staff) begin pursuing this with NO financial outlay? Focus on leveraging AI capabilities, open-source tools, and sweat equity (agent work-hours)."
+            "\n4.  **Key AI-Leveraged Activities:** What specific tasks can Skyscope's AI agents (e.g., content writers, code generators, researchers, social media bots) perform to build and monetize this opportunity?"
+            "\n5.  **Potential Revenue Streams (Short-Term Focus):** Identify 2-3 ways this could start generating revenue quickly (e.g., freelance service, affiliate commission, micro-product)."
+            "\n6.  **Target Audience/Market:** Who are the initial customers or users?"
+            "\n7.  **Actionable First Steps (3 concrete actions):** What are the absolute first three steps Skyscope's AI agents should take to begin executing this opportunity? Be specific (e.g., 'Draft 5 variations of a service proposal for X using AI content writers', 'Identify 10 relevant subreddits for initial outreach', 'Use AI to generate a list of 20 potential affiliate products in Y niche')."
+            "\n8.  **Potential Challenges & Mitigation with AI:** What are the main hurdles, and how can AI help overcome them?"
+            "\n\nCRITICAL CONSIDERATIONS:"
+            "\n- **No Funds Constraint:** This is paramount. Solutions requiring upfront payment for tools (beyond existing free tiers or open source), advertising, or inventory are NOT acceptable unless a clear path to acquiring those funds *through the opportunity itself* is outlined as a very first step."
+            "\n- **AI Skillset:** Assume Skyscope has AI agents capable of research, content creation (text, basic images), simple code generation/scripting, data analysis, and automated outreach (e.g., social media posting, email drafting)."
+            "\n- **Realistic & Actionable:** Avoid purely theoretical or overly complex ideas. Focus on what can be started *now* by AI agents."
+            "\n\nYour output should be a well-structured analysis, ready to be formatted into a Markdown report by the ReportingAgent. Address each of the 8 points above for every opportunity you identify."
+        )
+        # Potential tools for later: execute_python_code_in_e2b for complex data tasks
+        super().__init__(
+            agent_name=agent_name,
+            system_prompt=system_prompt,
             department_name=DEPARTMENT_NAME,
             role_in_department="Opportunity Analyst & Viability Assessor",
             **kwargs
@@ -292,6 +322,13 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
 
     analysis_agent = AnalysisAgent(
         tools=analysis_agent_tools,
+        # tools=research_tools, # Removed redundant/incorrect tools parameter
+        tools=research_tools,
+        max_loops=1, # Max loops for the agent's own internal process, not for retries in sequence.
+        verbose=verbose
+    )
+
+    analysis_agent = AnalysisAgent(
         max_loops=1,
         verbose=verbose
     )
@@ -335,6 +372,9 @@ def run_opportunity_scouting_swarm(initial_topic: str = None, verbose: bool = Tr
         current_task = f"Refine and confirm this topic for research: '{initial_topic}'. If suitable, output the topic. If not, generate a better one based on your advanced criteria." # Updated task for TopicGenerator
     else:
         current_task = "Generate one promising and unique topic for identifying new AI-driven income-generating opportunities with low initial capital, using your search tool if needed for inspiration." # Updated task
+        current_task = f"Refine and confirm this topic for research: '{initial_topic}'. If suitable, output the topic. If not, generate a better one."
+    else:
+        current_task = "Generate one promising topic for identifying new income-generating opportunities."
 
     final_report_markdown = workflow.run(current_task)
 
