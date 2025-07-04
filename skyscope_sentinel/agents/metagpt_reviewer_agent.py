@@ -9,6 +9,8 @@ if project_root not in sys.path:
 
 # from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
 from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
+ feat/foundational-agent-system
+from skyscope_sentinel.agents.base_agent import BaseAgent
 from skyscope_sentinel.ollama_integration import OllamaIntegration
 
 class ReviewerAgent(OwlBaseAgent):
@@ -27,6 +29,28 @@ class ReviewerAgent(OwlBaseAgent):
     # Using self.log() from OwlBaseAgent for consistent logging format.
     # def log(self, message: str):
     #     print(f"[ReviewerAgent {self.agent_id}] {message}")
+
+# from skyscope_sentinel.agents.base_agent import BaseAgent # Replaced by OwlBaseAgent
+from skyscope_sentinel.owl_integration.owl_base_agent import OwlBaseAgent
+from skyscope_sentinel.ollama_integration import OllamaIntegration
+
+class ReviewerAgent(OwlBaseAgent):
+    def __init__(self, agent_id: str, ollama_integration_instance: OllamaIntegration = None, model_name: str = "qwen2:0.5b", owl_toolkits: list = None): # Default model
+        super().__init__(
+            agent_id,
+            department="Expert Panels", # Assigning to Expert Panels department
+            role_description="An AI agent that reviews Product Requirement Documents (PRDs) and code for quality, clarity, and adherence to standards.",
+            owl_toolkits=owl_toolkits
+        )
+        self.ollama_integration = ollama_integration_instance if ollama_integration_instance else OllamaIntegration()
+        self.model_name = model_name
+        self.status = "idle_reviewer"
+        self.log(f"ReviewerAgent initialized with model '{self.model_name}'. Identity: {self.identity.get('first_name')} {self.identity.get('last_name')}, Title: {self.identity.get('employee_title')}")
+
+    # Using self.log() from OwlBaseAgent for consistent logging format.
+    # def log(self, message: str):
+    #     print(f"[ReviewerAgent {self.agent_id}] {message}")
+ main
 
     def review_prd(self, prd_data: dict) -> dict:
         self.log(f"Reviewing PRD for project: '{prd_data.get('project_name', 'Unknown Project')}' using Ollama model '{self.model_name}'.")
