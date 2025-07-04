@@ -11,6 +11,7 @@ It eliminates reliance on external APIs, subscriptions, or manual inputs, ensuri
 
 **AI-Driven Automation* 
 Multi-agent system for research, website creation, crypto trading, and social media content generation.
+    *   **Opportunity Scouting Swarm**: An autonomous multi-agent swarm (built with `kyegomez/swarms`) that researches and identifies potential income-generating opportunities, saving reports to the workspace. Triggerable via the GUI.
   
 **Kaspa Mining*
 Optimized CPU-based mining for Kaspa blockchain using `kaspad`.
