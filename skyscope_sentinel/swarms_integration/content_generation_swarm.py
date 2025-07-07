@@ -190,6 +190,7 @@ def run_content_generation_swarm(
     content_type: str = "blog post",
     tone: str = "informative and engaging",
     verbose: bool = True
+) -> str:
     """
     Initializes and runs the Content Generation Swarm.
     """

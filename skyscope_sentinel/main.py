@@ -389,6 +389,14 @@ class ContentStudioPage(QWidget):
         self.status_message_requested.emit(f"Content generation failed: {error_message}", "error", 7000)
         QMessageBox.critical(self, "Content Generation Failed", f"An error occurred:\n{error_message}")
         self.async_thread = None
+
+    @Slot(str)
+    def on_generation_failed(self, error_message):
+        self.results_display.append(f"\n\n--- ERROR ---\n{error_message}")
+        self.generate_button.setEnabled(True)
+        self.status_message_requested.emit(f"Content generation failed: {error_message}", "error", 7000)
+        QMessageBox.critical(self, "Content Generation Failed", f"An error occurred:\n{error_message}")
+        self.async_thread = None
  feat/foundational-agent-system
 # AIAgent Class Definition
 class AIAgent:
@@ -895,6 +903,16 @@ feat/foundational-agent-system
             self.show_status_message(f"New generic agent '{agent_name}' added.", "success"); print(f"Added new agent: {agent_name}, ID: {new_agent_instance.agent_id}, Dept: {new_agent_instance.identity.get('department')}")
         except Exception as e: print(f"Error adding new agent: {e}"); self.show_status_message(f"Failed to add new agent: {e}", "error")
 
+
+    def add_new_agent(self):
+        self.show_status_message("Adding a new generic agent (simulated)...", "info"); new_agent_id_num = len(self.agents) + 1
+        try:
+            new_agent_instance = OwlBaseAgent(agent_id=f"AGENT{new_agent_id_num:03d}", department="Staff")
+            self.agents.append(new_agent_instance); display_text = f"{new_agent_instance.identity.get('first_name', 'N/A')} {new_agent_instance.identity.get('last_name', '')} ({new_agent_instance.identity.get('employee_title', 'N/A')}) - Status: {new_agent_instance.status}"; self.agent_list_widget.addItem(display_text)
+            self.agent_list_widget.item(self.agent_list_widget.count() - 1).setData(Qt.UserRole, new_agent_instance); agent_name = f"{new_agent_instance.identity.get('first_name', 'Agent')} {new_agent_instance.identity.get('last_name', new_agent_instance.agent_id)}"
+            self.show_status_message(f"New generic agent '{agent_name}' added.", "success"); print(f"Added new agent: {agent_name}, ID: {new_agent_instance.agent_id}, Dept: {new_agent_instance.identity.get('department')}")
+        except Exception as e: print(f"Error adding new agent: {e}"); self.show_status_message(f"Failed to add new agent: {e}", "error")
+
  feat/foundational-agent-system
             agent = current_item.data(Qt.UserRole)
             print(f"Attempting to view logs for agent: {agent.name}")
@@ -1012,6 +1030,23 @@ class MainWindow(QMainWindow):
         app_title_label = QLabel("Skyscope Sentinel"); app_title_label.setAlignment(Qt.AlignCenter); app_title_label.setStyleSheet("font-size: 18px; font-weight: bold; padding-bottom: 10px; margin-top: 5px;"); self.sidebar_layout.addWidget(app_title_label)
         icon_map = {"Dashboard": "view-dashboard", "Opportunity Research": "system-search", "Content Studio": "document-edit", "Agent Control": "applications-system", "Video Tools": "applications-multimedia", "Model Hub": "drive-harddisk", "Log Stream": "document-view", "Settings": "preferences-configure"}
         tooltips = {"Dashboard": "View system overview and key metrics", "Opportunity Research": "Run AI agents to research market opportunities", "Content Studio": "Generate content using AI swarms", "Agent Control": "Manage and configure AI agents", "Video Tools": "Access video processing utilities", "Model Hub": "Explore and manage Ollama models", "Log Stream": "Monitor real-time application and agent logs", "Settings": "Configure application settings"}
+        for section_name in self.sections:
+            button = QPushButton(section_name); button.setIcon(QIcon.fromTheme(icon_map.get(section_name, "application-default-icon"))); button.setToolTip(tooltips.get(section_name, f"Navigate to {section_name}")); button.setCheckable(True); button.clicked.connect(lambda checked, name=section_name: self.switch_page(name)); self.sidebar_layout.addWidget(button); self.nav_buttons[section_name] = button
+            if section_name == "Model Hub": self.model_hub_page = ModelHubPage(); self.model_hub_page.status_message_requested.connect(self.show_status_message); self.content_area.addWidget(self.model_hub_page)
+            elif section_name == "Settings": self.settings_page = SettingsPage(); self.settings_page.status_message_requested.connect(self.show_status_message); self.settings_page.theme_change_requested.connect(self.apply_theme_by_name); self.settings_page.acrylic_effect_requested.connect(self.apply_acrylic_effect); self.settings_page.tray_icon_visibility_requested.connect(self.set_tray_icon_visibility); self.content_area.addWidget(self.settings_page)
+            elif section_name == "Video Tools": self.video_agent_page = VideoAgentPage(); self.video_agent_page.status_message_requested.connect(self.show_status_message); self.content_area.addWidget(self.video_agent_page)
+            elif section_name == "Opportunity Research": self.research_task_page = ResearchTaskPage(); self.research_task_page.status_message_requested.connect(self.show_status_message_slot); self.content_area.addWidget(self.research_task_page)
+            elif section_name == "Content Studio": self.content_studio_page = ContentStudioPage(); self.content_studio_page.status_message_requested.connect(self.show_status_message_slot); self.content_area.addWidget(self.content_studio_page)
+            else: self.content_area.addWidget(PlaceholderPage(section_name))
+        self.sidebar_layout.addStretch()
+        founder_label = QLabel("Founded by: Miss Casey Jay Topojani"); founder_label.setAlignment(Qt.AlignCenter); founder_label.setStyleSheet("font-size: 10px; color: #999999; padding-top: 10px;"); self.sidebar_layout.addWidget(founder_label)
+        contact_label = QLabel("Contact: admin@skyscope.cloud"); contact_label.setAlignment(Qt.AlignCenter); contact_label.setStyleSheet("font-size: 10px; color: #999999; padding-bottom: 5px;"); self.sidebar_layout.addWidget(contact_label)
+        self.theme_button = QPushButton("Toggle Theme"); self.theme_button.setIcon(QIcon.fromTheme("preferences-desktop-theme")); self.theme_button.setToolTip("Quickly switch between dark and light themes."); self.theme_button.clicked.connect(self.toggle_theme_directly); self.sidebar_layout.addWidget(self.theme_button)
+        self.status_bar = QStatusBar(); self.setStatusBar(self.status_bar); self.show_status_message("Welcome to Skyscope Sentinel!", "info", 5000)
+        self.load_initial_settings()
+        if hasattr(self, 'settings_manager') and self.settings_manager: global_config.update_from_settings_manager(self.settings_manager)
+        if global_config.get_serper_api_key(): os.environ["SERPER_API_KEY"] = global_config.get_serper_api_key()
+        if global_config.get_openai_api_key(): os.environ["OPENAI_API_KEY"] = global_config.get_openai_api_key()
         for section_name in self.sections:
             button = QPushButton(section_name); button.setIcon(QIcon.fromTheme(icon_map.get(section_name, "application-default-icon"))); button.setToolTip(tooltips.get(section_name, f"Navigate to {section_name}")); button.setCheckable(True); button.clicked.connect(lambda checked, name=section_name: self.switch_page(name)); self.sidebar_layout.addWidget(button); self.nav_buttons[section_name] = button
             if section_name == "Model Hub": self.model_hub_page = ModelHubPage(); self.model_hub_page.status_message_requested.connect(self.show_status_message); self.content_area.addWidget(self.model_hub_page)

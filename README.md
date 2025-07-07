@@ -1,14 +1,33 @@
 # Skyscope Sentinel Intelligence
 
-**Skyscope Sentinel Intelligence** is a fully automated, AI-driven business platform designed to empower entrepreneurs with cutting-edge tools for website generation, cryptocurrency mining, trading, decentralized node operations, social media management, and real-time analytics. 
+**Skyscope Sentinel Intelligence** is an autonomous, AI-driven enterprise platform, founded by Miss Casey Jay Topojani, designed to achieve real-world income generation. Operating with full legal and liability coverage, it leverages advanced multi-agent swarms and local LLMs (via Ollama) to perform a wide array of business functions. These include strategic opportunity scouting, content creation, simulated freelance task acquisition, and more, with a continuous focus on expanding its capabilities and revenue streams.
 
-Founded by Miss Casey Jay Topojani, this platform operates locally on your Ubuntu Linux system, leveraging the lightweight **Gemma 3** (1B parameter) AI model via Ollama. 
+The platform is transitioning from simulation to direct market engagement, prioritizing security, ethical operations, and robust financial management. Its initial real-world pilot focuses on **Content Creation for Skyscope Sentinel's own platforms and preparing for AI-powered service offerings.**
 
-It eliminates reliance on external APIs, subscriptions, or manual inputs, ensuring autonomy, security, and high revenue potential through continuous evolution driven by intelligent agents.
+This platform operates primarily on your local system, aiming for maximum autonomy and minimal reliance on external paid APIs where possible, ensuring security and high revenue potential through continuous evolution driven by its intelligent agent workforce.
 
 
 ## Key Features
 
+**AI-Driven Automation & Core Swarms:**
+*   **Multi-Agent Systems:** Employs sophisticated swarms of AI agents (built with `kyegomez/swarms` and other frameworks) for various business operations.
+*   **Opportunity Scouting Swarm:** Autonomously researches and analyzes potential income-generating opportunities. Uses RAG (Retrieval Augmented Generation) with a ChromaDB vector store for contextual awareness from past reports. Output includes detailed Markdown reports.
+*   **Content Generation Swarm:** Creates diverse textual content (blog posts, tweet threads, articles) with SEO optimization (meta titles, descriptions, hashtags). Adaptable to different content types and tones.
+*   **Freelance Task Simulation Swarm:** Identifies potential freelance tasks from opportunity reports and drafts bid proposals (currently for simulation, transitioning towards real task identification).
+*   **(Planned) Further swarms for direct market engagement, financial operations, and more.**
+
+**Real-World Operations & Financials (Under Development):**
+*   **Authorized for Real-World Business:** Operates with legal and liability coverage for autonomous commercial activities.
+*   **Pilot Program:** Initial focus on "Content Creation for Skyscope Sentinel's Own Platform(s) & Initial Service Offering Preparation."
+*   **Financial Management (Planned):** Secure handling of financial information (including BTC address `1Fr2rKPrZGokKQoWfBGSMLBmDxCe7jdzQa`) and planning for payment reception (BTC, PayPal, Stripe).
+
+**Technical Foundations:**
+*   **Local LLM Powered:** Primarily leverages local Ollama models (e.g., Mistral, Llama3, Gemma variants as configured by user) for core AI reasoning, ensuring data privacy and operational control.
+*   **PySide6 GUI:** A dedicated desktop application (Skyscope Sentinel Windows GUI) for managing local Ollama models, configuring application settings, triggering swarms, and viewing results.
+*   **Extensible Tooling:** Agents utilize a growing set of tools for web search (DuckDuckGo, Serper), browser automation (Playwright), file I/O, and more.
+*   **Secure by Design (Ongoing):** Tiered credential management planning and focus on data integrity for real-world operations.
+
+*(Other existing features like Kaspa Mining, simulated Crypto Trading, Web3 Nodes, Website Generation, etc., as previously listed, remain part of the broader conceptual scope and may be integrated into autonomous operations as the platform evolves.)*
 **AI-Driven Automation* 
 Multi-agent system for research, website creation, crypto trading, and social media content generation.
     *   **Opportunity Scouting Swarm**: An autonomous multi-agent swarm (built with `kyegomez/swarms`) that researches and identifies potential income-generating opportunities, saving reports to the workspace. Triggerable via the GUI.
@@ -326,8 +345,8 @@ The GUI provides the following key sections, accessible via the sidebar navigati
 *   **Settings:**
     *   **General:** Configure application startup behavior (preference saved, actual OS-level autostart is a future enhancement), system tray icon preferences (enable/disable, minimize on close, show notification on minimize to tray).
     *   **Appearance:** Switch between Dark (default) and Light themes, toggle acrylic/transparency effects for the sidebar.
-        *   **Accent Color:** Choose a custom accent color for UI highlights (preview swatch updates, saved for future theme use).
-        *   **UI Scaling:** Select UI scaling preference (Small, Medium, Large). Requires application restart to take effect (preference saved, actual scaling implementation is a future enhancement).
+       *   **Accent Color:** Choose a custom accent color for UI highlights (preview swatch updates, saved for future theme use).
+       *   **UI Scaling:** Select UI scaling preference (Small, Medium, Large). Requires application restart to take effect (preference saved, actual scaling implementation is a future enhancement).
     *   **Ollama:** Configure the Ollama service URL, test connectivity, and set preference for attempting to auto-start the local Ollama service when the application launches (actual auto-start action happens at application startup if enabled).
     *   **Agents:** Set default agent log levels (preference saved). Set preference for automatically restarting crashed agents (actual monitoring and restart logic is part of a future agent management system).
     *   **Advanced:** Manage application data folder location (browse and set) and reset all settings to default. Placeholder for clearing application cache.
