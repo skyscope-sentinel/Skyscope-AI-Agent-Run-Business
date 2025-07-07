@@ -42,3 +42,6 @@ instructor>=1.0.0 # Check for latest stable
 
 # ChromaDB for local vector storage (RAG)
 chromadb>=0.4.24 # As of Phase E1
+
+# Cryptography for encrypting sensitive settings
+cryptography>=42.0.0 # Check for latest stable version
