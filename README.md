@@ -28,6 +28,36 @@ This platform operates primarily on your local system, aiming for maximum autono
 *   **Secure by Design (Ongoing):** Tiered credential management planning and focus on data integrity for real-world operations.
 
 *(Other existing features like Kaspa Mining, simulated Crypto Trading, Web3 Nodes, Website Generation, etc., as previously listed, remain part of the broader conceptual scope and may be integrated into autonomous operations as the platform evolves.)*
+**AI-Driven Automation* 
+Multi-agent system for research, website creation, crypto trading, and social media content generation.
+    *   **Opportunity Scouting Swarm**: An autonomous multi-agent swarm (built with `kyegomez/swarms`) that researches and identifies potential income-generating opportunities, saving reports to the workspace. Triggerable via the GUI.
+  
+**Kaspa Mining*
+Optimized CPU-based mining for Kaspa blockchain using `kaspad`.
+  
+**Cryptocurrency Trading*
+Simulated trading strategies with plans for real exchange integration.
+  
+**Web3 Nodes*
+Lightweight Ethereum nodes for DeFi and staking opportunities.
+  
+**Website Generation*
+Beautiful, AI-generated websites with Gen AI apps, hosted locally.
+  
+**Social Media Influence*
+Viral content creation for platforms like X, maximizing engagement.
+  
+**Live Chat & Support*
+Real-time customer interaction powered by AI agents.
+  
+**Compliance & Security*
+GDPR/CCPA compliance checks and secure credential storage with Vault.
+  
+**Monitoring & Analytics*
+Prometheus and Grafana for real-time performance insights.
+  
+**Local Operation*
+Runs on your Intel i7 12700 PC with 32 GB RAM, no GPU required.
 
 **Please make modifications in script/s for your personal workstation/PC/Mac or other system hardware variables for compatibility.**
 
@@ -315,8 +345,8 @@ The GUI provides the following key sections, accessible via the sidebar navigati
 *   **Settings:**
     *   **General:** Configure application startup behavior (preference saved, actual OS-level autostart is a future enhancement), system tray icon preferences (enable/disable, minimize on close, show notification on minimize to tray).
     *   **Appearance:** Switch between Dark (default) and Light themes, toggle acrylic/transparency effects for the sidebar.
-        *   **Accent Color:** Choose a custom accent color for UI highlights (preview swatch updates, saved for future theme use).
-        *   **UI Scaling:** Select UI scaling preference (Small, Medium, Large). Requires application restart to take effect (preference saved, actual scaling implementation is a future enhancement).
+       *   **Accent Color:** Choose a custom accent color for UI highlights (preview swatch updates, saved for future theme use).
+       *   **UI Scaling:** Select UI scaling preference (Small, Medium, Large). Requires application restart to take effect (preference saved, actual scaling implementation is a future enhancement).
     *   **Ollama:** Configure the Ollama service URL, test connectivity, and set preference for attempting to auto-start the local Ollama service when the application launches (actual auto-start action happens at application startup if enabled).
     *   **Agents:** Set default agent log levels (preference saved). Set preference for automatically restarting crashed agents (actual monitoring and restart logic is part of a future agent management system).
     *   **Advanced:** Manage application data folder location (browse and set) and reset all settings to default. Placeholder for clearing application cache.

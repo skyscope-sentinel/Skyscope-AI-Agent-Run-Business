@@ -5,6 +5,7 @@ This document provides guidance and context for AI agents (like Jules, Aider, et
 ## Core Principles for Agents
 
 *   **Understand the Goal:** The primary objective of Skyscope Sentinel Intelligence is to become a multi-agent powered enterprise platform capable of autonomously generating high income through various online means, starting with no initial funds. **Update:** As of Phase RW1, the platform is authorized for real-world operations with legal and liability coverage, shifting focus from simulation to actual income generation.
+*   **Understand the Goal:** The primary objective of Skyscope Sentinel Intelligence is to become a multi-agent powered enterprise platform capable of autonomously generating high income through various online means, starting with no initial funds.
 *   **Local First (Ollama):** Prioritize using local Ollama models for LLM tasks to ensure privacy, reduce costs, and enable offline capabilities where possible. User-provided API keys for other services (OpenAI, Serper, E2B) are supported for enhanced capabilities.
 *   **Modularity:** Strive for modular design in agent and tool development.
 *   **Swarm Intelligence:** The project is increasingly leveraging the `kyegomez/swarms` framework for orchestrating multiple agents. Familiarize yourself with its concepts (Agents, Swarms, Workflows, Tools).
@@ -25,7 +26,7 @@ Skyscope Sentinel Intelligence has received full legal authorization to operate 
     *   **Builds Tangible Assets:** Creates high-quality content that can be used for Skyscope Sentinel's own website/blog, establishing an online presence, demonstrating capabilities, and building a portfolio.
     *   **Foundation for Future Services:** The generated content and refined swarm serve as a direct foundation for offering "AI-Powered Content Creation as a Service" to real clients.
     *   **Path to Other Monetization:** High-quality content can later be used for affiliate marketing or to drive traffic to other Skyscope ventures.
-*   **Initial Pilot Tasks:**
+*   *   **Initial Pilot Tasks:**
     1.  Define 2-3 initial content pieces (e.g., blog posts) relevant to Skyscope Sentinel's brand and expertise (e.g., "The Future of Autonomous Businesses," "Leveraging Local LLMs for Enterprise").
     2.  Utilize the `ContentGenerationSwarm` (with prompts refined for this pilot) to produce these articles.
     3.  User (Casey Topojani) reviews and approves/edits content for quality and brand alignment.
@@ -65,8 +66,8 @@ Given the transition to real-world operations, managing sensitive data securely 
     *   **Storage for Skyscope's Operational Keys (Long-Term):** Dedicated Secrets Manager (e.g., HashiCorp Vault, Doppler, cloud provider's secrets manager). The core Skyscope backend (not individual agents) would authenticate to this service to fetch credentials *just-in-time* for specific, authorized operations, ideally performed by a dedicated Transaction Orchestration Service (TOS).
     *   **Storage for User's Public Payout Addresses:** These are public keys for *receiving* funds (e.g., BTC `1Fr2rKPrZGokKQoWfBGSMLBmDxCe7jdzQa`). Store via GUI "Financials" tab, managed by `SettingsManager`. Encryption is good for privacy.
     *   **Access by Agents (for using public addresses or *triggering* actions via TOS):**
-        *   **Receiving Payments:** Agents are instructed to use/display the configured public receiving addresses.
-        *   **Initiating Payments/Trades (Highly Controlled):** Agents generate a *request* (structured data for a payment/trade). This request goes to the secure TOS. The TOS validates, applies rules/limits, potentially requires Human-in-the-Loop (HITL) approval via GUI/notification for significant actions, and then uses credentials from the Secrets Manager to execute the transaction. Agents only get status updates, not direct access to keys.
+    *   **Receiving Payments:** Agents are instructed to use/display the configured public receiving addresses.
+    *   **Initiating Payments/Trades (Highly Controlled):** Agents generate a *request* (structured data for a payment/trade). This request goes to the secure TOS. The TOS validates, applies rules/limits, potentially requires Human-in-the-Loop (HITL) approval via GUI/notification for significant actions, and then uses credentials from the Secrets Manager to execute the transaction. Agents only get status updates, not direct access to keys.
 
 **IV. Iterative Implementation Plan for Credential Management:**
 
@@ -99,10 +100,10 @@ This plan outlines how Skyscope Sentinel Intelligence will handle incoming payme
 *   **Storage:** This address will be configured via the GUI's "Financials" settings tab and managed by `SettingsManager` (to be encrypted as per the Credential Management Plan).
 *   **Agent Usage:**
     *   **Service Invoicing:** If agents facilitate a service for which BTC payment is agreed:
-        *   A designated agent/swarm (e.g., future "BillingAgent") will generate an invoice or payment instruction.
-        *   This instruction will include the Skyscope BTC receiving address.
-        *   It may also include a USD/AUD equivalent amount, calculated using a crypto price feed tool at the time of invoicing (tool to be developed).
-        *   The prepared invoice/instruction will be saved to the workspace or presented to the user (Casey) for manual dispatch to the client. **Agents will not directly send financial requests to external parties without explicit HITL approval in early stages.**
+    *   A designated agent/swarm (e.g., future "BillingAgent") will generate an invoice or payment instruction.
+    *   This instruction will include the Skyscope BTC receiving address.
+    *   It may also include a USD/AUD equivalent amount, calculated using a crypto price feed tool at the time of invoicing (tool to be developed).
+    *   The prepared invoice/instruction will be saved to the workspace or presented to the user (Casey) for manual dispatch to the client. **Agents will not directly send financial requests to external parties without explicit HITL approval in early stages.**
     *   **Affiliate/Ad Revenue:** For platforms paying out in BTC, the user will configure them directly with the Skyscope BTC address. Agents might later be tasked with monitoring these platforms for earnings reports.
 *   **Payment Confirmation:**
     *   **Initial:** Manual confirmation by the user (Casey) via block explorer or personal wallet.
@@ -170,6 +171,11 @@ The project utilizes several AI agent frameworks and libraries:
 *   **Output**: Reports are saved in the `workspace/opportunity_reports/` directory. These reports are also automatically added to a ChromaDB vector store for RAG.
 *   **GUI Integration**: Triggered from the "Opportunity Research" tab. Users can select "Swarm Opportunity Scouting" mode and configure max search results for DuckDuckGo. Generated Markdown reports are now rendered directly in the GUI.
 *   **RAG Capability**: The `AnalysisAgent`'s prompt guides it to use its RAG tool. Logging is in place to help verify activation.
+    3.  **`AnalysisAgent`**: Analyzes gathered information. Enhanced to focus critically on zero-cost startup strategies and provide a detailed 8-point analysis for each opportunity, including actionable first steps for AI agents.
+    4.  **`ReportingAgent`**: Consolidates analysis into a structured Markdown report. Enhanced to follow a specific, detailed Markdown template for clarity and professionalism.
+*   **Output**: Reports are saved in the `workspace/opportunity_reports/` directory. These reports are also automatically added to a ChromaDB vector store for RAG.
+*   **GUI Integration**: Triggered from the "Opportunity Research" tab. Users can select "Swarm Opportunity Scouting" mode and configure max search results for DuckDuckGo. Generated Markdown reports are now rendered directly in the GUI.
+*   **RAG Capability**: The `AnalysisAgent` is now equipped with a tool (`get_contextual_information_for_topic`) to query the ChromaDB vector store of past reports, and its prompt guides it to use this context.
 
 ### 2. Content Generation Swarm
 
@@ -189,11 +195,22 @@ The project utilizes several AI agent frameworks and libraries:
 *   **Location**: `skyscope_sentinel/swarms_integration/freelance_simulation_swarm.py`
 *   **Workflow**:
     1.  `TaskProspectorAgent`: Parses an opportunity report, uses a search tool for conceptual task examples, and formulates 1-2 mock (soon to be real) freelance task descriptions.
+*   **Purpose**: To simulate identifying suitable freelance tasks from an opportunity report and drafting initial bid proposals. (Currently a simulation, does not interact with live platforms).
+*   **Location**: `skyscope_sentinel/swarms_integration/freelance_simulation_swarm.py`
+*   **Workflow**:
+    1.  `TaskProspectorAgent`: Parses an opportunity report, uses a search tool for conceptual task examples, and formulates 1-2 mock freelance task descriptions.
     2.  For each mock task:
-        *   `BidStrategistAgent`: Devises a bid strategy (fulfillment plan, selling points, conceptual pricing).
-        *   `ProposalDraftingAgent`: Drafts a proposal based on the task and strategy.
+       *   `BidStrategistAgent`: Devises a bid strategy (fulfillment plan, selling points, conceptual pricing).
+       *   `ProposalDraftingAgent`: Drafts a proposal based on the task and strategy.
 *   **Output**: Drafted proposals are saved as Markdown files in `workspace/simulated_proposals/`.
 *   **GUI Integration**: Triggered from the "Freelance Hub" tab. User provides a path to an opportunity report. Paths to generated proposals are displayed.
+*   **GUI Integration**: Triggered from the "Opportunity Research" tab. Users can select "Swarm Opportunity Scouting" mode. Generated Markdown reports are now rendered directly in the GUI.
+    1.  **`TopicGeneratorAgent`**: Generates or refines a research topic.
+    2.  **`ResearchAgent`**: Gathers information on the topic using search tools (DuckDuckGo, Serper if API key is available) and web browsing tools (Playwright via `browse_web_page_and_extract_text`).
+    3.  **`AnalysisAgent`**: Analyzes the gathered information to identify viable opportunities, assess potential revenue, risks, and resource requirements (aiming for low/no-cost).
+    4.  **`ReportingAgent`**: Consolidates the analysis into a structured Markdown report.
+*   **Output**: Reports are saved in the `workspace/opportunity_reports/` directory with filenames like `opportunity_report_[topic_slug]_[timestamp].md`.
+*   **GUI Integration**: Triggered from the "Opportunity Research" tab. Users can select "Swarm Opportunity Scouting" mode and optionally provide an initial topic.
 
 ## Key Code Locations
 
@@ -217,3 +234,16 @@ The project utilizes several AI agent frameworks and libraries:
 *   **Real-World Implications**: With the shift to real-world operations, all new features must be designed with robust security, data integrity, financial safety, and comprehensive audit logging in mind.
 
 This document will be updated as the project evolves. If you make significant architectural changes or add new core agent systems, please update this file accordingly.
+*   **RAG System**: Be aware of the ChromaDB vector store for opportunity reports. Future agents might query this store for contextual information.
+
+This document will be updated as the project evolves. If you make significant architectural changes or add new core agent systems, please update this file accordingly.
+*   **Tools**: Utility functions for search, browsing, file I/O, code execution are in `skyscope_sentinel/utils/`.
+*   **Identity Management**: `skyscope_sentinel/agent_identity.py` (generates identities for agents).
+
+## Working with an Agentic Environment
+
+*   **Tool Usage**: When implementing new agent capabilities, prefer creating reusable tool functions (like those in `utils/`) and providing them to agents rather than having agents generate complex code for common tasks like web searches or file I/O directly.
+*   **Error Handling**: Ensure robust error handling, especially for operations involving external APIs, file system access, or web interactions.
+*   **Asynchronous Operations**: GUI interactions that trigger long-running agent tasks MUST be run in separate threads (e.g., using `AsyncRunnerThread` in `main.py`) to keep the UI responsive.
+
+This document will be updated as the project evolves. 

@@ -30,6 +30,7 @@ class Config:
 
         # Financials - will be updated from SettingsManager
         self.current_btc_address = None # Default to None
+        self.current_e2b_api_key = self.e2b_api_key_env # Initialize current value
 
         print(f"[Config] Initialized. OLLAMA_MODEL env: {self.ollama_model_name_env}, OLLAMA_BASE_URL env: {self.ollama_base_url_env}")
         print(f"[Config] Effective Ollama Model: {self.current_ollama_model}, URL: {self.current_ollama_url}")
@@ -80,12 +81,31 @@ class Config:
         if gui_btc_address:
             self.current_btc_address = gui_btc_address
         # No environment variable fallback for BTC address, only GUI or None
+        gui_e2b_key = settings_manager.load_setting("api_keys/e2b_api_key", None) # Load E2B key
+
+        if gui_ollama_model:
+            self.current_ollama_model = gui_ollama_model
+        if gui_ollama_url:
+            self.current_ollama_url = gui_ollama_url
+        if gui_serper_key:
+            self.current_serper_api_key = gui_serper_key
+        if gui_openai_key:
+            self.current_openai_api_key = gui_openai_key
+        if gui_e2b_key: # Update current E2B key
+            self.current_e2b_api_key = gui_e2b_key
+
+        # Optionally, update environment variables so other modules using os.getenv() directly also benefit
+        # This can be useful but also has side effects. For now, just update internal state.
+        # if self.current_serper_api_key: os.environ["SERPER_API_KEY"] = self.current_serper_api_key
+        # if self.current_openai_api_key: os.environ["OPENAI_API_KEY"] = self.current_openai_api_key
+
 
         print(f"[Config] Updated from SettingsManager. Effective Ollama Model: {self.current_ollama_model}, URL: {self.current_ollama_url}")
         print(f"[Config] Effective SERPER_API_KEY: {'Set' if self.current_serper_api_key else 'Not Set'}")
         print(f"[Config] Effective OPENAI_API_KEY: {'Set' if self.current_openai_api_key else 'Not Set'}")
         print(f"[Config] Effective E2B_API_KEY: {'Set' if self.current_e2b_api_key else 'Not Set'}")
         print(f"[Config] Effective BTC Address: {'Set' if self.current_btc_address else 'Not Set'}")
+        print(f"[Config] Effective E2B_API_KEY: {'Set' if self.current_e2b_api_key else 'Not Set'}") # Print status of E2B key
 
     def get_ollama_model_name(self) -> str:
         """Returns the configured Ollama model name, preferring env var, then default."""
