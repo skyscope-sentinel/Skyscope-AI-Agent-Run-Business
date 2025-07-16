@@ -59,34 +59,6 @@ create_file() {
     # Create directory if it doesn't exist
     mkdir -p "$(dirname "$file_path")"
     
-    # Check if file already exists
-    if [ -f "$file_path" ]; then
-        echo -e "${BLUE}File $file_path already exists. Checking for differences...${NC}"
-        local temp_file=$(mktemp)
-        cat > "$temp_file"
-        
-        if diff -q "$file_path" "$temp_file" >/dev/null; then
-            echo -e "${GREEN}✓ File $file_path is up to date${NC}"
-            rm "$temp_file"
-            return 0
-        else
-            echo -e "${YELLOW}File $file_path has different content.${NC}"
-            echo -n "Do you want to overwrite it? (y/n): "
-            read -r answer
-            if [[ "$answer" =~ ^[Yy]$ ]]; then
-                cat "$temp_file" > "$file_path"
-                echo -e "${GREEN}✓ Updated $file_path${NC}"
-                rm "$temp_file"
-                chmod +x "$file_path" 2>/dev/null  # Make executable if appropriate
-                return 0
-            else
-                echo -e "${BLUE}Keeping existing file $file_path${NC}"
-                rm "$temp_file"
-                return 0
-            fi
-        fi
-    fi
-    
     # Create the file
     cat > "$file_path"
     
@@ -1385,6 +1357,43 @@ st.markdown("---")
 st.markdown("© 2025 Skyscope Technologies. All rights reserved.")
 EOF
 
+# Create start script
+echo -e "${BLUE}Creating startup script...${NC}"
+create_file "start.sh" << 'EOF'
+#!/bin/bash
+# Skyscope Sentinel Intelligence AI Agentic Co-Op Swarm System
+# Startup Script
+
+# Activate virtual environment if it exists
+if [ -d "venv" ]; then
+    source venv/bin/activate
+elif [ -d ".venv" ]; then
+    source .venv/bin/activate
+fi
+
+# Start the application
+python main_launcher.py "$@"
+EOF
+chmod +x start.sh
+
+# Create Windows batch file
+echo -e "${BLUE}Creating Windows startup script...${NC}"
+create_file "start.bat" << 'EOF'
+@echo off
+:: Skyscope Sentinel Intelligence AI Agentic Co-Op Swarm System
+:: Startup Script
+
+:: Activate virtual environment if it exists
+if exist venv\Scripts\activate.bat (
+    call venv\Scripts\activate.bat
+) else if exist .venv\Scripts\activate.bat (
+    call .venv\Scripts\activate.bat
+)
+
+:: Start the application
+python main_launcher.py %*
+EOF
+
 # Create placeholder for autonomous_business_operations.py
 echo -e "${BLUE}Creating placeholder for autonomous business operations...${NC}"
 create_file "autonomous_business_operations.py" << 'EOF'
@@ -1550,43 +1559,6 @@ if __name__ == "__main__":
     print("Skyscope Sentinel Intelligence AI - Autonomous Business Operations")
     print("This module is designed to be imported, not run directly.")
     print("In a production environment, this would be integrated with the agent manager.")
-EOF
-
-# Create start script
-echo -e "${BLUE}Creating startup script...${NC}"
-create_file "start.sh" << 'EOF'
-#!/bin/bash
-# Skyscope Sentinel Intelligence AI Agentic Co-Op Swarm System
-# Startup Script
-
-# Activate virtual environment if it exists
-if [ -d "venv" ]; then
-    source venv/bin/activate
-elif [ -d ".venv" ]; then
-    source .venv/bin/activate
-fi
-
-# Start the application
-python main_launcher.py "$@"
-EOF
-chmod +x start.sh
-
-# Create Windows batch file
-echo -e "${BLUE}Creating Windows startup script...${NC}"
-create_file "start.bat" << 'EOF'
-@echo off
-:: Skyscope Sentinel Intelligence AI Agentic Co-Op Swarm System
-:: Startup Script
-
-:: Activate virtual environment if it exists
-if exist venv\Scripts\activate.bat (
-    call venv\Scripts\activate.bat
-) else if exist .venv\Scripts\activate.bat (
-    call .venv\Scripts\activate.bat
-)
-
-:: Start the application
-python main_launcher.py %*
 EOF
 
 echo -e "${GREEN}${BOLD}All files created successfully!${NC}"
