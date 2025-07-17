@@ -1,0 +1,50 @@
+[
+    {
+        "title": "Aspirin",
+        "description": "Aspirin is a nonsteroidal anti-inflammatory drug (NSAID) used to reduce pain, fever, or inflammation. It is commonly used to treat conditions such as headaches, muscle pain, arthritis, and minor aches and pains. It also helps prevent blood clots, reducing the risk of heart attacks and strokes."
+    },
+    {
+        "title": "Paracetamol",
+        "description": "Paracetamol, also known as acetaminophen, is a widely used over-the-counter medication for relieving mild to moderate pain and reducing fever. It is often used for headaches, muscle aches, colds, and flu-like symptoms. Unlike NSAIDs, it does not have significant anti-inflammatory properties."
+    },
+    {
+        "title": "Ibuprofen",
+        "description": "Ibuprofen is a common NSAID used to treat pain, fever, and inflammation. It is frequently used for conditions such as arthritis, menstrual cramps, migraines, and muscle aches. It works by blocking the production of certain chemicals in the body that cause inflammation and pain."
+    },
+    {
+        "title": "Amoxicillin",
+        "description": "Amoxicillin is a broad-spectrum antibiotic belonging to the penicillin class. It is commonly prescribed to treat bacterial infections such as respiratory tract infections, urinary tract infections, ear infections, and skin infections. It works by inhibiting bacterial cell wall synthesis, leading to bacterial death."
+    },
+    {
+        "title": "Metformin",
+        "description": "Metformin is an oral medication used to manage type 2 diabetes. It helps control blood sugar levels by decreasing glucose production in the liver and improving insulin sensitivity. It is often used as a first-line treatment for diabetes and can help prevent complications such as nerve damage and kidney disease."
+    },
+    {
+        "title": "Lisinopril",
+        "description": "Lisinopril is an angiotensin-converting enzyme (ACE) inhibitor used to treat high blood pressure and heart failure. It helps relax blood vessels, reducing strain on the heart and improving blood flow. It is also prescribed to improve survival rates after a heart attack and to protect kidney function in diabetic patients."
+    },
+    {
+        "title": "Atorvastatin",
+        "description": "Atorvastatin is a statin medication used to lower cholesterol levels and reduce the risk of cardiovascular disease. It works by inhibiting an enzyme involved in cholesterol production in the liver. It is often prescribed to patients at risk of heart attacks, strokes, and other heart-related complications."
+    },
+    {
+        "title": "Omeprazole",
+        "description": "Omeprazole is a proton pump inhibitor (PPI) used to treat conditions such as gastroesophageal reflux disease (GERD), stomach ulcers, and acid reflux. It works by reducing the amount of acid produced in the stomach, relieving symptoms such as heartburn and preventing damage to the esophagus."
+    },
+    {
+        "title": "Cetirizine",
+        "description": "Cetirizine is a second-generation antihistamine used to relieve allergy symptoms such as runny nose, sneezing, itching, and hives. It is commonly used for hay fever and chronic urticaria. Unlike first-generation antihistamines, it causes less drowsiness and has a longer duration of action. It is available in tablet, liquid, and chewable forms, making it suitable for both adults and children. Side effects may include drowsiness, dry mouth, and fatigue, but they are generally mild compared to older antihistamines."
+    },
+    {
+        "title": "Losartan",
+        "description": "Losartan is an angiotensin II receptor blocker (ARB) used to treat high blood pressure and protect kidney function in diabetic patients. It helps relax blood vessels, lowering blood pressure and reducing the risk of strokes and heart attacks. It is often prescribed when ACE inhibitors are not well tolerated. Side effects may include dizziness, fatigue, and elevated potassium levels. Regular blood pressure monitoring and kidney function tests are recommended during treatment."
+    },
+    {
+        "title": "Simvastatin",
+        "description": "Simvastatin is a cholesterol-lowering medication that belongs to the statin class. It helps reduce the risk of heart disease and stroke by lowering LDL cholesterol and triglyceride levels while increasing HDL cholesterol. It works by inhibiting HMG-CoA reductase, an enzyme responsible for cholesterol production in the liver. Patients using simvastatin should have their liver function monitored periodically, as it may cause elevations in liver enzymes. Common side effects include muscle pain, headache, and digestive issues."
+    },
+    {
+        "title": "Furosemide",
+        "description": "Furosemide is a loop diuretic used to treat fluid retention (edema) associated with conditions such as heart failure, kidney disease, and liver disease. It works by increasing the excretion of sodium and water through urine, helping to reduce swelling and lower blood pressure. Due to its strong diuretic effect, furosemide should be used under medical supervision to avoid dehydration and electrolyte imbalances. Common side effects include increased urination, dizziness, and low potassium levels."
+    }
+]

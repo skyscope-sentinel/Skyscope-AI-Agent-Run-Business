@@ -1,0 +1,7 @@
+python-dotenv
+google-generativeai
+pybit
+pandas
+pandas-ta
+PyYAML
+numpy<2.0

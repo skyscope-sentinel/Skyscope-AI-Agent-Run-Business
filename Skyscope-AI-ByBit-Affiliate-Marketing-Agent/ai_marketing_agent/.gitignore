@@ -1,0 +1,5 @@
+# Ignore configuration file if it contained real secrets
+config/settings.yaml
+
+# Ignore logs
+logs/

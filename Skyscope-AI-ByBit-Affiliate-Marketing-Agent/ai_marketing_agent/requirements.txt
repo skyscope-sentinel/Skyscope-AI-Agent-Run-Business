@@ -1,0 +1,10 @@
+beautifulsoup4
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+google-generativeai
+opencv-python
+PyYAML
+pyzbar
+requests
+rich

@@ -1,0 +1,5 @@
+streamlit
+pysqlite3-binary
+crewai
+duckduckgo-search
+langchain

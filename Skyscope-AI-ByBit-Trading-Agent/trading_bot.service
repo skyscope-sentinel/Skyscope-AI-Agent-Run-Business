@@ -1,0 +1,37 @@
+[Unit]
+Description=Bybit Gemini Trading Bot
+After=network.target
+
+[Service]
+User=your_username
+Group=your_groupname
+WorkingDirectory=/path/to/bybit_gemini_bot_project
+
+# Option 1: Direct execution (ensure main.py is executable or called with python)
+# ExecStart=/path/to/bybit_gemini_bot_project/bybit_gemini_bot/main.py
+# Option 2: Explicit python interpreter from venv
+ExecStart=/path/to/bybit_gemini_bot_project/venv/bin/python /path/to/bybit_gemini_bot_project/bybit_gemini_bot/main.py
+
+# EnvironmentFile: Uncomment and use if you store API keys and other sensitive data in a separate file
+# Ensure this file is secured (e.g., chmod 600 and owned by the User)
+# EnvironmentFile=/etc/trading_bot/environment_vars
+
+# Standard Python environment variables you might want to set:
+# Environment="PYTHONUNBUFFERED=1" # Ensures print statements appear without delay in logs
+# Environment="PYTHONIOENCODING=UTF-8"
+
+Restart=on-failure
+RestartSec=5s
+
+# Logging to systemd journal
+StandardOutput=journal
+StandardError=journal
+
+# Optional: Limit resources (example)
+# CPUAccounting=true
+# CPUQuota=50%
+# MemoryAccounting=true
+# MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

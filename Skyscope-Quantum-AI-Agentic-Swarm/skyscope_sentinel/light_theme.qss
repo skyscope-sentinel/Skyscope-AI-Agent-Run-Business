@@ -1,0 +1,399 @@
+QMainWindow {
+    background-color: #ecf0f1; /* Light grey */
+    /* border-radius: 15px; */
+}
+
+/* Sidebar with acrylic effect */
+QFrame#sidebar {
+    background-color: rgba(230, 230, 230, 0.85); /* Light grey, less transparent than centralWidget */
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    border-right: 1px solid #bdc3c7; /* Subtle separator */
+}
+
+QPushButton {
+    background-color: #e1e5e8; /* Light Greyish Blue */
+    color: #2c3e50; /* Wet Asphalt text */
+    border: 1px solid transparent; /* Flatter look */
+    padding: 10px;
+    border-radius: 6px; /* Consistent rounded corners */
+    min-height: 30px;
+    text-align: left;
+    padding-left: 10px;
+}
+
+QPushButton:hover {
+    background-color: #f5f7f9; /* Almost white on hover */
+    border: 1px solid transparent; /* Flatter look */
+}
+
+QPushButton:pressed {
+    background-color: #c8ced3; /* Concrete for pressed */
+    border: 1px solid transparent; /* Flatter look */
+}
+
+QPushButton:checked { /* Style for the active page button in sidebar */
+    background-color: #3498db; /* Peter River Blue */
+    color: white;
+    border-left: 4px solid #2980b9; /* Belize Hole - thicker accent */
+    font-weight: bold;
+}
+
+QPushButton:disabled {
+    background-color: #dcdfe2;
+    color: #95a5a6; /* Silver for disabled text */
+}
+
+QLabel {
+    color: #2c3e50; /* Wet Asphalt text */
+    padding: 5px;
+}
+
+QWidget#placeholderPage { /* Used by placeholder pages */
+    background-color: #ffffff; /* White */
+    border-radius: 8px;
+}
+
+/* Content area styling */
+QWidget#contentArea > QWidget, QStackedWidget > QWidget {
+    background-color: #ecf0f1; /* Clouds - main background for content pages */
+    border-radius: 8px;
+}
+QWidget#modelHubPage, QWidget#settingsPage {
+    background-color: transparent;
+}
+
+
+QStackedWidget {
+    background-color: #ecf0f1; /* Clouds */
+    padding: 10px;
+}
+
+/* Ensure the central widget holding sidebar and content area has rounded corners */
+/* This is key for the overall rounded window look. */
+QWidget#centralWidget {
+    border-radius: 15px;
+    background-color: rgba(240, 240, 240, 0.8); /* Light grey, glassy effect */
+}
+
+/* Input Fields */
+QLineEdit {
+    background-color: #fdfefe; /* Near white */
+    color: #2c3e50;
+    border: 1px solid #AAA; /* Subtle border */
+    border-radius: 4px; /* Rounded corners for QLineEdit */
+    padding: 8px;
+    min-height: 20px;
+}
+QLineEdit:focus {
+    border: 1px solid #3498db; /* Peter River Blue border on focus */
+}
+QLineEdit:disabled {
+    background-color: #e5e7e9;
+    color: #95a5a6;
+}
+
+/* ComboBox */
+QComboBox {
+    background-color: #fdfefe;
+    color: #2c3e50;
+    border: 1px solid #AAA; /* Subtle border */
+    border-radius: 4px; /* Rounded corners for QComboBox */
+    padding: 8px;
+    min-height: 20px;
+}
+QComboBox:hover {
+    border: 1px solid #cacfd2;
+}
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 20px;
+    border-left-width: 1px;
+    border-left-color: #bdc3c7;
+    border-left-style: solid;
+    border-top-right-radius: 3px; /* Consistent with parent */
+    border-bottom-right-radius: 3px; /* Consistent with parent */
+    background-color: #e1e5e8;
+}
+QComboBox::down-arrow {
+    image: url(skyscope_sentinel/assets/down_arrow_dark.png); /* Needs this icon */
+}
+QComboBox QAbstractItemView { /* Dropdown list style */
+    background-color: #fdfefe;
+    color: #2c3e50;
+    border: 1px solid #bdc3c7;
+    selection-background-color: #3498db;
+    selection-color: white;
+    padding: 5px;
+    border-radius: 4px; /* Rounded corners for dropdown view */
+}
+
+/* Table Widget */
+QTableWidget {
+    background-color: #ffffff;
+    color: #2c3e50;
+    border: 1px solid #CCC; /* Subtle border */
+    gridline-color: #e1e5e8;
+    border-radius: 4px; /* Rounded corners for QTableWidget */
+}
+QHeaderView::section {
+    background-color: #e1e5e8;
+    color: #2c3e50;
+    padding: 5px;
+    border: 1px solid #CCC; /* Subtle border */
+    font-weight: bold;
+    /* No border-radius for header sections for a flatter, integrated look */
+}
+QTableWidget::item {
+    padding: 5px;
+    border-bottom: 1px solid #e1e5e8; /* Row separator */
+}
+QTableWidget::item:hover {
+    background-color: #f5f7f9; /* Consistent hover color */
+    color: #2c3e50; /* Ensure text color remains */
+}
+QTableWidget::item:selected {
+    background-color: #3498db;
+    color: white;
+}
+
+/* TextEdit */
+QTextEdit {
+    background-color: #fdfefe;
+    color: #2c3e50;
+    border: 1px solid #AAA; /* Subtle border */
+    border-radius: 4px; /* Rounded corners for QTextEdit */
+    padding: 5px;
+}
+
+/* ScrollBar */
+QScrollBar:vertical {
+    border: 1px solid #CCC; /* Subtle border */
+    background: #e1e5e8;
+    width: 10px; /* Thinner scrollbar */
+    margin: 0px 0px 0px 0px; /* No margin */
+}
+QScrollBar::handle:vertical {
+    background: #bdc3c7; /* Silver */
+    min-height: 20px;
+    border-radius: 5px; /* Adjusted for thinner bar */
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px; /* Hide arrows for a cleaner look */
+    background: none;
+}
+QScrollBar:horizontal {
+    border: 1px solid #CCC; /* Subtle border */
+    background: #e1e5e8;
+    height: 10px; /* Thinner scrollbar */
+    margin: 0px 0px 0px 0px; /* No margin */
+}
+QScrollBar::handle:horizontal {
+    background: #bdc3c7;
+    min-width: 20px;
+    border-radius: 5px; /* Adjusted for thinner bar */
+}
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px; /* Hide arrows for a cleaner look */
+    background: none;
+}
+
+/* ProgressBar */
+QProgressBar {
+    border: 1px solid #bdc3c7;
+    border-radius: 4px; /* Rounded corners for QProgressBar */
+    background-color: #e1e5e8;
+    text-align: center;
+    color: #2c3e50; /* Text color on the progress bar */
+    padding: 1px;
+    min-height: 18px;
+}
+QProgressBar::chunk {
+    background-color: #2ecc71; /* Emerald */
+    border-radius: 3px; /* Slightly more rounded chunk, consistent with parent radius */
+    margin: 1px;
+}
+
+/* CheckBox */
+QCheckBox {
+    spacing: 5px;
+    color: #2c3e50;
+}
+QCheckBox::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #bdc3c7;
+    border-radius: 3px; /* Rounded corners for checkbox indicator */
+    background-color: #fdfefe;
+}
+QCheckBox::indicator:checked {
+    background-color: #3498db; /* Peter River */
+    image: url(skyscope_sentinel/assets/check_mark_dark.png); /* Needs this icon */
+    border-radius: 3px; /* Keep consistent */
+}
+QCheckBox::indicator:unchecked:hover {
+    border: 1px solid #3498db;
+}
+QCheckBox:disabled {
+    color: #95a5a6;
+}
+QCheckBox::indicator:disabled {
+    background-color: #e5e7e9;
+    border: 1px solid #dcdfe2;
+}
+
+/* TabWidget */
+QTabWidget::pane { /* The container for the tab contents */
+    border: 1px solid #dcdfe2;
+    border-top: none; /* Remove top border as tabs are above it */
+    background-color: #ffffff; /* White content area for tabs */
+    border-bottom-left-radius: 4px; /* Rounded bottom corners */
+    border-bottom-right-radius: 4px; /* Rounded bottom corners */
+    padding: 10px;
+}
+QTabBar::tab {
+    background: #e1e5e8; /* Light grey tabs */
+    color: #2c3e50;
+    border: 1px solid #dcdfe2;
+    border-bottom: none; /* Tab sits on top of the pane */
+    padding: 8px 15px;
+    border-top-left-radius: 4px; /* Rounded top corners of tabs */
+    border-top-right-radius: 4px; /* Rounded top corners of tabs */
+    margin-right: 2px; /* Spacing between tabs */
+}
+QTabBar::tab:selected {
+    background: #ffffff; /* White for selected tab */
+    font-weight: bold;
+    border-bottom: 1px solid #ffffff; /* Blend with pane */
+}
+QTabBar::tab:hover:!selected {
+    background: #f5f7f9; /* Lighter grey on hover */
+}
+
+/* GroupBox */
+QGroupBox {
+    color: #2c3e50;
+    border: 1px solid #CCC; /* Consistent border */
+    border-radius: 4px; /* Rounded corners for QGroupBox */
+    margin-top: 10px;
+    padding: 10px 5px 5px 5px;
+}
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 5px;
+    left: 10px;
+    background-color: transparent; /* More integrated title background */
+    color: #2c3e50; /* Standard text color for title */
+}
+
+/* QSplitter */
+QSplitter::handle {
+    background-color: #bdc3c7; /* Silver handle */
+    border-radius: 3px; /* Rounded splitter handles */
+}
+QSplitter::handle:hover {
+    background-color: #cacfd2;
+}
+QSplitter::handle:pressed {
+    background-color: #3498db;
+}
+
+/* QStatusBar */
+QStatusBar {
+    background-color: #ecf0f1; /* Match main window background */
+    color: #2c3e50;
+    border-top: 1px solid #dcdfe2; /* Separator line */
+    padding: 3px;
+    /* No border-radius for status bar, typically spans window width */
+}
+QStatusBar::item {
+    border: none;
+}
+
+/* QMessageBox */
+QMessageBox {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #bdc3c7; /* Consistent border */
+    border-radius: 8px; /* Rounded corners for QMessageBox */
+}
+QMessageBox QLabel {
+    color: #2c3e50;
+    background-color: transparent;
+    padding: 5px;
+}
+QMessageBox QPushButton {
+    background-color: #e1e5e8;
+    color: #2c3e50;
+    border: 1px solid #bdc3c7;
+    padding: 8px 15px;
+    min-width: 70px;
+    border-radius: 4px; /* Rounded buttons in QMessageBox */
+}
+QMessageBox QPushButton:hover {
+    background-color: #f5f7f9;
+}
+QMessageBox QPushButton:pressed {
+    background-color: #3498db;
+    color: white;
+}
+
+/* QDialog */
+QDialog {
+    background-color: #ffffff; /* White background for dialogs */
+    color: #2c3e50;
+    border: 1px solid #bdc3c7; /* Consistent border */
+    border-radius: 8px; /* Rounded corners for QDialog */
+}
+QDialog QLabel, QDialog QCheckBox {
+    color: #2c3e50;
+    background-color: transparent;
+}
+QDialog QPushButton {
+    background-color: #e1e5e8;
+    color: #2c3e50;
+    border: 1px solid #bdc3c7;
+    padding: 8px 15px;
+    min-width: 70px;
+    border-radius: 4px; /* Rounded buttons in QDialog */
+}
+QDialog QPushButton:hover {
+    background-color: #f5f7f9;
+}
+QDialog QPushButton:pressed {
+    background-color: #3498db;
+    color: white;
+}
+
+
+/* Dashboard Card Styling */
+QFrame[objectName^="dashboardCard"] {
+    background-color: rgba(255, 255, 255, 0.8); /* Slightly transparent white */
+    /* Alternative solid color: #FDFEFE; */
+    border: 1px solid #D5DBDB; /* Subtle light border */
+    border-radius: 8px; /* Consistent with other larger elements */
+    padding: 15px;
+}
+
+QFrame[objectName^="dashboardCard"] QLabel[objectName^="titleLabel"],
+QFrame[objectName^="dashboardCard"] QLabel:first-child {
+    font-size: 16px;
+    font-weight: bold;
+    color: #2c3e50; /* Dark text for titles */
+    border: none;
+    background: transparent;
+    padding: 0px; /* Reset padding */
+}
+
+QFrame[objectName^="dashboardCard"] QLabel[objectName^="contentLabel"],
+QFrame[objectName^="dashboardCard"] QLabel:not(:first-child) {
+    font-size: 12px;
+    color: #566573; /* Slightly lighter text for content */
+    border: none;
+    background: transparent;
+    padding: 0px; /* Reset padding */
+}
+
+/* Add comments for clarity */
+/* End of light_theme.qss */

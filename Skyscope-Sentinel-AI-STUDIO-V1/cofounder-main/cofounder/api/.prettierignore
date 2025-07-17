@@ -1,0 +1,4 @@
+db/
+dump/
+dist/
+node_modules/

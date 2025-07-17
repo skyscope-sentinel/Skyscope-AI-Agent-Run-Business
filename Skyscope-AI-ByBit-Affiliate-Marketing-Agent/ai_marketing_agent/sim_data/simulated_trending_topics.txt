@@ -1,0 +1,6 @@
+# Format: Topic, Trendiness_Score (1-10, 10=hottest)
+"AI in Crypto Trading",8
+"New Layer 1 Blockchains",7
+"Bybit Platform Updates",9
+"Crypto Regulation News",6
+"Decentralized Finance (DeFi) Innovations",7

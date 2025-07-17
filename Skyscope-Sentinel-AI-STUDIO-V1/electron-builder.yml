@@ -1,0 +1,63 @@
+appId: com.kangfenmao.CherryStudio
+productName: Cherry Studio
+directories:
+  buildResources: build
+files:
+  - '!{.vscode,.yarn,.github}'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+  - '!src'
+  - '!scripts'
+  - '!local'
+asarUnpack:
+  - resources/**
+win:
+  executableName: Cherry Studio
+nsis:
+  artifactName: ${productName}-${version}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+  allowToChangeInstallationDirectory: true
+  oneClick: false
+mac:
+  entitlementsInherit: build/entitlements.mac.plist
+  extendInfo:
+    - NSCameraUsageDescription: Application requests access to the device's camera.
+    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
+    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
+    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
+  notarize: false
+  target:
+    - target: dmg
+      arch:
+        - arm64
+        - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
+dmg:
+  artifactName: ${productName}-${version}-${arch}.${ext}
+linux:
+  target:
+    - target: AppImage
+      arch:
+        - arm64
+        - x64
+    # - snap
+    # - deb
+  maintainer: electronjs.org
+  category: Utility
+appImage:
+  artifactName: ${productName}-${version}-${arch}.${ext}
+npmRebuild: false
+publish:
+  provider: github
+  repo: cherry-studio
+  owner: kangfenmao
+electronDownload:
+  mirror: https://npmmirror.com/mirrors/electron/
+afterSign: scripts/notarize.js

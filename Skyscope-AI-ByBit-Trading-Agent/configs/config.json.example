@@ -1,0 +1,19 @@
+{
+  "bybit_api_key": "YOUR_BYBIT_API_KEY",
+  "bybit_api_secret": "YOUR_BYBIT_API_SECRET",
+  "gemini_api_key": "YOUR_GEMINI_API_KEY",
+  "gemini_api_secret": "YOUR_GEMINI_API_SECRET",
+  "testnet_api_key_bybit": "YOUR_BYBIT_TESTNET_API_KEY",
+  "testnet_api_secret_bybit": "YOUR_BYBIT_TESTNET_API_SECRET",
+  "mainnet_api_key_bybit": "YOUR_BYBIT_MAINNET_API_KEY",
+  "mainnet_api_secret_bybit": "YOUR_BYBIT_MAINNET_API_SECRET",
+  "trading_symbols": ["BTCUSDT", "ETHUSDT"],
+  "risk_percentage": 0.01,
+  "risk_per_trade_percentage": 1.0,
+  "stop_loss_percentage": 0.02,
+  "tp_fee_multiplier": 3.0,
+  "risk_reward_ratio": 1.5,
+  "taker_fee_rate": 0.00055,
+  "use_bybit_testnet_connector": false,
+  "use_gemini_analyzer": false
+}

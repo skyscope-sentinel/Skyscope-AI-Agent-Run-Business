@@ -1,0 +1,42 @@
+--- Ad Copy Examples Generated on 2025-06-10 04:45:26 ---
+This file contains simulated ad copy based on templates and configuration.
+It includes placeholders for where real API calls to Google Ads would occur.
+Compliance checks (disclosures, restricted keywords) are simulated based on config.
+==================================================
+
+**Ad Example 1**
+  Campaign Name (Simulated): Bybit_Brand_Global
+  Ad Group (Simulated): General_Crypto_Traders
+  Headlines:
+    HL1: Trade Crypto Securely #Ad #Bybit #Crypto
+    HL2: Low Fees, Top Platform
+    HL3: Join Bybit Today!
+  Descriptions:
+    Desc1: Explore Bitcoin, Ethereum & more on Bybit. Advanced tools, 24/7 support. Bitcoin.
+    Desc2: Trusted by millions. Your premier crypto exchange for digital assets.
+  Final URL (Placeholder): YOUR_BYBIT_AFFILIATE_LINK_HERE
+  Display URL (Simulated): bybit.com/Official
+  Notes: Generic brand awareness ad, emphasizing security and platform strength.
+
+**Ad Example 2**
+  Campaign Name (Simulated): Bybit_Feature_Bybit_Launchpad
+  Ad Group (Simulated): Bybit_Launchpad_Acce_Prospecting
+  Headlines:
+    HL1: Bybit Launchpad Access #Ad #Bybit #Crypto
+    HL2: Explore Features on Bybit
+    HL3: Learn & Trade Now
+  Descriptions:
+    Desc1: Discover Bybit Launchpad Access with Bybit's easy-to-use platform. Get started in minutes!
+    Desc2: Access powerful tools, guides, and support. crypto exchange.
+  Final URL (Placeholder): YOUR_BYBIT_AFFILIATE_LINK_HERE
+  Display URL (Simulated): bybit.com/Bybit-launchpad
+  Notes: Ad focusing on specific feature/topic: Bybit Launchpad Access
+
+
+--- Google Ads API Call Simulation (Placeholder) ---
+
+    # --- SIMULATED GOOGLE ADS API CALL ---
+    # ... (simulation details) ...
+    # --- END SIMULATION ---
+
+==================================================

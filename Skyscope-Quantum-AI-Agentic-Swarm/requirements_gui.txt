@@ -1,0 +1,47 @@
+# Core framework for the Graphical User Interface
+# Provides the Qt bindings for Python, enabling the creation of desktop applications.
+PySide6>=6.0.0  # Example: PySide6==6.6.0 if a specific version is targeted
+
+# For video processing features in the Video Tools page (e.g., Images to Video, potentially colorization stubs)
+# Includes dependencies like numpy, imageio, Pillow, tqdm, decorator, which will be installed automatically.
+moviepy>=1.0.3
+
+# For image manipulation tasks, used by various components including video processing.
+# Also a dependency for moviepy.
+Pillow>=9.0.0
+
+# --- Agent Frameworks & Related ---
+# CrewAI for role-based agent orchestration
+crewai>=0.30.0 # Specify a recent version or use as per latest stable
+crewai[tools]>=0.1.0 # For built-in tools, adjust version as needed
+
+# AutoGen for multi-agent conversations and user proxy
+autogen-agentchat>=0.2.18 # Specify a recent version or use as per latest stable
+autogen-ext[openai]>=0.0.1 # For OpenAI client compatibility (can target Ollama)
+
+# For loading .env files during development (API keys etc.)
+python-dotenv>=1.0.0
+
+# For web search capabilities (alternative/fallback for SerperDevTool)
+duckduckgo-search>=5.0.0
+
+# For Serper Google Search API access (used by search_tools.py)
+google-search-results>=2.4.2 # SerpApi client
+
+# Swarms - Enterprise-Grade Multi-Agent Orchestration Framework
+swarms>=6.8.1 # Check for latest stable version, 6.8.1 was noted as recent.
+
+# E2B Code Interpreter for sandboxed code execution
+e2b_code_interpreter>=0.15.0 # Check for latest stable version
+
+# Playwright for browser automation
+playwright>=1.40.0 # Check for latest stable version
+
+# Instructor for structured outputs from LLMs
+instructor>=1.0.0 # Check for latest stable
+
+# ChromaDB for local vector storage (RAG)
+chromadb>=0.4.24 # As of Phase E1
+
+# Cryptography for encrypting sensitive settings
+cryptography>=42.0.0 # Check for latest stable version

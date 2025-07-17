@@ -1,0 +1,38 @@
+--- Running Python script (using GenerativeModel, corrected check) ---
+--- Running GeminiAnalyzer Standalone Example ---
+Attempting to load specific test configuration from: /app/configs/config.dev.json
+2025-06-06 23:07:51,373 - INFO - [gemini_analyzer] - Basic logging configured for GeminiAnalyzer standalone usage.
+2025-06-06 23:07:51,373 - INFO - [gemini_analyzer] - Attempting to initialize GenerativeModel. genai module version: 0.8.5
+2025-06-06 23:07:51,373 - INFO - [gemini_analyzer] - genai module path: ['/home/jules/.local/lib/python3.10/site-packages/google/generativeai']
+2025-06-06 23:07:51,373 - INFO - [gemini_analyzer] - GeminiAnalyzer initialized with GenerativeModel for model: models/gemma-3-12b-it. API Key ending with ...bRno
+
+--- Sample Prompt (first 300 chars) for model models/gemma-3-12b-it ---
+Analyze the following market data for BTCUSDT and provide a trading decision.
+    Current Price: 25200
+
+    Recent K-line Data (OHLCV):
+    [['1678886400000', '25000', '25500', '24800', '25200', '1000', '25200000'], ...]
+
+    Order Book Snippet (Top Bids/Asks):
+    {'bids': [['25190', '10'], ['25180...
+2025-06-06 23:07:51,373 - INFO - [gemini_analyzer] - Sending prompt to Gemini model 'models/gemma-3-12b-it' (snippet): Analyze the following market data for BTCUSDT and provide a trading decision.
+    Current Price: 25200
+
+    Recent K-line Data (OHLCV):
+    [['1678886400000', '25000', '25500', '24800', '25200', '1000', '25200000'], ...]
+
+    Order Book Snippet (Top Bids/Asks):
+    {'bids': [['25190', '10'], ['25180...
+2025-06-06 23:07:53,455 - INFO - [gemini_analyzer] - Successfully parsed JSON response from Gemini.
+
+--- Analysis Result from models/gemma-3-12b-it ---
+{
+  "decision": "HOLD",
+  "confidence_score": 0.3,
+  "entry_price_target": null,
+  "stop_loss_price": null,
+  "take_profit_target": null,
+  "reasoning": "Current price is near the high of the recent K-line data and within a narrow range. No clear breakout above the 20-period SMA is observed. RSI confirmation is also lacking. Therefore, holding the position is the most prudent action."
+}
+
+--- GeminiAnalyzer Standalone Example Finished ---

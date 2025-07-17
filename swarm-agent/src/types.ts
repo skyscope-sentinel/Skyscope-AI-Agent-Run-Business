@@ -1,0 +1,1 @@
+export { ioc } from './services';

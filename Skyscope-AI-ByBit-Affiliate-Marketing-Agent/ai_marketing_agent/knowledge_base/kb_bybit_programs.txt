@@ -1,0 +1,7 @@
+feat/ai-marketing-agent-foundation
+## Bybit Programs\n- Affiliate Program Details\n- VIP Tiers & Benefits
+=======
+## Bybit Programs Summary
+- Affiliate Program: Earn commissions.
+- Referral Program: Invite friends for rewards.
+main

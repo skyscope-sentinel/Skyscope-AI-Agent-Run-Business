@@ -1,0 +1,8 @@
+feat/ai-marketing-agent-foundation
+## Bybit Features Summary\n- Spot & Futures Trading\n- High Leverage Options\n- Bybit Earn Programs
+=======
+## Bybit Features Summary
+- Spot Trading: Wide range of pairs.
+- Derivatives: USDT Perpetuals, Options.
+- Bybit Earn: Staking, Savings.
+main

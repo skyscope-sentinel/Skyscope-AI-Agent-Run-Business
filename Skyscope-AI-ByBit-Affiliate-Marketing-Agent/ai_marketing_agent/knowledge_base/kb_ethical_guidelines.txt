@@ -1,0 +1,8 @@
+feat/ai-marketing-agent-foundation
+## Ethical Guidelines\n- Full Disclosure (#Ad)\n- No Profit Guarantees\n- Clear Risk Warnings
+=======
+## Ethical Marketing Guidelines Summary
+- Disclosure: Always use #Ad or equivalent.
+- Honesty: No profit guarantees. Avoid hype.
+- Risk Warnings: Include disclaimers about volatility.
+main

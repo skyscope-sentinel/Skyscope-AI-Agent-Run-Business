@@ -1,0 +1,16 @@
+/* 全局初始化滚动条样式 */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 2px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-scrollbar-thumb);
+  &:hover {
+    background: var(--color-scrollbar-thumb-hover);
+  }
+}
