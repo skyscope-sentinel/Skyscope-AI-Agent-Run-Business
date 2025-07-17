@@ -1,0 +1,128 @@
+{
+  "system": {
+    "name": "Skyscope Sentinel Intelligence AI Platform",
+    "version": "1.0.0",
+    "max_agents": 10000,
+    "log_level": "INFO",
+    "debug_mode": false,
+    "backup_enabled": true,
+    "backup_interval": 3600,
+    "health_check_interval": 300
+  },
+  "ai": {
+    "default_provider": "openai-unofficial",
+    "providers": {
+      "openai-unofficial": {
+        "enabled": true,
+        "api_key_env": "OPENAI_API_KEY",
+        "model": "gpt-4o"
+      },
+      "google-gemini": {
+        "enabled": false,
+        "api_key_env": "GEMINI_API_KEY",
+        "model": "gemini-pro"
+      },
+      "huggingface": {
+        "enabled": false,
+        "api_key_env": "HUGGINGFACE_API_KEY",
+        "model": "mistralai/Mixtral-8x7B-Instruct-v0.1"
+      },
+      "anthropic": {
+        "enabled": false,
+        "api_key_env": "ANTHROPIC_API_KEY",
+        "model": "claude-3-opus-20240229"
+      }
+    }
+  },
+  "resources": {
+    "cpu_allocation_percentage": 80,
+    "memory_allocation_percentage": 70,
+    "gpu_allocation_percentage": 90,
+    "disk_allocation_percentage": 50,
+    "network_allocation_percentage": 60
+  },
+  "income": {
+    "target_daily": 1000.0,
+    "risk_level": "medium",
+    "strategies": {
+      "crypto_trading": {
+        "enabled": true,
+        "allocation_percentage": 25,
+        "risk_level": "medium"
+      },
+      "mev_bot": {
+        "enabled": true,
+        "allocation_percentage": 20,
+        "risk_level": "high"
+      },
+      "nft_generation": {
+        "enabled": true,
+        "allocation_percentage": 15,
+        "risk_level": "medium"
+      },
+      "freelance_work": {
+        "enabled": true,
+        "allocation_percentage": 15,
+        "risk_level": "low"
+      },
+      "content_creation": {
+        "enabled": true,
+        "allocation_percentage": 10,
+        "risk_level": "low"
+      },
+      "social_media": {
+        "enabled": true,
+        "allocation_percentage": 10,
+        "risk_level": "medium"
+      },
+      "affiliate_marketing": {
+        "enabled": true,
+        "allocation_percentage": 5,
+        "risk_level": "low"
+      }
+    }
+  },
+  "agents": {
+    "total": 10000,
+    "allocation": {
+      "crypto_trading": 2000,
+      "mev_bot": 1000,
+      "nft_generation": 2000,
+      "freelance_work": 2000,
+      "content_creation": 1500,
+      "social_media": 1000,
+      "affiliate_marketing": 500
+    },
+    "auto_scaling": true,
+    "performance_threshold": 0.7
+  },
+  "wallet": {
+    "secure_storage": true,
+    "auto_withdrawal": false,
+    "withdrawal_threshold": 1000.0,
+    "withdrawal_address": "",
+    "supported_currencies": [
+      "BTC", "ETH", "SOL", "BNB", "USDT", "USDC"
+    ]
+  },
+  "legal": {
+    "compliance_check_enabled": true,
+    "business_name": "Skyscope Sentinel Intelligence",
+    "tax_tracking_enabled": true,
+    "jurisdiction": "United States",
+    "terms_of_service_version": "1.0.0"
+  },
+  "ui": {
+    "theme": "dark",
+    "refresh_interval": 5000,
+    "chart_history": 24,
+    "minimize_to_tray": true,
+    "enable_notifications": true
+  },
+  "integration": {
+    "pinokio_enabled": true,
+    "pinokio_port": 42000,
+    "vscode_integration": true,
+    "docker_integration": true
+  }
+}

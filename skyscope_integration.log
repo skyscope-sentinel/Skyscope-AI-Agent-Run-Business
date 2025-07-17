@@ -1,0 +1,76 @@
+2025-07-18 00:20:23,737 - SkyscopeIntegration - INFO - Configuration loaded from /Users/skyscope.cloud/SkyscopeEnterprise/config/system_config.json
+2025-07-18 00:20:23,737 - SkyscopeIntegration - INFO - Configuration manager initialized
+2025-07-18 00:20:23,737 - SkyscopeIntegration - INFO - Dependency manager initialized
+2025-07-18 00:20:23,786 - SkyscopeIntegration - WARNING - Error detecting GPUs: name 'subprocess' is not defined
+2025-07-18 00:20:23,786 - SkyscopeIntegration - INFO - Resource manager initialized
+2025-07-18 00:20:23,786 - SkyscopeIntegration - INFO - Available resources: {'cpu': {'total': 20, 'allocated': 0}, 'memory': {'total': 32768, 'allocated': 0}, 'gpu': {'total': 0, 'allocated': 0}, 'disk': {'total': 789509, 'allocated': 0}, 'network': {'bandwidth': 100, 'allocated': 0}}
+2025-07-18 00:20:23,786 - SkyscopeIntegration - INFO - Component registry initialized
+2025-07-18 00:20:23,786 - SkyscopeIntegration - WARNING - API key not found for provider openai-unofficial
+2025-07-18 00:20:23,786 - SkyscopeIntegration - INFO - AI provider manager initialized
+2025-07-18 00:20:23,786 - SkyscopeIntegration - INFO - Integration system initialized
+2025-07-18 00:20:23,786 - SkyscopeIntegration - INFO - Initializing system...
+2025-07-18 00:20:23,787 - SkyscopeIntegration - INFO - Loading core modules...
+2025-07-18 00:20:23,787 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,787 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Error loading module ai_ml_engine: unexpected EOF while parsing (ai_ml_engine.py, line 2050)
+2025-07-18 00:20:23,793 - SkyscopeIntegration - INFO - Initializing strategy components...
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for crypto_trading_strategy
+2025-07-18 00:20:23,793 - SkyscopeIntegration - WARNING - Strategy module crypto_trading_strategy not found
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for mev_bot_strategy
+2025-07-18 00:20:23,793 - SkyscopeIntegration - WARNING - Strategy module mev_bot_strategy not found
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,793 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for nft_generation_strategy
+2025-07-18 00:20:23,793 - SkyscopeIntegration - WARNING - Strategy module nft_generation_strategy not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for freelance_work_strategy
+2025-07-18 00:20:23,794 - SkyscopeIntegration - WARNING - Strategy module freelance_work_strategy not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for content_creation_strategy
+2025-07-18 00:20:23,794 - SkyscopeIntegration - WARNING - Strategy module content_creation_strategy not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for social_media_strategy
+2025-07-18 00:20:23,794 - SkyscopeIntegration - WARNING - Strategy module social_media_strategy not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for affiliate_marketing_strategy
+2025-07-18 00:20:23,794 - SkyscopeIntegration - WARNING - Strategy module affiliate_marketing_strategy not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - INFO - Initializing manager components...
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for agent_manager
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,794 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for crypto_manager
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for nft_manager
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for income_manager
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Error loading module wallet_management: Module wallet_management not found
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Failed to load dependency wallet_management for autonomous_income_system
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Failed to load dependency autonomous_income_system for social_manager
+2025-07-18 00:20:23,795 - SkyscopeIntegration - INFO - Initializing integration components...
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Error loading module pinokio_integration: Module pinokio_integration not found
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Error loading module vscode_integration: Module vscode_integration not found
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Error loading module docker_integration: Module docker_integration not found
+2025-07-18 00:20:23,795 - SkyscopeIntegration - INFO - Initializing UI components...
+2025-07-18 00:20:23,795 - SkyscopeIntegration - ERROR - Error loading module main_window: Module main_window not found
+2025-07-18 00:20:23,795 - SkyscopeIntegration - INFO - System initialized successfully
+2025-07-18 00:20:23,795 - SkyscopeIntegration - INFO - Starting system...
+2025-07-18 00:20:23,795 - SkyscopeIntegration - INFO - Resource monitoring task started
+2025-07-18 00:20:23,796 - SkyscopeIntegration - INFO - Health check task started
+2025-07-18 00:20:23,796 - SkyscopeIntegration - ERROR - Error in resource monitoring task: 'total'
+2025-07-18 00:20:23,796 - SkyscopeIntegration - INFO - Backup task started
+2025-07-18 00:20:23,796 - SkyscopeIntegration - INFO - System started successfully
+2025-07-18 00:20:23,796 - SkyscopeIntegration - INFO - System started successfully
+2025-07-18 00:20:23,797 - SkyscopeIntegration - INFO - Backup created at /Users/skyscope.cloud/Documents/Github/Skyscope-AI-Agent-Run-Business/backups/backup_20250718_002023
+2025-07-18 00:22:23,803 - SkyscopeIntegration - ERROR - Error in resource monitoring task: 'total'
