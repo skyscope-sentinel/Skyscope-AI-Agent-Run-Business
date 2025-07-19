@@ -24,6 +24,8 @@ from queue import Queue, PriorityQueue
 # Import our unified AI client
 from ai_client import ai_client
 from crypto_wallet_manager import wallet_manager
+from blockchain_manager import blockchain_manager
+from config import config
 
 # Configure logging
 logging.basicConfig(
@@ -270,9 +272,10 @@ Complete this task to generate real income. Be specific, actionable, and results
                 {"role": "user", "content": user_message}
             ]
             
+            model_name = config.get("models.default_model")
             response = ai_client.chat_completion(
                 messages=messages,
-                model="gpt-4o",
+                model=model_name,
                 temperature=0.7,
                 max_tokens=4000
             )
@@ -389,23 +392,9 @@ class AgentSwarmManager:
         os.makedirs("data/results", exist_ok=True)
         os.makedirs("data/earnings", exist_ok=True)
         
-        # Initialize wallets for earnings
-        self._initialize_wallets()
+        self.wallets = wallet_manager.list_wallets()
         
         logger.info(f"Agent Swarm Manager initialized with capacity for {max_agents} agents")
-    
-    def _initialize_wallets(self):
-        """Initialize cryptocurrency wallets for receiving earnings."""
-        self.wallets = wallet_manager.setup_default_wallets()
-        
-        # Save wallet addresses to a file for easy reference
-        wallet_info = {name: {"address": info["address"], "cryptocurrency": info["cryptocurrency"]} 
-                      for name, info in self.wallets.items()}
-        
-        with open("data/earnings/wallet_addresses.json", "w") as f:
-            json.dump(wallet_info, f, indent=2)
-        
-        logger.info(f"Initialized {len(self.wallets)} cryptocurrency wallets for earnings")
     
     def create_agent(self, agent_type: str = None, department: str = None, 
                     seniority: str = None, name: str = None) -> str:
@@ -900,13 +889,25 @@ class AgentSwarmManager:
             Dict: Earnings summary
         """
         wallet_balances = {}
-        for name, wallet in self.wallets.items():
-            wallet_balances[name] = {
-                "balance": wallet["balance"],
-                "cryptocurrency": wallet["cryptocurrency"],
-                "address": wallet["address"]
-            }
-        
+        for wallet_name in self.wallets:
+            wallet = wallet_manager.get_wallet(wallet_name)
+            if wallet:
+                try:
+                    network = self._get_network_for_crypto(wallet["cryptocurrency"])
+                    balance = blockchain_manager.get_balance(wallet["address"], network)
+                    wallet_balances[wallet_name] = {
+                        "balance": balance,
+                        "cryptocurrency": wallet["cryptocurrency"],
+                        "address": wallet["address"]
+                    }
+                except Exception as e:
+                    logger.error(f"Could not get balance for {wallet_name}: {e}")
+                    wallet_balances[wallet_name] = {
+                        "balance": "Error",
+                        "cryptocurrency": wallet["cryptocurrency"],
+                        "address": wallet["address"]
+                    }
+
         return {
             "total_earnings": self.total_earnings,
             "by_department": self.earnings_by_department,
@@ -914,6 +915,24 @@ class AgentSwarmManager:
             "wallet_balances": wallet_balances,
             "updated_at": datetime.now().isoformat()
         }
+
+    def _get_network_for_crypto(self, crypto: str) -> str:
+        """
+        Get the network name for a given cryptocurrency.
+
+        Args:
+            crypto: The cryptocurrency symbol (e.g., "BTC", "ETH").
+
+        Returns:
+            The corresponding network name for INFURA.
+        """
+        crypto_map = {
+            "BTC": "ethereum_mainnet", # No direct BTC support in web3, use a placeholder
+            "ETH": "ethereum_mainnet",
+            "SOL": "solana_mainnet", # This is a placeholder, solana has a different API
+            "BNB": "bsc_mainnet",
+        }
+        return crypto_map.get(crypto.upper(), "ethereum_mainnet")
     
     def generate_income_tasks(self, count: int = 10) -> List[str]:
         """
