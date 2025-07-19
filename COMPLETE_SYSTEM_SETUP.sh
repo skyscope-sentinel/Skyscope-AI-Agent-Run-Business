@@ -197,10 +197,10 @@ pip install --upgrade \
     opencv-python \
     scikit-learn
 
-# Install AI and ML dependencies
+# Install AI and ML dependencies (FREE UNLIMITED ACCESS!)
 print_info "Installing AI and ML dependencies..."
 pip install --upgrade \
-    openai \
+    openai-unofficial \
     anthropic \
     google-generativeai \
     huggingface-hub \
