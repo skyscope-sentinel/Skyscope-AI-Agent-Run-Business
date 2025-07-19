@@ -29,13 +29,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger("CryptoWallet")
 
-# Try to import mnemonic for seed phrase generation
-try:
-    from mnemonic import Mnemonic
-    MNEMONIC_AVAILABLE = True
-except ImportError:
-    MNEMONIC_AVAILABLE = False
-    logger.warning("mnemonic package not available. Using fallback seed phrase generation.")
+from config import config
 
 class CryptoWalletManager:
     """Manages real cryptocurrency wallets and transactions"""
@@ -82,14 +76,11 @@ class CryptoWalletManager:
     def generate_wallet(self, wallet_name: str, cryptocurrency: str = "BTC") -> Dict:
         """Generate a new cryptocurrency wallet with seed phrase"""
         
-        # Generate mnemonic seed phrase
-        if MNEMONIC_AVAILABLE:
-            mnemo = Mnemonic("english")
-            seed_phrase = mnemo.generate(strength=256)  # 24 words
-        else:
-            # Fallback seed phrase generation
-            words = self._generate_fallback_seed_phrase(24)
-            seed_phrase = " ".join(words)
+        # Get seed phrase from config
+        seed_phrase = config.get_seed_phrase()
+        if not seed_phrase:
+            logger.error("Seed phrase not found in configuration. Cannot generate wallet.")
+            raise ValueError("Seed phrase not configured.")
         
         # Generate wallet data based on cryptocurrency
         if cryptocurrency.upper() == "BTC":
@@ -124,34 +115,6 @@ class CryptoWalletManager:
         
         logger.info(f"Generated new {cryptocurrency} wallet: {wallet_name}")
         return wallet_info
-    
-    def _generate_fallback_seed_phrase(self, word_count: int = 24) -> List[str]:
-        """Generate a fallback seed phrase if mnemonic package is not available"""
-        # This is a simplified version for demonstration
-        # In production, use a proper BIP39 implementation
-        word_list = [
-            "abandon", "ability", "able", "about", "above", "absent", "absorb", "abstract", "absurd", "abuse",
-            "access", "accident", "account", "accuse", "achieve", "acid", "acoustic", "acquire", "across", "act",
-            "action", "actor", "actress", "actual", "adapt", "add", "addict", "address", "adjust", "admit",
-            "adult", "advance", "advice", "aerobic", "affair", "afford", "afraid", "again", "age", "agent",
-            "agree", "ahead", "aim", "air", "airport", "aisle", "alarm", "album", "alcohol", "alert",
-            "alien", "all", "alley", "allow", "almost", "alone", "alpha", "already", "also", "alter",
-            "always", "amateur", "amazing", "among", "amount", "amused", "analyst", "anchor", "ancient", "anger",
-            "angle", "angry", "animal", "ankle", "announce", "annual", "another", "answer", "antenna", "antique",
-            "anxiety", "any", "apart", "apology", "appear", "apple", "approve", "april", "arch", "arctic",
-            "area", "arena", "argue", "arm", "armed", "armor", "army", "around", "arrange", "arrest",
-            "arrive", "arrow", "art", "artefact", "artist", "artwork", "ask", "aspect", "assault", "asset",
-            "assist", "assume", "asthma", "athlete", "atom", "attack", "attend", "attitude", "attract", "auction",
-            "audit", "august", "aunt", "author", "auto", "autumn", "average", "avocado", "avoid", "awake",
-            "aware", "away", "awesome", "awful", "awkward", "axis", "baby", "bachelor", "bacon", "badge",
-            "bag", "balance", "balcony", "ball", "bamboo", "banana", "banner", "bar", "barely", "bargain",
-            "barrel", "base", "basic", "basket", "battle", "beach", "bean", "beauty", "because", "become",
-            "beef", "before", "begin", "behave", "behind", "believe", "below", "belt", "bench", "benefit"
-        ]
-        
-        # Generate random indices for the word list
-        indices = [secrets.randbelow(len(word_list)) for _ in range(word_count)]
-        return [word_list[i] for i in indices]
     
     def _generate_bitcoin_wallet(self, seed_phrase: str) -> Dict:
         """Generate Bitcoin wallet from seed phrase"""

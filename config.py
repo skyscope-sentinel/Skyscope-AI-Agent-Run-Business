@@ -53,7 +53,7 @@ class Config:
         },
         "models": {
             "default_provider": "Local (Ollama)",
-            "default_model": "llama3:latest",
+            "default_model": "stable-code:3b-code-q4_0",
             "temperature": 0.7,
             "max_tokens": 4096,
             "top_p": 0.95,
@@ -139,6 +139,38 @@ Finally, review your answer for accuracy and completeness."""
             "encryption_enabled": True,
             "salt": None,  # Will be generated on first run
             "key_derivation_iterations": 100000,
+            "seed_phrase": None, # Will be set from environment variable
+        },
+        "infura": {
+            "api_key": None, # Will be set from environment variable
+            "endpoints": {
+                "ethereum_mainnet": "https://mainnet.infura.io/v3/",
+                "ethereum_sepolia": "https://sepolia.infura.io/v3/",
+                "linea_mainnet": "https://linea-mainnet.infura.io/v3/",
+                "linea_sepolia": "https://linea-sepolia.infura.io/v3/",
+                "polygon_mainnet": "https://polygon-mainnet.infura.io/v3/",
+                "polygon_amoy": "https://polygon-amoy.infura.io/v3/",
+                "base_mainnet": "https://base-mainnet.infura.io/v3/",
+                "base_sepolia": "https://base-sepolia.infura.io/v3/",
+                "blast_mainnet": "https://blast-mainnet.infura.io/v3/",
+                "blast_sepolia": "https://blast-sepolia.infura.io/v3/",
+                "optimism_mainnet": "https://optimism-mainnet.infura.io/v3/",
+                "optimism_sepolia": "https://optimism-sepolia.infura.io/v3/",
+                "arbitrum_mainnet": "https://arbitrum-mainnet.infura.io/v3/",
+                "arbitrum_sepolia": "https://arbitrum-sepolia.infura.io/v3/",
+                "avalanche_mainnet": "https://avalanche-mainnet.infura.io/v3/",
+                "avalanche_fuji": "https://avalanche-fuji.infura.io/v3/",
+                "starknet_mainnet": "https://starknet-mainnet.infura.io/v3/",
+                "starknet_sepolia": "https://starknet-sepolia.infura.io/v3/",
+                "celo_mainnet": "https://celo-mainnet.infura.io/v3/",
+                "celo_alfajores": "https://celo-alfajores.infura.io/v3/",
+                "zksync_mainnet": "https://zksync-mainnet.infura.io/v3/",
+                "zksync_sepolia": "https://zksync-sepolia.infura.io/v3/",
+                "bsc_mainnet": "https://bsc-mainnet.infura.io/v3/",
+                "bsc_testnet": "https://bsc-testnet.infura.io/v3/",
+                "mantle_mainnet": "https://mantle-mainnet.infura.io/v3/",
+                "mantle_sepolia": "https://mantle-sepolia.infura.io/v3/",
+            }
         },
         "knowledge_stack": {
             "max_items": 100,
@@ -222,15 +254,24 @@ Finally, review your answer for accuracy and completeness."""
             "GOOGLE_API_KEY": "google",
             "HUGGINGFACE_API_KEY": "huggingface",
             "SERPER_API_KEY": "serper",
-            "BROWSERLESS_API_KEY": "browserless"
+            "BROWSERLESS_API_KEY": "browserless",
+            "INFURA_API_KEY": "infura_api_key",
+            "SEED_PHRASE": "seed_phrase"
         }
         
-        # Load API keys from environment variables
+        # Load API keys and other secrets from environment variables
         for env_var, config_key in env_to_config.items():
-            api_key = os.environ.get(env_var)
-            if api_key:
-                self.set_api_key(config_key, api_key)
-                logger.debug(f"Loaded API key for {config_key} from environment")
+            value = os.environ.get(env_var)
+            if value:
+                if config_key == "infura_api_key":
+                    self.set("infura.api_key", value)
+                    logger.debug("Loaded INFURA API key from environment")
+                elif config_key == "seed_phrase":
+                    self.set_seed_phrase(value)
+                    logger.debug("Loaded seed phrase from environment")
+                else:
+                    self.set_api_key(config_key, value)
+                    logger.debug(f"Loaded API key for {config_key} from environment")
     
     def encrypt(self, data: str) -> str:
         """
@@ -301,6 +342,29 @@ Finally, review your answer for accuracy and completeness."""
         
         self.config["api_keys"][provider] = self.encrypt(api_key)
         logger.debug(f"Set API key for {provider}")
+
+    def set_seed_phrase(self, seed_phrase: str):
+        """
+        Set the wallet seed phrase securely.
+
+        Args:
+            seed_phrase: The 12 or 24-word seed phrase.
+        """
+        self.config["security"]["seed_phrase"] = self.encrypt(seed_phrase)
+        logger.debug("Set seed phrase")
+
+    def get_seed_phrase(self) -> str:
+        """
+        Get the decrypted wallet seed phrase.
+
+        Returns:
+            The decrypted seed phrase or an empty string if not found.
+        """
+        encrypted_seed_phrase = self.config["security"].get("seed_phrase")
+        if not encrypted_seed_phrase:
+            return ""
+
+        return self.decrypt(encrypted_seed_phrase)
     
     def load_config(self) -> bool:
         """
