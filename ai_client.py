@@ -60,12 +60,8 @@ class AIClient:
         if self._initialized:
             return
             
-        self.api_key = api_key or os.environ.get("OPENAI_API_KEY", "")
-        if not self.api_key:
-            logger.warning("No OpenAI API key provided. Using openai-unofficial without API key.")
-            
         # Initialize the client
-        self.client = OpenAIUnofficial(api_key=self.api_key)
+        self.client = OpenAIUnofficial()
         self.models_cache = {}
         self.token_usage = {"total": 0, "by_model": {}}
         self._initialized = True

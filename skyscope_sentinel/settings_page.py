@@ -61,6 +61,7 @@ class SettingsPage(QWidget):
         self.tab_widget.addTab(self.create_ollama_tab(), QIcon.fromTheme("network-server"), "Ollama")
         self.tab_widget.addTab(self.create_agents_tab(), QIcon.fromTheme("applications-science"), "Agents")
         self.tab_widget.addTab(self.create_api_keys_tab(), QIcon.fromTheme("dialog-password", QIcon.fromTheme("security-high")), "API Keys") # New API Keys tab
+        self.tab_widget.addTab(self.create_web3_tab(), QIcon.fromTheme("network-wireless"), "Web3")
         self.tab_widget.addTab(self.create_financials_tab(), QIcon.fromTheme("wallet-open-symbolic", QIcon.fromTheme("emblem-money")), "Financials")
         self.tab_widget.addTab(self.create_advanced_tab(), QIcon.fromTheme("preferences-other"), "Advanced")
 
@@ -295,6 +296,12 @@ class SettingsPage(QWidget):
         if hasattr(self, 'le_e2b_api_key'): # Load E2B API Key
             self.le_e2b_api_key.setText(self.settings_manager.load_setting("api_keys/e2b_api_key", ""))
 
+        # Web3 - Load saved values
+        if hasattr(self, 'le_infura_api_key'):
+            self.le_infura_api_key.setText(self.settings_manager.load_setting("web3/infura_api_key", ""))
+        if hasattr(self, 'le_seed_phrase'):
+            self.le_seed_phrase.setText(self.settings_manager.load_setting("web3/seed_phrase", ""))
+
         self.status_message_requested.emit("Settings loaded.", "info")
 
     # --- API Keys Tab Creator ---
@@ -342,6 +349,39 @@ class SettingsPage(QWidget):
         # Add more API key fields here as needed in the future
 
         return api_keys_tab
+
+    def create_web3_tab(self):
+        web3_tab, layout = self._create_tab_content_widget()
+
+        web3_instructions = QLabel(
+            "Configure your Web3 settings here. This includes your Infura API key and your wallet seed phrase.\n"
+            "This information is stored locally and securely."
+        )
+        web3_instructions.setWordWrap(True)
+        web3_instructions.setStyleSheet("font-style: italic; color: #888888; margin-bottom: 10px;")
+        layout.addRow(web3_instructions)
+
+        # Infura API Key
+        self.le_infura_api_key = QLineEdit()
+        self.le_infura_api_key.setPlaceholderText("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx")
+        self.le_infura_api_key.setToolTip("Your Infura API Key for connecting to the Ethereum network.")
+        self.le_infura_api_key.setEchoMode(QLineEdit.Password)
+        self.le_infura_api_key.editingFinished.connect(
+            lambda: self.save_setting_value("web3/infura_api_key", self.le_infura_api_key.text().strip())
+        )
+        layout.addRow("Infura API Key:", self.le_infura_api_key)
+
+        # Seed Phrase
+        self.le_seed_phrase = QLineEdit()
+        self.le_seed_phrase.setPlaceholderText("12 word seed phrase")
+        self.le_seed_phrase.setToolTip("Your 12-word seed phrase for your wallet.")
+        self.le_seed_phrase.setEchoMode(QLineEdit.Password)
+        self.le_seed_phrase.editingFinished.connect(
+            lambda: self.save_setting_value("web3/seed_phrase", self.le_seed_phrase.text().strip())
+        )
+        layout.addRow("Seed Phrase:", self.le_seed_phrase)
+
+        return web3_tab
 
     # --- Financials Tab Creator and Methods ---
     def create_financials_tab(self):

@@ -49,6 +49,7 @@ class SkyscopeSwarmAgent(SwarmsBaseAgent):
         autosave: bool = False,
         verbose: bool = True,
         tools: list = None,
+        web3_utils: object = None,
         long_term_memory=None,
         # Removed system_prompt, agent_name, agent_description from here as they are now higher up
         **kwargs
@@ -123,6 +124,8 @@ class SkyscopeSwarmAgent(SwarmsBaseAgent):
             **kwargs
         )
 
+        self.web3_utils = web3_utils
+
         print(f"[SkyscopeSwarmAgent {_agent_name_for_swarms}] Initialized. Skyscope ID: {self.agent_id}, Role: {effective_role}, Department: {self.skyscope_identity.get('department')}")
 
     def get_skyscope_identity_summary(self) -> str:
@@ -162,12 +165,22 @@ if __name__ == '__main__':
     from skyscope_sentinel.tools.browser_tools import browse_web_page_and_extract_text
     from skyscope_sentinel.tools.code_execution_tools import execute_python_code_in_e2b
     from skyscope_sentinel.tools.file_io_tools import write_file, read_file, list_files
+    from skyscope_sentinel.tools.web3_tools import GetBalanceTool, SendTransactionTool, GetSolanaKeypairTool
 
     # Prepare the tools list
     # For testing, we'll use DuckDuckGo by default. Serper would require SERPER_API_KEY.
     # E2B tool would require E2B_API_KEY.
 
-    available_tools = [duckduckgo_search_function, browse_web_page_and_extract_text, write_file, read_file, list_files]
+    available_tools = [
+        duckduckgo_search_function,
+        browse_web_page_and_extract_text,
+        write_file,
+        read_file,
+        list_files,
+        GetBalanceTool(),
+        SendTransactionTool(),
+        GetSolanaKeypairTool(),
+    ]
 
     # Conditionally add Serper if key is available (from .env for this standalone test)
     if os.getenv("SERPER_API_KEY"):

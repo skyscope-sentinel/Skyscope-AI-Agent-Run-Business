@@ -13,6 +13,8 @@ SETTING_PAYPAL_EMAIL = "financials/paypal_email"
 SETTING_PAYID = "financials/payid"
 SETTING_BSB_NUMBER = "financials/bsb_number"
 SETTING_ACCOUNT_NUMBER = "financials/account_number"
+SETTING_INFURA_API_KEY = "web3/infura_api_key"
+SETTING_SEED_PHRASE = "web3/seed_phrase"
 
 
 ENCRYPTED_SETTINGS_KEYS = {
@@ -26,6 +28,8 @@ ENCRYPTED_SETTINGS_KEYS = {
     SETTING_PAYID,
     SETTING_BSB_NUMBER,
     SETTING_ACCOUNT_NUMBER,
+    SETTING_INFURA_API_KEY,
+    SETTING_SEED_PHRASE,
 }
 
 class SettingsManager:

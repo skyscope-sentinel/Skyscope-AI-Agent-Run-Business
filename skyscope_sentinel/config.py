@@ -31,6 +31,8 @@ class Config:
         # Financials - will be updated from SettingsManager
         self.current_btc_address = None # Default to None
         self.current_e2b_api_key = self.e2b_api_key_env # Initialize current value
+        self.infura_api_key = os.getenv("INFURA_API_KEY")
+        self.seed_phrase = os.getenv("SEED_PHRASE")
 
         print(f"[Config] Initialized. OLLAMA_MODEL env: {self.ollama_model_name_env}, OLLAMA_BASE_URL env: {self.ollama_base_url_env}")
         print(f"[Config] Effective Ollama Model: {self.current_ollama_model}, URL: {self.current_ollama_url}")
@@ -47,6 +49,8 @@ class Config:
         gui_openai_key = settings_manager.load_setting("api_keys/openai_api_key", None)
         gui_e2b_key = settings_manager.load_setting("api_keys/e2b_api_key", None)
         gui_btc_address = settings_manager.load_setting("financials/btc_address", None) # Key from settings_manager.py
+        gui_infura_api_key = settings_manager.load_setting("web3/infura_api_key", None)
+        gui_seed_phrase = settings_manager.load_setting("web3/seed_phrase", None)
 
         if gui_ollama_model:
             self.current_ollama_model = gui_ollama_model
@@ -80,6 +84,10 @@ class Config:
 
         if gui_btc_address:
             self.current_btc_address = gui_btc_address
+        if gui_infura_api_key:
+            self.infura_api_key = gui_infura_api_key
+        if gui_seed_phrase:
+            self.seed_phrase = gui_seed_phrase
         # No environment variable fallback for BTC address, only GUI or None
         gui_e2b_key = settings_manager.load_setting("api_keys/e2b_api_key", None) # Load E2B key
 
@@ -142,6 +150,14 @@ class Config:
     def get_btc_address(self) -> str | None:
         """Returns the effective BTC Address if set, otherwise None."""
         return self.current_btc_address
+
+    def get_infura_api_key(self) -> str | None:
+        """Returns the effective Infura API key if set, otherwise None."""
+        return self.infura_api_key
+
+    def get_seed_phrase(self) -> str | None:
+        """Returns the effective seed phrase if set, otherwise None."""
+        return self.seed_phrase
 
 if __name__ == '__main__':
    from dotenv import load_dotenv

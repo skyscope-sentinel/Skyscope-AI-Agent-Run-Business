@@ -3,8 +3,7 @@ import os # Required for os.path.exists in ContentStudioPage
 from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QStackedWidget, QFrame, QStatusBar, QSystemTrayIcon, QMenu, QGridLayout, QSizePolicy,
-    QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit, QMessageBox
-    QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit, QMessageBox # Added QMessageBox
+    QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit, QMessageBox, QInputDialog
 )
 from PySide6.QtCore import Qt, QSize, QFile, QTextStream, Slot
 from PySide6.QtGui import QColor, QPalette, QIcon, QAction, QFont
@@ -13,6 +12,7 @@ from .model_hub_page import ModelHubPage
 from .settings_page import SettingsPage, SETTING_THEME, SETTING_ACRYLIC_EFFECT, SETTING_AUTOSTART, SETTING_MINIMIZE_TO_TRAY
 from .settings_manager import SettingsManager
 from .video_agent_page import VideoAgentPage
+from .web3_utils import Web3Utils
 
 
 def load_stylesheet(filename):
@@ -583,7 +583,7 @@ class PlaceholderPage(QWidget):
 
         if name == "Dashboard":
             grid_layout = QGridLayout()
-            card_titles = ["Active Agents", "System Status", "Recent Activity", "Model Performance"]
+            card_titles = ["Active Agents", "System Status", "Wallet Address", "Wallet Balance"]
             for i, title in enumerate(card_titles):
                 card = QFrame()
                 card.setObjectName(f"dashboardCard{i}")
@@ -596,6 +596,16 @@ class PlaceholderPage(QWidget):
                 title_label.setStyleSheet("font-size: 16px; font-weight: bold; border: none; background: transparent;")
                 content_label = QLabel("Details and metrics will appear here.")
                 content_label.setStyleSheet("font-size: 12px; border: none; background: transparent;")
+                if title == "Wallet Address":
+                    if self.parent().parent().parent().web3_utils:
+                        content_label.setText(self.parent().parent().parent().web3_utils.account.address)
+                    else:
+                        content_label.setText("N/A")
+                elif title == "Wallet Balance":
+                    if self.parent().parent().parent().web3_utils:
+                        content_label.setText(str(self.parent().parent().parent().web3_utils.get_balance()))
+                    else:
+                        content_label.setText("N/A")
                 card_layout.addWidget(title_label)
                 card_layout.addWidget(content_label)
                 card_layout.addStretch()
@@ -636,6 +646,7 @@ class PlaceholderPage(QWidget):
             self.btn_stop_agent = QPushButton(QIcon.fromTheme("media-playback-stop"), "Stop Selected"); self.btn_stop_agent.setToolTip("Stop the selected agent."); self.btn_stop_agent.setEnabled(False); self.btn_stop_agent.clicked.connect(self.stop_selected_agent); actions_layout.addWidget(self.btn_stop_agent)
             self.btn_config_agent = QPushButton(QIcon.fromTheme("preferences-system"), "Configure Selected"); self.btn_config_agent.setToolTip("Configure the selected agent."); self.btn_config_agent.setEnabled(False); self.btn_config_agent.clicked.connect(self.configure_selected_agent); actions_layout.addWidget(self.btn_config_agent)
             self.btn_view_logs = QPushButton(QIcon.fromTheme("document-preview"), "View Logs"); self.btn_view_logs.setToolTip("View logs for the selected agent."); self.btn_view_logs.setEnabled(False); self.btn_view_logs.clicked.connect(self.view_agent_logs); actions_layout.addWidget(self.btn_view_logs)
+            self.btn_send_tx = QPushButton(QIcon.fromTheme("emblem-money"), "Send Transaction"); self.btn_send_tx.setToolTip("Send a transaction from the agent's wallet."); self.btn_send_tx.setEnabled(False); self.btn_send_tx.clicked.connect(self.send_transaction); actions_layout.addWidget(self.btn_send_tx)
             layout.addLayout(actions_layout)
             self.add_agent_btn = QPushButton(QIcon.fromTheme("list-add"), "Add New Agent..."); self.add_agent_btn.setToolTip("Define and configure a new AI agent."); self.add_agent_btn.clicked.connect(self.add_new_agent); self.add_agent_btn.setStyleSheet("QPushButton { text-align: center; padding-left: 0px; margin-top: 10px; }"); layout.addWidget(self.add_agent_btn, 0, Qt.AlignCenter)
             layout.addStretch()
@@ -1002,6 +1013,25 @@ feat/foundational-agent-system
     def on_log_search_changed(self, text):
         if hasattr(self, 'search_log_input'): print(f"Log search text: {text}");_ = text and self.show_status_message(f"Searching logs for: {text}", "info", 1500)
 
+    def send_transaction(self):
+        current_item = self.agent_list_widget.currentItem()
+        if current_item:
+            agent_instance = current_item.data(Qt.UserRole)
+            if self.parent().parent().parent().web3_utils:
+                to_address, ok = QInputDialog.getText(self, "Send Transaction", "Enter recipient address:")
+                if ok and to_address:
+                    amount, ok = QInputDialog.getDouble(self, "Send Transaction", "Enter amount:")
+                    if ok and amount > 0:
+                        try:
+                            tx_hash = self.parent().parent().parent().web3_utils.send_transaction(to_address, amount)
+                            self.show_status_message(f"Transaction sent: {tx_hash}", "success")
+                        except Exception as e:
+                            self.show_status_message(f"Failed to send transaction: {e}", "error")
+            else:
+                self.show_status_message("Web3 Utils not initialized.", "warning")
+        else:
+            self.show_status_message("No agent selected.", "warning")
+
     def clear_logs_display(self):
         if hasattr(self, 'log_display_area'): self.log_display_area.clear(); print("Log display cleared."); self.show_status_message("Log display cleared.", "info")
 
@@ -1025,6 +1055,7 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.sidebar)
         self.content_area = QStackedWidget(); self.content_area.setObjectName("contentArea"); self.main_layout.addWidget(self.content_area)
         self.settings_manager = SettingsManager()
+        self.web3_utils = None
         self.nav_buttons = {}
         self.sections = ["Dashboard", "Opportunity Research", "Content Studio", "Agent Control", "Video Tools", "Model Hub", "Log Stream", "Settings"]
         app_title_label = QLabel("Skyscope Sentinel"); app_title_label.setAlignment(Qt.AlignCenter); app_title_label.setStyleSheet("font-size: 18px; font-weight: bold; padding-bottom: 10px; margin-top: 5px;"); self.sidebar_layout.addWidget(app_title_label)
@@ -1240,6 +1271,13 @@ class MainWindow(QMainWindow):
     def load_initial_settings(self):
         initial_theme_name = self.settings_manager.load_setting(SETTING_THEME, "dark"); self.apply_theme_by_name(initial_theme_name)
         initial_acrylic = self.settings_manager.load_setting(SETTING_ACRYLIC_EFFECT, True); self.apply_acrylic_effect(initial_acrylic)
+        infura_api_key = self.settings_manager.load_setting("web3/infura_api_key", None)
+        seed_phrase = self.settings_manager.load_setting("web3/seed_phrase", None)
+        if infura_api_key and seed_phrase:
+            self.web3_utils = Web3Utils(infura_api_key, seed_phrase)
+            self.show_status_message("Web3 Utils initialized.", "success")
+        else:
+            self.show_status_message("Web3 Utils not initialized. Missing Infura API key or seed phrase.", "warning")
 
     def switch_page(self, section_name):
         page_found = False

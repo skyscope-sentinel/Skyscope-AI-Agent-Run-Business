@@ -4,7 +4,6 @@ langchain>=0.0.267
 crewai>=0.28.0
 swarms>=0.3.0
 autogen>=0.2.0
-agentverse>=0.2.0
 instructor>=0.4.5
 pydantic>=2.4.0
 chromadb>=0.4.15
@@ -12,7 +11,6 @@ sentence-transformers>=2.2.2
 llama-index>=0.8.54
 guidance>=0.1.0
 anthropic>=0.5.0
-cohere-api>=4.32.0
 google-generativeai>=0.3.0
 transformers>=4.35.0
 accelerate>=0.23.0
@@ -96,13 +94,11 @@ keybert>=0.8.3
 sumy>=0.11.0
 lexrank>=0.1.0
 polyglot>=16.7.4
-fasttext>=0.9.2
 
 # Image and Audio Processing
 opencv-python>=4.8.1.78
 scikit-image>=0.22.0
 imageio>=2.31.5
-librosa>=0.10.1
 soundfile>=0.12.1
 pydub>=0.25.1
 speechrecognition>=3.10.0
@@ -139,18 +135,6 @@ tqdm>=4.66.1
 sentry-sdk>=1.32.0
 
 # Business Automation
-zapier-python>=0.2.4
-make-api-client>=0.1.0
-n8n-python-client>=0.1.0
-airtable-python-wrapper>=0.15.3
-pygsheets>=2.0.6
-trello>=0.9.7
-slack-sdk>=3.23.0
-tweepy>=4.14.0
-facebook-sdk>=3.1.0
-linkedin-api>=2.0.0
-instagram-private-api>=1.6.0
-youtube-api-python>=0.0.20
 
 # Development and Testing
 pytest>=7.4.2

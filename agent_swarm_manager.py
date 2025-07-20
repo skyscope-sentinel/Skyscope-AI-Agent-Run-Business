@@ -1770,5 +1770,256 @@ document.addEventListener('DOMContentLoaded', function() {
             if (nav.style.display === 'none') {
                 nav.style.display = 'block';
             } else {
-                nav.style.display = '
+            nav.style.display = 'none';
+        }
+    });
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+
+// Contact form submission
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+        }
+    });
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+});
+
+// Contact form submission
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+            }
+        });
+
+        handleResize();
+        window.addEventListener('resize', handleResize);
+    }
+});
+
+// Contact form submission
+const contactForm = document.getElementById('contactForm');
+if (contactForm) {
+    contactForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+"""
+
+        with open(f"{deployment_dir}/js/main.js", "w") as f:
+            f.write(js)
+        files_created.append("js/main.js")
+
+        contact_js = """
+document.addEventListener('DOMContentLoaded', function() {
+    const contactForm = document.getElementById('contactForm');
+    if (contactForm) {
+        contactForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const subject = document.getElementById('subject').value;
+            const message = document.getElementById('message').value;
+
+            // In a real application, you would send this to a server
+            console.log('Form submitted:', { name, email, subject, message });
+
+            alert('Thank you for your message! We will get back to you soon.');
+            contactForm.reset();
+        });
+    }
+});
+"""
+        with open(f"{deployment_dir}/js/contact.js", "w") as f:
+            f.write(contact_js)
+        files_created.append("js/contact.js")
+
+        return files_created
+
+    def _get_wallet_for_business(self, business_type: str) -> str:
+        """
+        Get a wallet address for a business based on its type.
+
+        Args:
+            business_type: Type of business
+
+        Returns:
+            str: Wallet address
+        """
+        # Simple mapping of business type to wallet
+        if "crypto" in business_type.lower() or "trading" in business_type.lower():
+            return self.wallets.get("bitcoin_earnings", {}).get("address", "")
+        elif "content" in business_type.lower() or "media" in business_type.lower():
+            return self.wallets.get("solana_earnings", {}).get("address", "")
+        else:
+            return self.wallets.get("ethereum_earnings", {}).get("address", "")
+
+# Create singleton instance
+agent_swarm_manager = AgentSwarmManager()
+
+if __name__ == "__main__":
+    # Simple test
+    print("Agent Swarm Manager Test")
+    print("=======================")
+
+    # Create initial agents
+    num_agents = agent_swarm_manager.create_initial_swarm(num_agents=100)
+    print(f"Created {num_agents} agents")
+
+    # Generate tasks
+    income_tasks = agent_swarm_manager.generate_income_tasks(count=20)
+    print(f"Generated {len(income_tasks)} income tasks")
+
+    business_tasks = agent_swarm_manager.generate_business_creation_tasks(count=5)
+    print(f"Generated {len(business_tasks)} business tasks")
+
+    # Start the swarm
+    agent_swarm_manager.start(num_workers=5)
+
+    # Run for a bit
+    try:
+        print("Running agent swarm for 10 seconds...")
+        time.sleep(10)
+    except KeyboardInterrupt:
+        pass
+
+    # Stop the swarm
+    agent_swarm_manager.stop()
+
+    # Print results
+    earnings = agent_swarm_manager.get_earnings_summary()
+    print(f"\nTotal earnings: ${earnings['total_earnings']:.2f}")
+
+    top_agents = agent_swarm_manager.get_top_performing_agents(5)
+    print("\nTop 5 agents:")
+    for i, agent in enumerate(top_agents):
+        print(f"{i+1}. Agent {agent['id'][:8]}: ${agent['earnings']:.2f} ({agent['specialization']})")
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
+        e.preventDefault();
+
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // In a real application, you would send this to a server
+        console.log('Form submitted:', { name, email, subject, message });
+
+        alert('Thank you for your message! We will get back to you soon.');
+        contactForm.reset();
+    });
+}
 
