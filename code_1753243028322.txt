@@ -1,0 +1,22 @@
+FileNotFoundError:[Errno 2] No such file or directory: '/home/user/skyscope_rag/pinokio_integrations/config.json'
+---------------------------------------------------------------------------FileNotFoundError                         Traceback (most recent call last)Cell In[3], line 65
+      9 # Create configuration files and setup scripts for the integrations
+     10 
+     11 # 1. Main configuration file
+     12 main_config = {
+     13     "pinokio_integrations": {
+     14         "browser_use": {
+   (...)     62     }
+     63 }
+---> 65 with open(integration_dir / "config.json", "w") as f:
+     66     json.dump(main_config, f, indent=2)
+     68 print("✅ Created main configuration file")
+File /usr/local/lib/python3.12/site-packages/IPython/core/interactiveshell.py:326, in _modified_open(file, *args, **kwargs)
+    319 if file in {0, 1, 2}:
+    320     raise ValueError(
+    321         f"IPython won't let you open fd={file} by default "
+    322         "as it is likely to crash IPython. If you know what you are doing, "
+    323         "you can use builtins' open."
+    324     )
+--> 326 return io_open(file, *args, **kwargs)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/user/skyscope_rag/pinokio_integrations/config.json'

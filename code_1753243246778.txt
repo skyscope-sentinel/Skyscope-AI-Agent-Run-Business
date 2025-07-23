@@ -1,0 +1,53 @@
+PARQUET FILE SCHEMA ANALYSIS:
+
+Based on the github-code.py and github_preprocessing.py analysis:
+
+Expected Schema Fields:
+1. content (string) - The actual source code content
+2. repo_name (string) - GitHub repository name (e.g., "user/repository")
+3. path (string) - File path within the repository (e.g., "src/main.py")
+4. license (string) - Repository license (one of 15 supported licenses)
+5. size (int32) - File size in bytes
+6. copies (int) - Number of copies found (from BigQuery)
+
+Derived Fields (added during loading):
+- language (string) - Programming language inferred from file extension
+- hash (string) - MD5 hash for deduplication (removed after processing)
+
+File Structure Details:
+- Each Parquet file contains ~272-284 MB of compressed data
+- Files are sharded with ~1000 MB uncompressed data per shard
+- Row groups optimized for batch processing (10,000 records per batch)
+- Total dataset: 115M files across 1,126 Parquet files
+
+Data Types for Indexing:
+1. Text Fields (for semantic search):
+   - content: Full source code (primary search target)
+   - repo_name: Repository identifier
+   - path: File path (contains filename and directory structure)
+
+2. Categorical Fields (for filtering):
+   - language: 32 programming languages
+   - license: 15 license types
+
+3. Numeric Fields (for sorting/filtering):
+   - size: File size in bytes (0 to 1,048,575 bytes per original query)
+
+4. Structural Fields:
+   - File extension (derived from path)
+   - Directory depth (derived from path)
+   - Repository organization (derived from repo_name)
+
+Indexing Strategy Recommendations:
+1. Full-text search index on 'content' field
+2. Keyword index on 'path' and 'repo_name' 
+3. Categorical indexes on 'language' and 'license'
+4. Range index on 'size' field
+5. Composite indexes for common query patterns
+6. Vector embeddings for semantic code search
+
+Estimated Index Size:
+- Full dataset: ~1TB uncompressed
+- Text index: ~200-500 GB (depending on tokenization)
+- Vector embeddings: ~100-200 GB (depending on embedding size)
+- Metadata indexes: ~10-20 GB

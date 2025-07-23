@@ -1,0 +1,12 @@
+stdout: ✅ Parquet Processing System created
+📊 Features:
+  • Batch processing with progress tracking
+  • Deduplication using content hashes
+  • Automatic language detection
+  • Chunking for semantic search
+  • Embedding generation and storage
+  • FTS5 indexing for keyword search
+💡 Ready to process Parquet files from GitHub codebase
+
+stderr: 2025-07-22 11:40:10,502 - INFO - Found 0 already processed files
+

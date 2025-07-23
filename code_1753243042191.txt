@@ -1,0 +1,14 @@
+NameError:name 'integration_dir' is not defined
+---------------------------------------------------------------------------NameError                                 Traceback (most recent call last)Cell In[1], line 57
+      1 # Create configuration files and setup scripts for the integrations
+      2 
+      3 # 1. Main configuration file
+      4 main_config = {
+      5     "pinokio_integrations": {
+      6         "browser_use": {
+   (...)     54     }
+     55 }
+---> 57 with open(integration_dir / "config.json", "w") as f:
+     58     json.dump(main_config, f, indent=2)
+     60 print("✅ Created main configuration file")
+NameError: name 'integration_dir' is not defined

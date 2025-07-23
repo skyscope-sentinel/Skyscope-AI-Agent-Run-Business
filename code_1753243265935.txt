@@ -1,0 +1,63 @@
+GITHUB-CODE CODEBASE STRUCTURE ANALYSIS:
+
+Dataset Overview:
+- Total Files: 1,126 Parquet files (train-00000-of-01126.parquet to train-01125-of-01126.parquet)
+- File Size Range: ~265 MB to ~284 MB per file
+- Total Dataset Size: ~300+ GB compressed (~1TB uncompressed)
+- Content: 115M code files from GitHub in 32 programming languages
+
+Data Schema (from github-code.py):
+- code: string (file content)
+- repo_name: string (GitHub repository name)
+- path: string (file path in repository)
+- language: string (programming language)
+- license: string (repository license)
+- size: int32 (file size in bytes)
+
+Supported Languages (32):
+Assembly, Batchfile, C, C#, C++, CMake, CSS, Dockerfile, FORTRAN, GO, Haskell, HTML, Java, JavaScript, Julia, Lua, Makefile, Markdown, PHP, Perl, PowerShell, Python, Ruby, Rust, SQL, Scala, Shell, TypeScript, TeX, Visual Basic
+
+Supported Licenses (15):
+mit, apache-2.0, gpl-3.0, gpl-2.0, bsd-3-clause, agpl-3.0, lgpl-3.0, lgpl-2.1, bsd-2-clause, cc0-1.0, epl-1.0, mpl-2.0, unlicense, isc, artistic-2.0
+
+Language Distribution (from README.md):
+1. Java: 19.5M files (107.70 GB)
+2. C: 14.1M files (183.83 GB)
+3. JavaScript: 11.8M files (87.82 GB)
+4. HTML: 11.2M files (118.12 GB)
+5. PHP: 11.2M files (61.41 GB)
+6. Markdown: 8.5M files (23.09 GB)
+7. C++: 7.4M files (87.73 GB)
+8. Python: 7.2M files (52.03 GB)
+... and 24 other languages
+
+File Structure:
+/Users/skyscope.cloud/Documents/github-code/
+├── .git/ (Git repository metadata)
+├── .gitattributes (Git LFS configuration)
+├── README.md (Dataset documentation)
+├── data/ (1,126 Parquet files containing the actual code data)
+├── github-code.py (HuggingFace datasets loading script)
+├── github_preprocessing.py (Data preprocessing pipeline)
+├── query.sql (Original BigQuery SQL for data extraction)
+└── github-code-stats-alpha.png (Dataset statistics visualization)
+
+Preprocessing Pipeline (from github_preprocessing.py):
+1. Hash-based deduplication
+2. Line length filtering (max 1000 characters per line)
+3. Alpha character fraction analysis
+4. Auto-generated file detection
+5. Shard creation for efficient storage
+
+Loading Configuration Options:
+- Language filtering: Can load specific languages or all
+- License filtering: Can load specific licenses or all
+- Streaming support: Can stream data without loading entire dataset
+- Batch processing: 10,000 records per batch during iteration
+
+Technical Implementation:
+- Uses PyArrow for efficient Parquet handling
+- Supports multiprocessing for preprocessing
+- HuggingFace datasets integration
+- Git LFS for large file storage
+- Configurable builder patterns for different subsets

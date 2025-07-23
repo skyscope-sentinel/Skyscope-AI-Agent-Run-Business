@@ -1,0 +1,2 @@
+stdout: ✅ Created OpenWebUI integration module
+

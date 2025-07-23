@@ -1,0 +1,6 @@
+SyntaxError:invalid decimal literal (805583316.py, line 255)
+  Cell In[13], line 255
+    body {{ font-family: Arial, sans-serif; margin: 0; padding: 20px; }}
+                                                                 ^
+SyntaxError: invalid decimal literal
+

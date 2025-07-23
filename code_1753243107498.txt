@@ -1,0 +1,2 @@
+stdout: ✅ Created MacOS-Use integration module
+
