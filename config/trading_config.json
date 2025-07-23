@@ -1,0 +1,29 @@
+{
+  "trading_enabled": false,
+  "exchanges": {
+    "binance": {
+      "api_key": "YOUR_BINANCE_API_KEY",
+      "api_secret": "YOUR_BINANCE_SECRET_KEY",
+      "sandbox": true,
+      "enabled": false
+    },
+    "coinbase": {
+      "api_key": "YOUR_COINBASE_API_KEY",
+      "api_secret": "YOUR_COINBASE_SECRET_KEY",
+      "passphrase": "YOUR_COINBASE_PASSPHRASE",
+      "sandbox": true,
+      "enabled": false
+    }
+  },
+  "trading_pairs": [
+    "BTC/USDT",
+    "ETH/USDT",
+    "BNB/USDT"
+  ],
+  "risk_management": {
+    "max_position_size": 0.1,
+    "stop_loss_percentage": 0.02,
+    "take_profit_percentage": 0.05,
+    "max_daily_trades": 50
+  }
+}

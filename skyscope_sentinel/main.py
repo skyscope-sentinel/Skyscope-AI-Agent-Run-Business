@@ -4,7 +4,6 @@ from PySide6.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QStackedWidget, QFrame, QStatusBar, QSystemTrayIcon, QMenu, QGridLayout, QSizePolicy,
     QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit, QMessageBox
-    QListWidget, QGroupBox, QComboBox, QTextEdit, QLineEdit, QMessageBox # Added QMessageBox
 )
 from PySide6.QtCore import Qt, QSize, QFile, QTextStream, Slot
 from PySide6.QtGui import QColor, QPalette, QIcon, QAction, QFont
@@ -13,6 +12,7 @@ from .model_hub_page import ModelHubPage
 from .settings_page import SettingsPage, SETTING_THEME, SETTING_ACRYLIC_EFFECT, SETTING_AUTOSTART, SETTING_MINIMIZE_TO_TRAY
 from .settings_manager import SettingsManager
 from .video_agent_page import VideoAgentPage
+from .agent_control_page import AgentControlPage
 
 
 def load_stylesheet(filename):
@@ -39,7 +39,7 @@ from .swarms_integration.opportunity_scouting_swarm import run_opportunity_scout
 from .swarms_integration.content_generation_swarm import run_content_generation_swarm
 import asyncio
 from PySide6.QtCore import QThread, Signal
-from .config import Config
+from config import Config
 
 global_config = Config()
 
@@ -208,18 +208,6 @@ class ResearchTaskPage(QWidget):
         result_str = str(result)
         if self.current_mode == "Swarm Opportunity Scouting" and \
            result_str and (result_str.startswith("workspace/") or result_str.startswith("./workspace/")) and \
-        self.async_thread.task_completed.connect(self.on_task_completed) # Renamed slot
-        self.async_thread.task_failed.connect(self.on_task_failed)       # Renamed slot
-        self.async_thread.start()
-        self.status_message_requested.emit(f"{target_function_name} task started for topic '{topic if topic else 'auto-generated'}'.", "info", 0)
-
-
-    @Slot(object)
-    def on_task_completed(self, result): # Renamed from on_research_completed
-        result_str = str(result)
-        # Use self.current_mode to check which task was run
-        if self.current_mode == "Swarm Opportunity Scouting" and \
-           (result_str.startswith("workspace/") or result_str.startswith("./workspace/")) and \
            result_str.endswith(".md"):
             try:
                 with open(result_str, "r", encoding="utf-8") as f:
@@ -229,13 +217,11 @@ class ResearchTaskPage(QWidget):
             except FileNotFoundError:
                 self.results_display.setText(f"Error: Report file not found at {result_str}")
                 self.status_message_requested.emit(f"Report file not found: {result_str}", "error", 7000)
-                self.status_message_requested.emit(f"Report loaded: {result_str}", "success", 5000)
             except Exception as e:
                 self.results_display.setText(f"Successfully generated report at: {result_str}\n\nError reading/rendering report: {e}")
                 self.status_message_requested.emit(f"Error displaying report {result_str}: {e}", "error", 7000)
         else:
             self.results_display.setText(result_str)
-            self.results_display.setText(result_str) # For CrewAI results or other messages
             self.status_message_requested.emit("Task completed successfully.", "success", 5000)
 
         self.run_button.setEnabled(True)
@@ -397,19 +383,8 @@ class ContentStudioPage(QWidget):
         self.status_message_requested.emit(f"Content generation failed: {error_message}", "error", 7000)
         QMessageBox.critical(self, "Content Generation Failed", f"An error occurred:\n{error_message}")
         self.async_thread = None
- feat/foundational-agent-system
-# AIAgent Class Definition
-class AIAgent:
-    def __init__(self, name: str, agent_type: str, status: str = "Offline", config: dict = None):
-        self.name = name
-        self.type = agent_type
-        self.status = status
-        self.config = config if config else {}
-        # Store a unique ID if needed, for now name is unique identifier
-        # self.id = str(uuid.uuid4())
-
     @Slot(str)
-    def on_task_failed(self, error_message): # Renamed from on_research_failed
+    def on_task_failed(self, error_message):
         self.results_display.append(f"\n\n--- ERROR ---\n{error_message}")
         self.run_button.setEnabled(True)
         self.status_message_requested.emit(f"Task failed: {error_message}", "error", 7000)
@@ -735,7 +710,6 @@ class PlaceholderPage(QWidget):
                 list_item = self.agent_list_widget.item(self.agent_list_widget.count() - 1)
                 list_item.setData(Qt.UserRole, agent_instance) # Store the actual agent object
 
- main
             # Agent Actions Section
             actions_layout = QHBoxLayout()
             self.btn_start_agent = QPushButton(QIcon.fromTheme("media-playback-start"), "Start Selected"); self.btn_start_agent.setToolTip("Start the selected agent."); self.btn_start_agent.setEnabled(False); self.btn_start_agent.clicked.connect(self.start_selected_agent); actions_layout.addWidget(self.btn_start_agent)
@@ -1030,31 +1004,6 @@ class MainWindow(QMainWindow):
         app_title_label = QLabel("Skyscope Sentinel"); app_title_label.setAlignment(Qt.AlignCenter); app_title_label.setStyleSheet("font-size: 18px; font-weight: bold; padding-bottom: 10px; margin-top: 5px;"); self.sidebar_layout.addWidget(app_title_label)
         icon_map = {"Dashboard": "view-dashboard", "Opportunity Research": "system-search", "Content Studio": "document-edit", "Agent Control": "applications-system", "Video Tools": "applications-multimedia", "Model Hub": "drive-harddisk", "Log Stream": "document-view", "Settings": "preferences-configure"}
         tooltips = {"Dashboard": "View system overview and key metrics", "Opportunity Research": "Run AI agents to research market opportunities", "Content Studio": "Generate content using AI swarms", "Agent Control": "Manage and configure AI agents", "Video Tools": "Access video processing utilities", "Model Hub": "Explore and manage Ollama models", "Log Stream": "Monitor real-time application and agent logs", "Settings": "Configure application settings"}
-        for section_name in self.sections:
-            button = QPushButton(section_name); button.setIcon(QIcon.fromTheme(icon_map.get(section_name, "application-default-icon"))); button.setToolTip(tooltips.get(section_name, f"Navigate to {section_name}")); button.setCheckable(True); button.clicked.connect(lambda checked, name=section_name: self.switch_page(name)); self.sidebar_layout.addWidget(button); self.nav_buttons[section_name] = button
-            if section_name == "Model Hub": self.model_hub_page = ModelHubPage(); self.model_hub_page.status_message_requested.connect(self.show_status_message); self.content_area.addWidget(self.model_hub_page)
-            elif section_name == "Settings": self.settings_page = SettingsPage(); self.settings_page.status_message_requested.connect(self.show_status_message); self.settings_page.theme_change_requested.connect(self.apply_theme_by_name); self.settings_page.acrylic_effect_requested.connect(self.apply_acrylic_effect); self.settings_page.tray_icon_visibility_requested.connect(self.set_tray_icon_visibility); self.content_area.addWidget(self.settings_page)
-            elif section_name == "Video Tools": self.video_agent_page = VideoAgentPage(); self.video_agent_page.status_message_requested.connect(self.show_status_message); self.content_area.addWidget(self.video_agent_page)
-            elif section_name == "Opportunity Research": self.research_task_page = ResearchTaskPage(); self.research_task_page.status_message_requested.connect(self.show_status_message_slot); self.content_area.addWidget(self.research_task_page)
-            elif section_name == "Content Studio": self.content_studio_page = ContentStudioPage(); self.content_studio_page.status_message_requested.connect(self.show_status_message_slot); self.content_area.addWidget(self.content_studio_page)
-            else: self.content_area.addWidget(PlaceholderPage(section_name))
-        self.sidebar_layout.addStretch()
-        founder_label = QLabel("Founded by: Miss Casey Jay Topojani"); founder_label.setAlignment(Qt.AlignCenter); founder_label.setStyleSheet("font-size: 10px; color: #999999; padding-top: 10px;"); self.sidebar_layout.addWidget(founder_label)
-        contact_label = QLabel("Contact: admin@skyscope.cloud"); contact_label.setAlignment(Qt.AlignCenter); contact_label.setStyleSheet("font-size: 10px; color: #999999; padding-bottom: 5px;"); self.sidebar_layout.addWidget(contact_label)
-        self.theme_button = QPushButton("Toggle Theme"); self.theme_button.setIcon(QIcon.fromTheme("preferences-desktop-theme")); self.theme_button.setToolTip("Quickly switch between dark and light themes."); self.theme_button.clicked.connect(self.toggle_theme_directly); self.sidebar_layout.addWidget(self.theme_button)
-        self.status_bar = QStatusBar(); self.setStatusBar(self.status_bar); self.show_status_message("Welcome to Skyscope Sentinel!", "info", 5000)
-        self.load_initial_settings()
-        if hasattr(self, 'settings_manager') and self.settings_manager: global_config.update_from_settings_manager(self.settings_manager)
-        if global_config.get_serper_api_key(): os.environ["SERPER_API_KEY"] = global_config.get_serper_api_key()
-        if global_config.get_openai_api_key(): os.environ["OPENAI_API_KEY"] = global_config.get_openai_api_key()
-        for section_name in self.sections:
-            button = QPushButton(section_name); button.setIcon(QIcon.fromTheme(icon_map.get(section_name, "application-default-icon"))); button.setToolTip(tooltips.get(section_name, f"Navigate to {section_name}")); button.setCheckable(True); button.clicked.connect(lambda checked, name=section_name: self.switch_page(name)); self.sidebar_layout.addWidget(button); self.nav_buttons[section_name] = button
-            if section_name == "Model Hub": self.model_hub_page = ModelHubPage(); self.model_hub_page.status_message_requested.connect(self.show_status_message); self.content_area.addWidget(self.model_hub_page)
-            elif section_name == "Settings": self.settings_page = SettingsPage(); self.settings_page.status_message_requested.connect(self.show_status_message); self.settings_page.theme_change_requested.connect(self.apply_theme_by_name); self.settings_page.acrylic_effect_requested.connect(self.apply_acrylic_effect); self.settings_page.tray_icon_visibility_requested.connect(self.set_tray_icon_visibility); self.content_area.addWidget(self.settings_page)
-            elif section_name == "Video Tools": self.video_agent_page = VideoAgentPage(); self.video_agent_page.status_message_requested.connect(self.show_status_message); self.content_area.addWidget(self.video_agent_page)
-            elif section_name == "Opportunity Research": self.research_task_page = ResearchTaskPage(); self.research_task_page.status_message_requested.connect(self.show_status_message_slot); self.content_area.addWidget(self.research_task_page)
-            elif section_name == "Content Studio": self.content_studio_page = ContentStudioPage(); self.content_studio_page.status_message_requested.connect(self.show_status_message_slot); self.content_area.addWidget(self.content_studio_page)
-            else: self.content_area.addWidget(PlaceholderPage(section_name))
         self.sidebar_layout.addStretch()
         founder_label = QLabel("Founded by: Miss Casey Jay Topojani"); founder_label.setAlignment(Qt.AlignCenter); founder_label.setStyleSheet("font-size: 10px; color: #999999; padding-top: 10px;"); self.sidebar_layout.addWidget(founder_label)
         contact_label = QLabel("Contact: admin@skyscope.cloud"); contact_label.setAlignment(Qt.AlignCenter); contact_label.setStyleSheet("font-size: 10px; color: #999999; padding-bottom: 5px;"); self.sidebar_layout.addWidget(contact_label)
@@ -1250,6 +1199,7 @@ class MainWindow(QMainWindow):
                (section_name == "Video Tools" and isinstance(widget, VideoAgentPage)) or \
                (section_name == "Opportunity Research" and isinstance(widget, ResearchTaskPage)) or \
                (section_name == "Content Studio" and isinstance(widget, ContentStudioPage)) or \
+               (section_name == "Agent Control" and isinstance(widget, AgentControlPage)) or \
                (isinstance(widget, PlaceholderPage) and self.sections[i] == section_name) : # Relies on order for Placeholders
                 self.content_area.setCurrentIndex(i); page_found = True
                 if isinstance(widget, PlaceholderPage) and hasattr(widget, 'label') and section_name not in ["Agent Control", "Log Stream", "Dashboard"]: widget.label.setText(f"Welcome to the {section_name} Page")

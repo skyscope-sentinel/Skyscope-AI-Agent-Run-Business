@@ -1,0 +1,61 @@
+{
+  "core_dependencies": {
+    "sys": true,
+    "os": true,
+    "json": true,
+    "threading": true,
+    "queue": true,
+    "datetime": true,
+    "pathlib": true,
+    "logging": true
+  },
+  "gui_framework": {
+    "PyQt6.QtWidgets": false,
+    "PyQt6.QtCore": false,
+    "PyQt6.QtGui": false,
+    "PyQt6.QtCharts": false,
+    "psutil": false,
+    "app_creation": false
+  },
+  "business_modules": {
+    "main_application.py": true,
+    "autonomous_orchestrator.py": true,
+    "autonomous_business_operations.py": true,
+    "income_generator.py": true,
+    "crypto_manager.py": true,
+    "agent_manager.py": true
+  },
+  "ai_libraries": {
+    "numpy": false,
+    "pandas": false,
+    "matplotlib": false,
+    "requests": false,
+    "cryptography": false,
+    "openai_optional": false,
+    "anthropic_optional": false,
+    "transformers_optional": false,
+    "torch_optional": false,
+    "tensorflow_optional": false
+  },
+  "crypto_libraries": {
+    "ccxt": false,
+    "web3": false,
+    "hashlib": true,
+    "base64": true,
+    "binance_optional": false,
+    "yfinance_optional": false,
+    "ta_optional": false
+  },
+  "system_files": {
+    "START_SYSTEM.sh": true,
+    "BUILD_MACOS_APP.sh": true,
+    "COMPLETE_SYSTEM_SETUP.sh": true,
+    "requirements_complete.txt": true,
+    "README.md": true,
+    "logs": true,
+    "config": true,
+    "data": true
+  },
+  "configuration": {},
+  "overall_status": "poor"
+}

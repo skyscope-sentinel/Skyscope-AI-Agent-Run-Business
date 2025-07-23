@@ -1,0 +1,11 @@
+([('Skyscope Enterprise Suite',
+   '/Users/admin.skyscope.cloud/Documents/GitHub/Skyscope-AI-Agent-Run-Business/build/Skyscope '
+   'Enterprise Suite/Skyscope Enterprise Suite',
+   'EXECUTABLE'),
+  ('libpython3.12.dylib',
+   '/Users/admin.skyscope.cloud/.local/share/uv/python/cpython-3.12.7-macos-x86_64-none/lib/libpython3.12.dylib',
+   'BINARY'),
+  ('base_library.zip',
+   '/Users/admin.skyscope.cloud/Documents/GitHub/Skyscope-AI-Agent-Run-Business/build/Skyscope '
+   'Enterprise Suite/base_library.zip',
+   'DATA')],)
