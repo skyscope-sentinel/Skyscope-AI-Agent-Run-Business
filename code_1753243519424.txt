@@ -1,0 +1,27 @@
+FileNotFoundError:[Errno 2] No such file or directory: '/home/user/swarm_orchestrator.py'
+---------------------------------------------------------------------------FileNotFoundError                         Traceback (most recent call last)Cell In[9], line 3
+      1 # Store all the enhanced code modules in the variable storage
+      2 enhanced_code_modules = {
+----> 3     "swarm_orchestrator.py": open('/home/user/swarm_orchestrator.py', 'r').read(),
+      4     "ollama_integration_enhanced.py": open('/home/user/ollama_integration_enhanced.py', 'r').read(),
+      5     "supervisor_agent.py": open('/home/user/supervisor_agent.py', 'r').read(),
+      6     "research_development_agent.py": open('/home/user/research_development_agent.py', 'r').read(),
+      7     "creative_content_agent.py": open('/home/user/creative_content_agent.py', 'r').read(),
+      8     "freelance_operations_agent.py": open('/home/user/freelance_operations_agent.py', 'r').read(),
+      9     "web_deployment_agent.py": open('/home/user/web_deployment_agent.py', 'r').read()
+     10 }
+     12 # Create the complete enhanced framework package
+     13 framework_package = {
+     14     "framework_info": {
+     15         "name": "Enhanced Multi-Agent Swarm Framework for Business Automation",
+   (...)     35     "creation_date": "2024-01-22"
+     36 }
+File /usr/local/lib/python3.12/site-packages/IPython/core/interactiveshell.py:326, in _modified_open(file, *args, **kwargs)
+    319 if file in {0, 1, 2}:
+    320     raise ValueError(
+    321         f"IPython won't let you open fd={file} by default "
+    322         "as it is likely to crash IPython. If you know what you are doing, "
+    323         "you can use builtins' open."
+    324     )
+--> 326 return io_open(file, *args, **kwargs)
+FileNotFoundError: [Errno 2] No such file or directory: '/home/user/swarm_orchestrator.py'

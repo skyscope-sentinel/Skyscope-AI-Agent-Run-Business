@@ -1,0 +1,469 @@
+# Skyscope AI Agent Business Automation System
+# Main Configuration Template
+# Copy this file to config.yaml and customize for your environment
+
+# ==============================================================================
+# SYSTEM CONFIGURATION
+# ==============================================================================
+system:
+  name: "Skyscope AI Business System"
+  version: "1.0.0"
+  environment: "production"  # Options: development, staging, production
+  platform: "macos"  # Options: macos, linux, windows
+  architecture: "apple_silicon"  # Options: apple_silicon, intel, amd64
+  timezone: "UTC"
+  locale: "en_US"
+  
+  # System paths
+  paths:
+    data_directory: "./data"
+    logs_directory: "./logs"
+    config_directory: "./config"
+    models_directory: "./models"
+    backups_directory: "./backups"
+    temp_directory: "./temp"
+
+# ==============================================================================
+# OLLAMA CONFIGURATION
+# ==============================================================================
+ollama:
+  # Connection settings
+  base_url: "http://localhost:11434"
+  api_timeout: 300  # seconds
+  max_retries: 3
+  retry_delay: 5  # seconds
+  
+  # Model configuration
+  models:
+    primary: "llama2:13b"        # Main general-purpose model
+    coding: "codellama:13b"      # Code generation and analysis
+    analysis: "mistral:7b"       # Fast analysis and reasoning
+    creative: "vicuna:13b"       # Creative content generation
+    conversation: "llama2:7b"    # Lightweight conversation model
+    
+  # Performance settings
+  gpu_acceleration: true
+  metal_support: true              # macOS Metal GPU support
+  gpu_layers: 35                   # Number of layers to offload to GPU
+  gpu_memory_fraction: 0.8         # Fraction of GPU memory to use
+  max_concurrent_requests: 4       # Maximum concurrent model requests
+  context_window: 4096             # Context window size
+  
+  # Model management
+  auto_download: true              # Automatically download missing models
+  model_cache_size: "8GB"          # Model cache size
+  preload_models: true             # Preload models at startup
+  model_update_check: "weekly"     # Check for model updates
+
+# ==============================================================================
+# ORCHESTRATION CONFIGURATION
+# ==============================================================================
+orchestration:
+  # Default orchestration mode
+  default_mode: "HIERARCHICAL"    # Options: HIERARCHICAL, COLLABORATIVE, SEQUENTIAL, PARALLEL, SWARM_INTELLIGENCE, CONSENSUS
+  
+  # Performance settings
+  max_concurrent_agents: 8         # Maximum concurrent agents
+  max_concurrent_tasks: 16         # Maximum concurrent tasks per agent
+  task_timeout: 3600               # Task timeout in seconds (1 hour)
+  retry_attempts: 3                # Number of retry attempts for failed tasks
+  retry_delay: 10                  # Delay between retry attempts
+  
+  # Communication settings
+  message_queue_size: 1000         # Message queue size per agent
+  heartbeat_interval: 30           # Heartbeat interval in seconds
+  communication_timeout: 60        # Communication timeout in seconds
+  
+  # Load balancing
+  load_balancing: true             # Enable load balancing
+  load_balancing_algorithm: "round_robin"  # Options: round_robin, least_connections, weighted
+  health_check_interval: 60        # Health check interval in seconds
+  
+  # Fault tolerance
+  fault_tolerance: true            # Enable fault tolerance
+  failure_threshold: 3             # Number of failures before agent isolation
+  recovery_timeout: 300            # Recovery timeout in seconds
+
+# ==============================================================================
+# AGENT CONFIGURATION
+# ==============================================================================
+agents:
+  # Supervisor Agent
+  supervisor:
+    enabled: true
+    learning_rate: 0.1             # Learning rate for continuous improvement
+    performance_threshold: 0.8     # Performance threshold for optimization
+    crisis_detection_sensitivity: 0.7  # Crisis detection sensitivity
+    optimization_interval: 300     # Optimization interval in seconds
+    max_concurrent_supervisions: 5  # Maximum concurrent supervisions
+    
+  # Research & Development Agent
+  research:
+    enabled: true
+    max_concurrent_sources: 10     # Maximum concurrent research sources
+    research_timeout: 1800         # Research timeout in seconds (30 minutes)
+    max_results_per_source: 100    # Maximum results per research source
+    cache_results: true            # Cache research results
+    cache_duration: 86400          # Cache duration in seconds (24 hours)
+    
+    # Research sources
+    sources:
+      web_search: true
+      academic_papers: true
+      patent_databases: true
+      news_sources: true
+      social_media: true
+      industry_reports: true
+      
+    # API keys for research sources (set as environment variables)
+    api_keys:
+      google_search: "${GOOGLE_SEARCH_API_KEY}"
+      bing_search: "${BING_SEARCH_API_KEY}"
+      arxiv: "${ARXIV_API_KEY}"
+      patent_api: "${PATENT_API_KEY}"
+      news_api: "${NEWS_API_KEY}"
+      social_api: "${SOCIAL_API_KEY}"
+  
+  # Creative Content Agent
+  content:
+    enabled: true
+    max_concurrent_generation: 5   # Maximum concurrent content generation
+    content_cache: true            # Cache generated content
+    seo_optimization: true         # Enable SEO optimization
+    brand_consistency_check: true  # Check brand consistency
+    
+    # Supported platforms
+    platforms:
+      - "linkedin"
+      - "twitter"
+      - "instagram"
+      - "facebook"
+      - "tiktok"
+      - "youtube"
+      - "medium"
+      - "substack"
+      
+    # Content types
+    content_types:
+      - "blog_post"
+      - "social_media"
+      - "email_campaign"
+      - "video_script"
+      - "podcast_script"
+      - "marketing_copy"
+      - "technical_documentation"
+      - "press_release"
+      
+    # Quality settings
+    quality_threshold: 0.8         # Quality threshold for content
+    plagiarism_check: true         # Check for plagiarism
+    fact_checking: true            # Enable fact checking
+    
+  # Freelance Operations Agent
+  freelance:
+    enabled: true
+    crm_integration: true          # Enable CRM integration
+    auto_invoicing: true           # Enable automatic invoicing
+    time_tracking: true            # Enable time tracking
+    portfolio_updates: true        # Enable portfolio updates
+    client_communication: true     # Enable client communication
+    
+    # Business settings
+    hourly_rate: 100               # Default hourly rate
+    currency: "USD"                # Default currency
+    payment_terms: "net_30"        # Payment terms
+    tax_rate: 0.25                 # Tax rate
+    
+    # Automation settings
+    lead_generation: true          # Enable lead generation
+    proposal_automation: true      # Enable proposal automation
+    contract_management: true      # Enable contract management
+    project_tracking: true         # Enable project tracking
+    
+  # Web Deployment Agent
+  deployment:
+    enabled: true
+    auto_scaling: true             # Enable auto-scaling
+    performance_monitoring: true   # Enable performance monitoring
+    ssl_auto_config: true          # Enable SSL auto-configuration
+    backup_before_deploy: true     # Backup before deployment
+    
+    # Supported platforms
+    platforms:
+      - "vercel"
+      - "netlify"
+      - "aws"
+      - "heroku"
+      - "digitalocean"
+      - "gcp"
+      - "azure"
+      - "github_pages"
+      - "cloudflare_pages"
+      - "railway"
+      
+    # Deployment settings
+    build_timeout: 600             # Build timeout in seconds (10 minutes)
+    deployment_timeout: 1800       # Deployment timeout in seconds (30 minutes)
+    health_check_retries: 5        # Health check retries
+    rollback_on_failure: true      # Rollback on deployment failure
+
+# ==============================================================================
+# SECURITY CONFIGURATION
+# ==============================================================================
+security:
+  # API security
+  api_key_encryption: true        # Encrypt API keys
+  jwt_secret: "${JWT_SECRET}"     # JWT secret key
+  jwt_expiration: 86400           # JWT expiration in seconds (24 hours)
+  
+  # Data encryption
+  data_encryption: true           # Enable data encryption
+  encryption_algorithm: "AES-256-GCM"  # Encryption algorithm
+  encryption_key: "${ENCRYPTION_KEY}"   # Encryption key
+  
+  # Access control
+  role_based_access: true         # Enable role-based access control
+  session_timeout: 3600           # Session timeout in seconds (1 hour)
+  max_login_attempts: 5           # Maximum login attempts
+  lockout_duration: 1800          # Lockout duration in seconds (30 minutes)
+  
+  # Audit logging
+  audit_logging: true             # Enable audit logging
+  log_retention: 2592000          # Log retention in seconds (30 days)
+  log_encryption: true            # Encrypt logs
+  
+  # Network security
+  rate_limiting: true             # Enable rate limiting
+  max_requests_per_minute: 100    # Maximum requests per minute
+  ip_whitelist: []                # IP whitelist (empty = allow all)
+  ip_blacklist: []                # IP blacklist
+
+# ==============================================================================
+# PERFORMANCE CONFIGURATION
+# ==============================================================================
+performance:
+  # Caching
+  cache_enabled: true             # Enable caching
+  cache_type: "redis"             # Cache type: memory, redis, memcached
+  cache_size: "2GB"               # Cache size
+  cache_ttl: 3600                 # Cache TTL in seconds (1 hour)
+  
+  # Database
+  database_pooling: true          # Enable database connection pooling
+  database_pool_size: 10          # Database pool size
+  database_timeout: 30            # Database timeout in seconds
+  
+  # Async processing
+  async_processing: true          # Enable asynchronous processing
+  thread_pool_size: 16            # Thread pool size
+  process_pool_size: 4            # Process pool size
+  
+  # Monitoring
+  monitoring_enabled: true        # Enable performance monitoring
+  monitoring_interval: 60         # Monitoring interval in seconds
+  metrics_retention: 604800       # Metrics retention in seconds (7 days)
+  
+  # Platform-specific optimizations
+  apple_silicon_optimizations: true    # Enable Apple Silicon optimizations
+  intel_optimizations: false           # Enable Intel optimizations
+  unified_memory_optimization: true    # Enable unified memory optimization
+  memory_pressure_handling: true       # Enable memory pressure handling
+
+# ==============================================================================
+# INTEGRATIONS CONFIGURATION
+# ==============================================================================
+integrations:
+  # OpenAI API
+  openai:
+    enabled: false               # Enable OpenAI integration
+    api_key: "${OPENAI_API_KEY}" # OpenAI API key
+    model: "gpt-4"               # Default OpenAI model
+    max_tokens: 2000             # Maximum tokens per request
+    
+  # Anthropic Claude
+  anthropic:
+    enabled: false               # Enable Anthropic integration
+    api_key: "${ANTHROPIC_API_KEY}" # Anthropic API key
+    model: "claude-3-opus"       # Default Anthropic model
+    max_tokens: 2000             # Maximum tokens per request
+    
+  # Slack
+  slack:
+    enabled: false               # Enable Slack integration
+    bot_token: "${SLACK_BOT_TOKEN}"     # Slack bot token
+    signing_secret: "${SLACK_SIGNING_SECRET}"  # Slack signing secret
+    default_channel: "#general"  # Default channel
+    
+  # Discord
+  discord:
+    enabled: false               # Enable Discord integration
+    bot_token: "${DISCORD_BOT_TOKEN}"   # Discord bot token
+    guild_id: "${DISCORD_GUILD_ID}"     # Discord guild ID
+    
+  # Telegram
+  telegram:
+    enabled: false               # Enable Telegram integration
+    bot_token: "${TELEGRAM_BOT_TOKEN}"  # Telegram bot token
+    
+  # Email
+  email:
+    enabled: false               # Enable email integration
+    smtp_server: "smtp.gmail.com"       # SMTP server
+    smtp_port: 587               # SMTP port
+    smtp_username: "${EMAIL_USERNAME}"  # SMTP username
+    smtp_password: "${EMAIL_PASSWORD}"  # SMTP password
+    
+  # Calendar
+  calendar:
+    enabled: false               # Enable calendar integration
+    provider: "google"           # Calendar provider
+    api_key: "${CALENDAR_API_KEY}"      # Calendar API key
+    
+  # CRM
+  crm:
+    enabled: false               # Enable CRM integration
+    provider: "salesforce"       # CRM provider
+    api_key: "${CRM_API_KEY}"    # CRM API key
+    
+  # Analytics
+  analytics:
+    enabled: false               # Enable analytics integration
+    provider: "google_analytics" # Analytics provider
+    tracking_id: "${GA_TRACKING_ID}"    # Tracking ID
+
+# ==============================================================================
+# LOGGING CONFIGURATION
+# ==============================================================================
+logging:
+  # Log levels
+  level: "INFO"                  # Options: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  # Log files
+  file_logging: true             # Enable file logging
+  log_file: "logs/skyscope.log"  # Log file path
+  max_file_size: "10MB"          # Maximum log file size
+  backup_count: 5                # Number of backup files
+  
+  # Console logging
+  console_logging: true          # Enable console logging
+  console_level: "INFO"          # Console log level
+  
+  # Structured logging
+  structured_logging: true       # Enable structured logging
+  log_format: "json"             # Log format: text, json
+  
+  # Log rotation
+  rotation: "daily"              # Rotation: daily, weekly, monthly
+  retention_days: 30             # Log retention in days
+  
+  # Specific logger settings
+  loggers:
+    orchestrator: "INFO"
+    agents: "INFO"
+    performance: "DEBUG"
+    security: "WARNING"
+    integrations: "INFO"
+
+# ==============================================================================
+# BACKUP CONFIGURATION
+# ==============================================================================
+backup:
+  # Backup settings
+  enabled: true                  # Enable backups
+  schedule: "daily"              # Backup schedule: hourly, daily, weekly
+  retention: 30                  # Backup retention in days
+  compression: true              # Enable backup compression
+  
+  # Backup locations
+  local_backup: true             # Enable local backups
+  local_path: "./backups"        # Local backup path
+  
+  cloud_backup: false            # Enable cloud backups
+  cloud_provider: "aws_s3"       # Cloud provider: aws_s3, gcp_storage, azure_blob
+  cloud_bucket: "${BACKUP_BUCKET}"        # Cloud bucket name
+  
+  # Backup contents
+  backup_config: true            # Backup configuration files
+  backup_data: true              # Backup data files
+  backup_logs: false             # Backup log files
+  backup_models: false           # Backup AI models (large files)
+
+# ==============================================================================
+# NOTIFICATIONS CONFIGURATION
+# ==============================================================================
+notifications:
+  # Notification settings
+  enabled: true                  # Enable notifications
+  
+  # Notification types
+  system_alerts: true            # System alerts
+  performance_warnings: true     # Performance warnings
+  task_completions: false        # Task completion notifications
+  error_notifications: true      # Error notifications
+  
+  # Notification channels
+  channels:
+    email: false                 # Email notifications
+    slack: false                 # Slack notifications
+    discord: false               # Discord notifications
+    telegram: false              # Telegram notifications
+    webhook: false               # Webhook notifications
+    
+  # Notification thresholds
+  thresholds:
+    cpu_usage: 80                # CPU usage threshold (%)
+    memory_usage: 85             # Memory usage threshold (%)
+    disk_usage: 90               # Disk usage threshold (%)
+    error_rate: 5                # Error rate threshold (%)
+    response_time: 5000          # Response time threshold (ms)
+
+# ==============================================================================
+# DEVELOPMENT CONFIGURATION
+# ==============================================================================
+development:
+  # Development mode
+  debug: false                   # Enable debug mode
+  hot_reload: false              # Enable hot reload
+  auto_restart: false            # Enable auto restart
+  
+  # Testing
+  testing_enabled: false         # Enable testing features
+  mock_external_apis: false      # Mock external APIs
+  test_data_generation: false    # Generate test data
+  
+  # Profiling
+  profiling_enabled: false       # Enable profiling
+  profiling_interval: 300        # Profiling interval in seconds
+  
+  # Development tools
+  enable_cors: true              # Enable CORS for development
+  api_docs: true                 # Enable API documentation
+  swagger_ui: true               # Enable Swagger UI
+
+# ==============================================================================
+# ADVANCED CONFIGURATION
+# ==============================================================================
+advanced:
+  # Experimental features
+  experimental_features: false   # Enable experimental features
+  beta_features: false           # Enable beta features
+  
+  # Custom plugins
+  plugins_enabled: false         # Enable custom plugins
+  plugins_directory: "./plugins" # Plugins directory
+  
+  # External models
+  external_models: false         # Enable external model integration
+  model_api_endpoint: ""         # External model API endpoint
+  
+  # Advanced analytics
+  advanced_analytics: false      # Enable advanced analytics
+  ml_optimization: false         # Enable ML-based optimization
+  
+  # Clustering
+  clustering_enabled: false      # Enable clustering
+  cluster_nodes: []              # Cluster nodes
+  
+  # Custom configurations
+  custom_config: {}              # Custom configuration options
