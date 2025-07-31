@@ -1,6 +1,0 @@
-stdout: ✅ ParquetCodeIndexer created
-📊 Database: /home/user/skyscope_rag/indexes/code_index.db
-🔧 Schema initialized with FTS5 and chunk support
-
-stderr: 2025-07-22 11:37:51,574 - INFO - Database initialized: /home/user/skyscope_rag/indexes/code_index.db
-

@@ -1,8 +1,0 @@
-stdout: ✅ Advanced Search Engine created
-🔍 Features:
-  • FTS5 keyword search with filters
-  • Semantic search with embeddings
-  • Hybrid search combining both
-  • Language and license filtering
-  • Similarity thresholding
-

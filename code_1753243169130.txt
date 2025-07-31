@@ -1,4 +1,0 @@
-stdout: ✅ Created executable scripts:
-  📜 /home/user/skyscope_rag/scripts/main.py - Main system interface
-  🔧 /home/user/skyscope_rag/scripts/setup.py - Setup and installation
-

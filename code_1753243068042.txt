@@ -1,6 +1,0 @@
-SyntaxError:invalid character '🚀' (U+1F680) (2572606514.py, line 201)
-  Cell In[19], line 201
-    <h1>🚀 Skyscope RAG System</h1>
-        ^
-SyntaxError: invalid character '🚀' (U+1F680)
-

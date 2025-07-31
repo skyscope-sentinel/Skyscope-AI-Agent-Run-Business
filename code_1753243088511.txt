@@ -1,2 +1,0 @@
-stdout: ✅ Created Bolt.diy integration module
-

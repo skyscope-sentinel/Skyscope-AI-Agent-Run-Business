@@ -1,9 +1,0 @@
-stdout: ✅ Creative Content Agent created
-📁 File saved: /home/user/creative_content_agent.py
-📊 Lines of code: 1101
-
-stderr: <>:860: SyntaxWarning: invalid escape sequence '\s'
-<>:860: SyntaxWarning: invalid escape sequence '\s'
-/tmp/ipykernel_473/1694678398.py:860: SyntaxWarning: invalid escape sequence '\s'
-  headers = re.findall(r'^#+\s+(.+)$', content, re.MULTILINE)
-

@@ -1,2 +1,0 @@
-stdout: ✅ Created Devika integration module
-

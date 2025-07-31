@@ -1,3 +1,0 @@
-stdout: ✅ Config created: /home/user/skyscope_rag/config/config.json
-📋 Basic system ready
-

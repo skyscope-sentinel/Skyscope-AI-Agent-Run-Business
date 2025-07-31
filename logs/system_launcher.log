@@ -1,0 +1,20 @@
+2025-07-31 13:42:28,297 - SystemLauncher - INFO - System Launcher initialized
+2025-07-31 13:42:28,297 - SystemLauncher - INFO - Installing required dependencies...
+2025-07-31 13:42:29,133 - SystemLauncher - WARNING - Failed to install web3>=6.0.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'web3>=6.0.0']' returned non-zero exit status 1.
+2025-07-31 13:42:29,688 - SystemLauncher - WARNING - Failed to install eth-account>=0.8.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'eth-account>=0.8.0']' returned non-zero exit status 1.
+2025-07-31 13:42:30,437 - SystemLauncher - WARNING - Failed to install ccxt>=4.0.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'ccxt>=4.0.0']' returned non-zero exit status 1.
+2025-07-31 13:42:31,087 - SystemLauncher - WARNING - Failed to install mnemonic>=0.20: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'mnemonic>=0.20']' returned non-zero exit status 1.
+2025-07-31 13:42:31,699 - SystemLauncher - WARNING - Failed to install streamlit>=1.28.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'streamlit>=1.28.0']' returned non-zero exit status 1.
+2025-07-31 13:42:32,230 - SystemLauncher - WARNING - Failed to install plotly>=5.15.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'plotly>=5.15.0']' returned non-zero exit status 1.
+2025-07-31 13:42:32,719 - SystemLauncher - WARNING - Failed to install pandas>=2.0.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'pandas>=2.0.0']' returned non-zero exit status 1.
+2025-07-31 13:42:33,271 - SystemLauncher - WARNING - Failed to install numpy>=1.24.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'numpy>=1.24.0']' returned non-zero exit status 1.
+2025-07-31 13:42:33,894 - SystemLauncher - WARNING - Failed to install scikit-learn>=1.3.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'scikit-learn>=1.3.0']' returned non-zero exit status 1.
+2025-07-31 13:42:34,467 - SystemLauncher - WARNING - Failed to install requests>=2.31.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'requests>=2.31.0']' returned non-zero exit status 1.
+2025-07-31 13:42:34,937 - SystemLauncher - WARNING - Failed to install schedule>=1.2.0: Command '['/usr/local/opt/python@3.13/bin/python3.13', '-m', 'pip', 'install', 'schedule>=1.2.0']' returned non-zero exit status 1.
+2025-07-31 13:42:34,938 - SystemLauncher - INFO - Dependencies installation completed
+2025-07-31 13:42:34,938 - SystemLauncher - ERROR - Missing required environment variables: ['INFURA_API_KEY', 'DEFAULT_BTC_ADDRESS', 'DEFAULT_ETH_ADDRESS']
+2025-07-31 13:42:34,938 - SystemLauncher - ERROR - Please ensure all required variables are set in ~/.zshrc
+2025-07-31 13:42:34,938 - SystemLauncher - ERROR - Environment validation failed. Please check your ~/.zshrc configuration.
+2025-07-31 13:42:34,938 - SystemLauncher - INFO - Stopping Skyscope Sentinel Intelligence...
+2025-07-31 13:42:34,939 - SystemLauncher - INFO - Backup created: backups/backup_20250731_134234
+2025-07-31 13:42:34,940 - SystemLauncher - INFO - System stopped successfully

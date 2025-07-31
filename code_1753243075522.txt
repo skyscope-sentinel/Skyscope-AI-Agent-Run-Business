@@ -1,6 +1,0 @@
-SyntaxError:invalid decimal literal (3261881032.py, line 263)
-  Cell In[17], line 263
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                  ^
-SyntaxError: invalid decimal literal
-
