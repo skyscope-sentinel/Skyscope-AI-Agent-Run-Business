@@ -1,0 +1,82 @@
+{
+  "running": true,
+  "business_name": "Skyscope Sentinel Intelligence",
+  "metrics": {
+    "total_agents": 50,
+    "active_agents": 0,
+    "total_income_usd": 0.0,
+    "daily_income_usd": 0.0,
+    "success_rate": 0.0,
+    "uptime_hours": 1.715189880794949e-05,
+    "last_transfer_amount": 0.0,
+    "last_transfer_time": ""
+  },
+  "top_agents": [
+    {
+      "agent_id": "agent_24d6f1b5",
+      "status": "AgentStatus.ERROR",
+      "total_income": 0.0,
+      "tasks_completed": 1,
+      "success_rate": 0.0,
+      "last_activity": "2025-07-31T13:47:41.600625",
+      "strategy": "IncomeStrategy.CRYPTO_TRADING",
+      "performance_score": 0.0
+    },
+    {
+      "agent_id": "agent_79e48eca",
+      "status": "AgentStatus.ERROR",
+      "total_income": 0.0,
+      "tasks_completed": 1,
+      "success_rate": 0.0,
+      "last_activity": "2025-07-31T13:47:41.601338",
+      "strategy": "IncomeStrategy.MEV_BOTS",
+      "performance_score": 0.0
+    },
+    {
+      "agent_id": "agent_4e141767",
+      "status": "AgentStatus.ERROR",
+      "total_income": 0.0,
+      "tasks_completed": 1,
+      "success_rate": 0.0,
+      "last_activity": "2025-07-31T13:47:41.601881",
+      "strategy": "IncomeStrategy.NFT_GENERATION",
+      "performance_score": 0.0
+    },
+    {
+      "agent_id": "agent_88f5a763",
+      "status": "AgentStatus.ERROR",
+      "total_income": 0.0,
+      "tasks_completed": 1,
+      "success_rate": 0.0,
+      "last_activity": "2025-07-31T13:47:41.602451",
+      "strategy": "IncomeStrategy.FREELANCE_WORK",
+      "performance_score": 0.0
+    },
+    {
+      "agent_id": "agent_b851605b",
+      "status": "AgentStatus.ERROR",
+      "total_income": 0.0,
+      "tasks_completed": 1,
+      "success_rate": 0.0,
+      "last_activity": "2025-07-31T13:47:41.602984",
+      "strategy": "IncomeStrategy.CONTENT_CREATION",
+      "performance_score": 0.0
+    }
+  ],
+  "wallet_balances": {
+    "main_eth": {
+      "balance_eth": 0.0,
+      "balance_usd": 0.0,
+      "address": "0xecadc0c9d0f5c473d51b10d4c9994983cd9d3b8c"
+    },
+    "total_usd": 0.0
+  },
+  "config": {
+    "initial_agents": 50,
+    "max_agents": 200000,
+    "scale_up_threshold": 0.8,
+    "scale_down_threshold": 0.3,
+    "performance_check_interval": 300,
+    "transfer_check_interval": 60
+  }
+}
